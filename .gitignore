@@ -1,5 +1,5 @@
 # production configurations file
-../../../Library/Application Support/JetBrains/PyCharmCE2022.2/scratches/configuration.yaml
+source/group_eq_bot/configurations/configuration.yaml
 
 # hydra executing loggs
 outputs/
