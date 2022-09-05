@@ -1,7 +1,7 @@
 FROM python:3.8-slim
 
-COPY . /who-is-bot
-WORKDIR /who-is-bot
+COPY . /project
+WORKDIR /project
 
 RUN apt-get update \
     && apt-get install -y -u gcc \

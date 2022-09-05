@@ -2,24 +2,24 @@ version: "3.8"
 
 services:
 
-  # WhoIs Telegram Bot
-  who-is-bot:
-    image: who-is-bot:latest
-    container_name: who-is-bot
+  # group-eq-bot stands for registering TG events and writing those into events-database container
+  group-eq-bot:
+    image: group-eq-bot:latest
+    container_name: group-eq-bot
     build:
       context: group_eq_bot
       dockerfile: Dockerfile
     restart: always
     networks:
-      - who-is-network
+      - group-eq-bot-network
 
-  # ElasticSearch stands for EventDB
+  # events-database (ElasticSearch) stands for storing under indexes TG events, TG groups and TG users
   events-database:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
     container_name: events-database
     restart: always
     networks:
-      - who-is-network
+      - group-eq-bot-network
     environment:
       - xpack.security.enabled=false
       - cluster.routing.allocation.disk.threshold_enabled=false
@@ -39,21 +39,21 @@ services:
     ports:
       - "9200:9200"
     depends_on:
-      - who-is-bot
+      - group-eq-bot
 
-  # Kibana stands for EventDB management & fetching | visualising data
+  # events-database-manager (Kibana) stands for UI for managing & fetching | visualising data from events-database (ElasticSearch)
   events-database-manager:
     image: docker.elastic.co/kibana/kibana:7.4.0
     container_name: events-database-manager
     restart: always
     networks:
-      - who-is-network
+      - group-eq-bot-network
     environment:
       - ELASTICSEARCH_HOSTS=http://events-database:9200  # address of elasticsearch docker container which kibana will connect
     ports:
       - "5601:5601"
     depends_on:
-     - who-is-bot
+     - group-eq-bot
      - events-database
 
 volumes:
@@ -61,7 +61,7 @@ volumes:
       driver: local
 
 networks:
-  who-is-network:
+  group-eq-bot-network:
     driver: bridge
     ipam:
       config:

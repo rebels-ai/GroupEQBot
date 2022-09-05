@@ -12,19 +12,32 @@ more `ethical`, `secured`, `targeted` and in general, `wholesome` is a right thi
 
 
 ## Technical Description
-Mainly, `GroupEQBot` bot service stands for: 
-- `validating users`, who aiming to join [telegram group](https://www.telegram-group.com/en/blog/the-difference-between-telegram-groups-and-telegram-channels/) 
-- `capturing and analyzing users behaviour` within [telegram group](https://www.telegram-group.com/en/blog/the-difference-between-telegram-groups-and-telegram-channels/)  
-- `providing analytics` per [telegram group](https://www.telegram-group.com/en/blog/the-difference-between-telegram-groups-and-telegram-channels/) per user
-- `based on employed clustering and classification` ML algorithms, detect suspicious users and contrary, unite users with common interests 
+- Mainly, `GroupEQBot` bot service stands for:
+  - registering & validating & transforming & ingesting incoming Telegram group(S) events    
+  - `validating users`, who aiming to join [telegram group](https://www.telegram-group.com/en/blog/the-difference-between-telegram-groups-and-telegram-channels/) 
+  - `capturing and analyzing users behaviour` within [telegram group](https://www.telegram-group.com/en/blog/the-difference-between-telegram-groups-and-telegram-channels/)  
+  - `providing analytics` per [telegram group](https://www.telegram-group.com/en/blog/the-difference-between-telegram-groups-and-telegram-channels/) per user
+  - `based on employed clustering and classification` ML algorithms, detect suspicious users and contrary, unite users with common interests
+
+- Registered by `GroupEQBot` Telegram groups events are ingested in and managed with:
+  - ElasticSearch (stands for storing `events`, `users` and `groups` data)
+  - Kibana (stands for UI to manage | query | visualise `events`, `users` and `groups` data)
 
 
-## System Design Overview
-``
-Note: system design can vary during development process. 
-``
-![WICB_system_design_overview](https://user-images.githubusercontent.com/97040130/178306103-26cbb0b6-fe38-407c-be79-9434fec6db33.jpg)
 
+## Example
+### User attempts to pass the validation
+
+### General system flow overview
+
+
+## System Configurations
+- There is configurations template file, containing all the system configurations:
+```
+group_eq_bot/configurations/sample.yaml
+```
+
+To set up the system before deploying, navigate to the folder and `create` and `fill` `configuration.yaml`, based on `sample.yaml`:
 
 ## System Deployment
 ``
@@ -33,17 +46,6 @@ From the "source" folder, invoke:
 ```bash
 $ docker-compose up --build --force-recreate
 ```
-
-## Demo Example
-#### New member attempts to pass the validation
-
-`Member passed validation`
-
-https://user-images.githubusercontent.com/37558223/185430821-7f63f561-2e57-453f-b44f-a815348fcf92.mp4
-
-`Member failed validation`
-
-https://user-images.githubusercontent.com/37558223/185430839-3f5d6fc0-92b7-47c0-b134-a6cdcf6a380a.mp4
 
 
 ## Licence
