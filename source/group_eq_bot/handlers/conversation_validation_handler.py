@@ -137,13 +137,13 @@ class Validator:
         if await ConversationValidatorHelpers(event=event, context=context).check_if_chat_owner():
             logger.info(f'User, who talks with bot: {event.message.from_user.full_name}')
 
-            await event.message.reply_text('You are owner ! No need to validate yourself ^_^ ')
+            await event.message.reply_text(text='You are the owner! No need to validate yourself ^_^ ')
             return ConversationStates.FINISH_CONVERSATION_STATE.value
 
         else:
             logger.info(f'User, who talks with bot: {event.message.from_user.full_name}')
             await event.message.reply_voice(voice=open(configurations.validation.questions_paths.first, 'rb'),
-                                            reply_markup=ForceReply())
+                                            reply_markup=ForceReply(selective=True))
             return ConversationStates.SECOND_QUESTION_STATE.value
 
     @staticmethod
@@ -156,7 +156,7 @@ class Validator:
 
         if validated_reply is True:
             await event.message.reply_voice(voice=open(configurations.validation.questions_paths.second, 'rb'),
-                                            reply_markup=ForceReply())
+                                            reply_markup=ForceReply(selective=True))
             return ConversationStates.THIRD_QUESTION_STATE.value
 
         else:
@@ -183,7 +183,7 @@ class Validator:
 
         if validated_reply is True:
             await event.message.reply_voice(voice=open(configurations.validation.questions_paths.third, 'rb'),
-                                            reply_markup=ForceReply())
+                                            reply_markup=ForceReply(selective=True))
             return ConversationStates.FOURTH_QUESTION_STATE.value
 
         else:
@@ -210,7 +210,7 @@ class Validator:
 
         if validated_reply is True:
             await event.message.reply_voice(voice=open(configurations.validation.questions_paths.fourth, 'rb'),
-                                            reply_markup=ForceReply())
+                                            reply_markup=ForceReply(selective=True))
             return ConversationStates.GOODBYE_STATE.value
 
         else:
@@ -261,7 +261,7 @@ class Validator:
 
         logger.info(f'User who canceled conversation: {event.message.from_user.full_name}')
         await event.message.reply_text(text=" To try again type '/start' ",
-                                       reply_markup=ForceReply())
+                                       reply_markup=ForceReply(selective=True))
 
         return ConversationStates.FINISH_CONVERSATION_STATE.value
 
