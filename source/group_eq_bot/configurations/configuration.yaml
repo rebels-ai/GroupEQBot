@@ -1,0 +1,22 @@
+administration:
+  token: 5366972505:AAEfkPDD6eeBJHAF7e201_j3cM7vWO0cPVQ
+  name: group_eq_bot
+  version: 1.0
+validation:
+  limit_of_attempts_to_fail_per_question: 3
+  mathematical_answer: 40
+  questions_paths:
+    first: ${hydra:runtime.cwd}/assets/first_question.m4a
+    second: ${hydra:runtime.cwd}/assets/second_question.m4a
+    third: ${hydra:runtime.cwd}/assets/third_question.m4a
+    fourth: ${hydra:runtime.cwd}/assets/fourth_question.m4a
+    goodbye: ${hydra:runtime.cwd}/assets/say_goodbye.m4a
+events_driven_database:
+  settings:
+    default_number_of_shards: 2
+    default_number_of_replicas: 0
+  indices:
+    template: ${administration.name}-${administration.version}
+  hosts:
+    localhost: 127.0.0.1
+    production: host.docker.internal

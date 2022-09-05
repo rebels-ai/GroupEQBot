@@ -1,0 +1,68 @@
+version: "3.8"
+
+services:
+
+  # WhoIs Telegram Bot
+  who-is-bot:
+    image: who-is-bot:latest
+    container_name: who-is-bot
+    build:
+      context: group_eq_bot
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - who-is-network
+
+  # ElasticSearch stands for EventDB
+  events-database:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+    container_name: events-database
+    restart: always
+    networks:
+      - who-is-network
+    environment:
+      - xpack.security.enabled=false
+      - cluster.routing.allocation.disk.threshold_enabled=false
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - snapshots-elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    depends_on:
+      - who-is-bot
+
+  # Kibana stands for EventDB management & fetching | visualising data
+  events-database-manager:
+    image: docker.elastic.co/kibana/kibana:7.4.0
+    container_name: events-database-manager
+    restart: always
+    networks:
+      - who-is-network
+    environment:
+      - ELASTICSEARCH_HOSTS=http://events-database:9200  # address of elasticsearch docker container which kibana will connect
+    ports:
+      - "5601:5601"
+    depends_on:
+     - who-is-bot
+     - events-database
+
+volumes:
+    snapshots-elasticsearch:
+      driver: local
+
+networks:
+  who-is-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.136.0.0/24
