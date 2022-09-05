@@ -1,0 +1,2 @@
+And the last:
+What would be the result of the expression 23 + 17 ?

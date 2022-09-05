@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from io import BufferedReader
 from typing import Union
 
 from hydra import compose, initialize
@@ -125,6 +126,26 @@ class ConversationValidatorHelpers:
         await self.context.bot.ban_chat_member(chat_id=self.event.message.chat.id,
                                                user_id=self.event.message.from_user.id)
 
+    @staticmethod
+    def load_question(question) -> Union[str, BufferedReader]:
+        """ Function, which loads question from with hydra """
+        if str(configurations.validation.questions_paths[question]).endswith('.txt'):
+            with open(configurations.validation.questions_paths[question], 'rt') as file:
+                question = file.read()
+        else:
+            question = open(configurations.validation.questions_paths[question], 'rb')
+        return question
+
+    @staticmethod
+    async def reply(event: TelegramEvent, question, need_answer=True):
+        """ call reply txt or audio depending on what messae in configs """
+        if isinstance(question, str):
+            await event.message.reply_text(text=question, reply_markup=ForceReply(selective=True) if need_answer == True else None)
+        elif isinstance(question, BufferedReader):
+            await event.message.reply_voice(voice=question, reply_markup=ForceReply(selective=True))
+        else:
+            logger.warning('Question assets must be text or audio files')
+
 
 @dataclass
 class Validator:
@@ -142,8 +163,9 @@ class Validator:
 
         else:
             logger.info(f'User, who talks with bot: {event.message.from_user.full_name}')
-            await event.message.reply_voice(voice=open(configurations.validation.questions_paths.first, 'rb'),
-                                            reply_markup=ForceReply(selective=True))
+
+            question = ConversationValidatorHelpers.load_question('first')
+            await ConversationValidatorHelpers.reply(event=event, question=question)
             return ConversationStates.SECOND_QUESTION_STATE.value
 
     @staticmethod
@@ -155,8 +177,9 @@ class Validator:
         validated_reply = ConversationValidatorHelpers(event=event, context=context).validate_reply(reply=reply)
 
         if validated_reply is True:
-            await event.message.reply_voice(voice=open(configurations.validation.questions_paths.second, 'rb'),
-                                            reply_markup=ForceReply(selective=True))
+
+            question = ConversationValidatorHelpers.load_question('second')
+            await ConversationValidatorHelpers.reply(event=event, question=question)
             return ConversationStates.THIRD_QUESTION_STATE.value
 
         else:
@@ -182,8 +205,8 @@ class Validator:
         validated_reply = ConversationValidatorHelpers(event=event, context=context).validate_reply(reply=reply)
 
         if validated_reply is True:
-            await event.message.reply_voice(voice=open(configurations.validation.questions_paths.third, 'rb'),
-                                            reply_markup=ForceReply(selective=True))
+            question = ConversationValidatorHelpers.load_question('third')
+            await ConversationValidatorHelpers.reply(event=event, question=question)
             return ConversationStates.FOURTH_QUESTION_STATE.value
 
         else:
@@ -209,8 +232,8 @@ class Validator:
         validated_reply = ConversationValidatorHelpers(event=event, context=context).validate_reply(reply=reply)
 
         if validated_reply is True:
-            await event.message.reply_voice(voice=open(configurations.validation.questions_paths.fourth, 'rb'),
-                                            reply_markup=ForceReply(selective=True))
+            question = ConversationValidatorHelpers.load_question('fourth')
+            await ConversationValidatorHelpers.reply(event=event, question=question)
             return ConversationStates.GOODBYE_STATE.value
 
         else:
@@ -237,7 +260,8 @@ class Validator:
             validate_reply(reply=reply, mathematical_question=True)
 
         if validated_reply is True:
-            await event.message.reply_voice(voice=open(configurations.validation.questions_paths.goodbye, 'rb'))
+            question = ConversationValidatorHelpers.load_question('goodbye')
+            await ConversationValidatorHelpers.reply(event=event, question=question, need_answer=False)
             await ConversationValidatorHelpers(event=event, context=context).disable_restrictions_for_validated_member()
             return ConversationStates.FINISH_CONVERSATION_STATE.value
 
