@@ -3,12 +3,12 @@ import hydra
 from typing import Union, Any
 from telegram.ext import ApplicationBuilder, Application
 
-from interfaces.telegram_event_handlers.chat_member_handler import MemberHandler
-from interfaces.telegram_event_handlers.text_message_handler import TextMessageHandler
-from interfaces.telegram_event_handlers.video_message_handler import VideoMessageHandler
-from interfaces.telegram_event_handlers.audio_message_handler import AudioMessageHandler
-from interfaces.telegram_event_handlers.document_message_handler import DocumentMessageHandler
-from interfaces.telegram_event_handlers.conversation_validation_handler import ConversationValidatorHandler
+from interfaces.telegram_event_handlers.chat_members.handler import MemberHandler
+from interfaces.telegram_event_handlers.messages.text.handler import TextMessageHandler
+from interfaces.telegram_event_handlers.messages.video.handler import VideoMessageHandler
+from interfaces.telegram_event_handlers.messages.audio.handler import AudioMessageHandler
+from interfaces.telegram_event_handlers.messages.document.handler import DocumentMessageHandler
+from interfaces.telegram_event_handlers.conversations.validation.handler import ConversationValidatorHandler
 
 from utilities.internal_logger.logger import logger
 
