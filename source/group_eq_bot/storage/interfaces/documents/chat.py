@@ -103,12 +103,15 @@ class EventsDatabaseChatInterface:
         chat_type_match = self.chat_type_matches(document=document_from_database)
 
         if not chat_name_match and not chat_type_match:
-            self.document.update(index=self.index,
-                                 detect_noop=False,
-                                 refresh=True,
-                                 doc_as_upsert=True,
-                                 chat_name=self.internal_event.chat_name,
-                                 chat_type=self.internal_event.chat_type)
+
+            connection.update(index=self.index)
+
+            # self.document.update(index=self.index,
+            #                      detect_noop=False,
+            #                      refresh=True,
+            #                      doc_as_upsert=True,
+            #                      chat_name=self.internal_event.chat_name,
+            #                      chat_type=self.internal_event.chat_type)
             return
 
         elif not chat_name_match:
