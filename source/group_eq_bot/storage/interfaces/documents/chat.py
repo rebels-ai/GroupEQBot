@@ -105,11 +105,10 @@ class EventsDatabaseChatInterface:
         chat_type_match = self.chat_type_matches(document=document_from_database)
 
         if not chat_name_match and not chat_type_match:
-            query = UpdateByQuery(using=connection, index=self.index)
-            query = query.script(source=[above query], params={'search_id': addrss, 'answer': upd_addrss)
-            res = ubq.execute ()
-            self.document.chat.chat_name =
-            connection.update(index=self.index)
+
+            connection.update(index=self.index,
+                              id=document_from_database.chat.chat_id,
+                              )
 
             # self.document.update(index=self.index,
             #                      detect_noop=False,
@@ -120,14 +119,18 @@ class EventsDatabaseChatInterface:
             return
 
         elif not chat_name_match:
-            connection.update(index=self.index,
-                              body=self.document)
-
             # self.document.update(index=self.index,
             #                      detect_noop=False,
             #                      refresh=True,
             #                      doc_as_upsert=True,
             #                      chat_name=self.internal_event.chat_name)
+
+            connection.update(index=self.index,
+                              id=document_from_database.chat.chat_id,
+                              body={
+                                "doc": self.document
+                              })
+
             return
 
         elif not chat_type_match:
