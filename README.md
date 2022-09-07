@@ -37,7 +37,15 @@ more `ethical`, `secured`, `targeted` and in general, `wholesome` is a right thi
 group_eq_bot/configurations/sample.yaml
 ```
 
-To set up the system before deploying, navigate to the folder and `create` and `fill` `configuration.yaml`, based on `sample.yaml`:
+To set up the system before deploying, navigate to the configurations folder:
+ - `copy` `sample.yaml` and name it `configuration.yaml`
+```bash
+$ mv sample.yaml configuration.yaml
+```
+ - `fill` `configuration.yaml`
+```bash
+$ nano configuration.yaml
+```
 
 ## System Deployment
 ``
