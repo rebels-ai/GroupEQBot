@@ -2,6 +2,5 @@ python-telegram-bot==20.0a2
 pydantic~=1.9.1
 hydra-core==1.2.0
 elasticsearch-dsl>=7.0.0,<8.0.0
-elasticsearchmappinggenerator==2.0.0
 
 

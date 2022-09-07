@@ -68,6 +68,7 @@ def main(configurations):
 
     pre_validate_bot_token(token=configurations.administration.token)
     bot = build_application(token=configurations.administration.token)
+    add_application_handlers(bot=bot)
     bot.run_polling()
 
 

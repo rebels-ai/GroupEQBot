@@ -10,5 +10,5 @@ configurations = compose(config_name="configuration")
 GlobalHydra.instance().clear()
 
 
-host = configurations.events_driven_database.hosts.production
+host = configurations.events_driven_database.which_host_to_use.host
 connection = connections.create_connection(hosts=[host])

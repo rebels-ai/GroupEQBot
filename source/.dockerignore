@@ -1,3 +1,9 @@
+# production configurations file
+source/group_eq_bot/configurations/configuration.yaml
+
+# hydra executing loggs
+outputs/
+
 __pycache__
 *.pyc
 *.pyo
