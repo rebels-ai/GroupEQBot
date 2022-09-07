@@ -4,12 +4,12 @@ from typing import Optional
 from elasticsearch_dsl import Document
 from elasticsearch.exceptions import NotFoundError
 
-from group_eq_bot.utilities.internal_logger.logger import logger
+from utilities.internal_logger.logger import logger
 
-from group_eq_bot.interfaces.models.internal_event import ExpectedInternalEvent
-from group_eq_bot.storage.schemas.documents.chat import Chat, ChatDocument
+from interfaces.models.internal_event import ExpectedInternalEvent
+from storage.schemas.documents.chat import Chat, ChatDocument
 
-from group_eq_bot.storage.connectors.connector import connection
+from storage.connectors.connector import connection
 
 
 @dataclass

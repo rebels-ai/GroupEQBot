@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from telegram.ext import MessageHandler, filters
 
-from group_eq_bot.interfaces.telegram_event_router.router import route_event
+from interfaces.telegram_event_router.router import route_event
 
 
 @dataclass

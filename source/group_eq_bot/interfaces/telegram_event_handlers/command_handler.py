@@ -3,8 +3,8 @@ from telegram.ext import CommandHandler, ContextTypes
 
 from telegram import Update as TelegramEvent
 
-from group_eq_bot.interfaces.telegram_event_router import route_event
-from group_eq_bot.utilities.internal_logger.logger import logger
+from interfaces.telegram_event_router.router import route_event
+from utilities.internal_logger.logger import logger
 
 
 @dataclass

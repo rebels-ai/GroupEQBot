@@ -8,8 +8,8 @@ from telegram import ForceReply, ChatPermissions
 from telegram import Update as TelegramEvent
 from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, filters, ContextTypes
 
-from group_eq_bot.utilities.internal_logger.logger import logger
-from group_eq_bot.interfaces.models.conversation_handler_states import ConversationStates
+from utilities.internal_logger.logger import logger
+from interfaces.models.conversation_handler_states import ConversationStates
 
 
 # Fetch bot configuration with hydra compose api

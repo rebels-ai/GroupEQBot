@@ -5,14 +5,14 @@ from typing import Optional
 from pydantic import ValidationError
 from telegram import Update as TelegramEvent
 
-from group_eq_bot.interfaces.models.chat import ChatType
-from group_eq_bot.interfaces.models.event import EventType
-from group_eq_bot.interfaces.models.member import MemberStatus
+from interfaces.models.chat import ChatType
+from interfaces.models.event import EventType
+from interfaces.models.member import MemberStatus
 
-from group_eq_bot.interfaces.models.external_event import ExpectedExternalEvent
-from group_eq_bot.interfaces.models.internal_event import ExpectedInternalEvent
+from interfaces.models.external_event import ExpectedExternalEvent
+from interfaces.models.internal_event import ExpectedInternalEvent
 
-from group_eq_bot.utilities.internal_logger.logger import logger
+from utilities.internal_logger.logger import logger
 
 
 @dataclass

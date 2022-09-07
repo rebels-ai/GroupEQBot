@@ -1,13 +1,13 @@
 from telegram.ext import ContextTypes
 from telegram import Update as TelegramEvent
 
-from group_eq_bot.interfaces.models.chat import ChatType
-from group_eq_bot.interfaces.telegram_event_validator.validator import EventValidator
+from interfaces.models.chat import ChatType
+from interfaces.telegram_event_validator.validator import EventValidator
 
-from group_eq_bot.interfaces.telegram_event_processors.public.processor import Processor as PublicEventProcessor
-from group_eq_bot.interfaces.telegram_event_processors.private.processor import Processor as PrivateEventProcessor
+from interfaces.telegram_event_processors.public.processor import Processor as PublicEventProcessor
+from interfaces.telegram_event_processors.private.processor import Processor as PrivateEventProcessor
 
-from group_eq_bot.utilities.internal_logger.logger import logger
+from utilities.internal_logger.logger import logger
 
 CONTEXT_DEFAULT_TYPE = ContextTypes.DEFAULT_TYPE
 

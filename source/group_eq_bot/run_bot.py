@@ -3,14 +3,14 @@ import hydra
 from typing import Union, Any
 from telegram.ext import ApplicationBuilder, Application
 
-from group_eq_bot.interfaces.telegram_event_handlers.chat_member_handler import MemberHandler
-from group_eq_bot.interfaces.telegram_event_handlers.text_message_handler import TextMessageHandler
-from group_eq_bot.interfaces.telegram_event_handlers.video_message_handler import VideoMessageHandler
-from group_eq_bot.interfaces.telegram_event_handlers.audio_message_handler import AudioMessageHandler
-from group_eq_bot.interfaces.telegram_event_handlers.document_message_handler import DocumentMessageHandler
-from group_eq_bot.interfaces.telegram_event_handlers.conversation_validation_handler import ConversationValidatorHandler
+from interfaces.telegram_event_handlers.chat_member_handler import MemberHandler
+from interfaces.telegram_event_handlers.text_message_handler import TextMessageHandler
+from interfaces.telegram_event_handlers.video_message_handler import VideoMessageHandler
+from interfaces.telegram_event_handlers.audio_message_handler import AudioMessageHandler
+from interfaces.telegram_event_handlers.document_message_handler import DocumentMessageHandler
+from interfaces.telegram_event_handlers.conversation_validation_handler import ConversationValidatorHandler
 
-from group_eq_bot.utilities.internal_logger.logger import logger
+from utilities.internal_logger.logger import logger
 
 HYDRA_VERSION = '1.2'
 CONFIGURATIONS_PATH = 'configurations'
