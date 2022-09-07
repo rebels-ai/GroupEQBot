@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from group_eq_bot.routing.validator import EventValidator
+from group_eq_bot.interfaces.telegram_event_router import EventValidator
 from group_eq_bot.tests.data.telegram_fake_events import fake_public_member_event, fake_public_message_event, fake_private_message_event
 
 

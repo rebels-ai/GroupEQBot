@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
 
-  # group-eq-bot stands for registering TG events and writing those into events-database container
+  # group-eq-bot stands for registering TG events and writing those into events-storage container
   group-eq-bot:
     image: group-eq-bot:1.0.0
     container_name: group-eq-bot
@@ -13,16 +13,16 @@ services:
       context: group_eq_bot
       dockerfile: Dockerfile
 
-  # events-database (ElasticSearch) stands for storing under indexes TG events, TG groups and TG users
+  # events-storage (ElasticSearch) stands for storing under indexes TG events, TG groups and TG users
   events-database:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
-    container_name: events-database
+    container_name: events-storage
     restart: always
     networks:
       - group-eq-bot-network
     environment:
       - xpack.security.enabled=false
-      - cluster.routing.allocation.disk.threshold_enabled=false
+      - cluster.telegram_event_router.allocation.disk.threshold_enabled=false
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
@@ -41,25 +41,23 @@ services:
     depends_on:
       - group-eq-bot
 
-  # events-database-manager (Kibana) stands for UI for managing & fetching | visualising data from events-database (ElasticSearch)
+  # events-storage-manager (Kibana) stands for UI for managing & fetching | visualising data from events-storage (ElasticSearch)
   events-database-manager:
     image: docker.elastic.co/kibana/kibana:7.4.0
-    container_name: events-database-manager
+    container_name: events-storage-manager
     restart: always
     networks:
       - group-eq-bot-network
     environment:
-      - ELASTICSEARCH_HOSTS=http://events-database:9200  # address of elasticsearch docker container which kibana will connect
+      - ELASTICSEARCH_HOSTS=http://events-storage:9200  # address of elasticsearch docker container which kibana will connect
     ports:
       - "5601:5601"
     depends_on:
      - group-eq-bot
-     - events-database
+     - events-storage
 
 volumes:
     snapshots-elasticsearch:
-      driver: local
-    snapshots-data-studio:
       driver: local
 
 networks:
