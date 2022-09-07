@@ -26,12 +26,18 @@ class EventsDatabaseChatInterface:
 
     internal_event: ExpectedInternalEvent
     document: ChatDocument = field(init=False)
+    document_id: int = field (init=False)
     index: str = field(init=False)
 
     def __post_init__(self):
         self.document = self.generate_chat_document_model()
+        self.document_id = self.set_document_id()
         # reference to ChatDocument index convention: <bot.configs.name>-<bot.configs.version>-chats-name-id-mappings
         self.index = f'{self.document.Index.name}-{self.INDEX_POSTFIX_CONVENTION}'
+
+    def set_document_id(self) -> int:
+        """ Method to set elasticsearch document id. """
+        return abs(self.internal_event.chat_id)
 
     def generate_chat_model(self) -> Chat:
         """
@@ -62,7 +68,7 @@ class EventsDatabaseChatInterface:
         """
 
         try:
-            data_model = ChatDocument(meta={'id': abs(self.internal_event.chat_id)},
+            data_model = ChatDocument(meta={'id': self.document_id},
                                       chat=self.generate_chat_model())
 
         except Exception as error:
