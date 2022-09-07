@@ -59,8 +59,6 @@ services:
 volumes:
     snapshots-elasticsearch:
       driver: local
-    snapshots-data-studio:
-      driver: local
 
 networks:
   group-eq-bot-network:
