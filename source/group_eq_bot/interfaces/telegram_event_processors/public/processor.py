@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from telegram.ext import ContextTypes
 
-from group_eq_bot.interfaces.models.event import EventType
-from group_eq_bot.interfaces.models.internal_event import ExpectedInternalEvent
+from interfaces.models.event import EventType
+from interfaces.models.internal_event import ExpectedInternalEvent
 
-from group_eq_bot.interfaces.telegram_event_processors.public.message import MessageEventProcessor
-from group_eq_bot.interfaces.telegram_event_processors.public.member import MemberEventProcessor
+from interfaces.telegram_event_processors.public.message import MessageEventProcessor
+from interfaces.telegram_event_processors.public.member import MemberEventProcessor
 
-from group_eq_bot.utilities.internal_logger.logger import logger
+from utilities.internal_logger.logger import logger
 
 
 @dataclass

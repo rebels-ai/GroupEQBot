@@ -4,8 +4,8 @@ from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
 
 from elasticsearch_dsl import Document, InnerDoc, Date, Keyword, Text, Object
-from group_eq_bot.storage.schemas.documents.chat import Chat
-from group_eq_bot.storage.schemas.documents.user import User
+from storage.schemas.documents.chat import Chat
+from storage.schemas.documents.user import User
 
 
 # Fetch bot configuration with hydra compose api

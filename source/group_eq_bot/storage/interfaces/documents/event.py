@@ -1,13 +1,13 @@
 from dataclasses import dataclass, field
 
-from group_eq_bot.utilities.internal_logger.logger import logger
+from utilities.internal_logger.logger import logger
 
-from group_eq_bot.storage.schemas.documents.chat import Chat
-from group_eq_bot.storage.schemas.documents.user import User
-from group_eq_bot.storage.schemas.documents.event import EventDocument, EventMetadata, Event
-from group_eq_bot.interfaces.models.internal_event import ExpectedInternalEvent
+from storage.schemas.documents.chat import Chat
+from storage.schemas.documents.user import User
+from storage.schemas.documents.event import EventDocument, EventMetadata, Event
+from interfaces.models.internal_event import ExpectedInternalEvent
 
-from group_eq_bot.storage.connectors.connector import connection
+from storage.connectors.connector import connection
 
 
 @dataclass

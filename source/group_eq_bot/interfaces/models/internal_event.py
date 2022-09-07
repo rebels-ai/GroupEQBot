@@ -1,10 +1,10 @@
 from typing import Optional
 from pydantic import BaseModel
 
-from group_eq_bot.interfaces.models.chat import ChatType
-from group_eq_bot.interfaces.models.event import EventType
-from group_eq_bot.interfaces.models.member import MemberStatus
-from group_eq_bot.interfaces.models.external_event import ExpectedExternalEvent
+from interfaces.models.chat import ChatType
+from interfaces.models.event import EventType
+from interfaces.models.member import MemberStatus
+from interfaces.models.external_event import ExpectedExternalEvent
 
 
 class ExpectedInternalEvent(BaseModel):

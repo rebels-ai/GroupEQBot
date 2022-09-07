@@ -7,23 +7,13 @@ from hydra.core.global_hydra import GlobalHydra
 from telegram import Update as TelegramEvent
 from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, filters, ContextTypes
 
-<<<<<<< HEAD:source/group_eq_bot/telegram_handlers/conversations/validation/handler.py
-from internal_logger.logger import logger
-from models.conversation_handler_states import ConversationStates
-from telegram_handlers.conversations.validation.helpers import ConversationValidatorHelpers
-=======
-from group_eq_bot.utilities.internal_logger.logger import logger
-from group_eq_bot.interfaces.models.conversation_handler_states import ConversationStates
->>>>>>> 0b8149e (fix/elasticsearch-update-method-resolving, revamped the codebase structure for further usecases.):source/group_eq_bot/interfaces/telegram_event_handlers/conversation_validation_handler.py
-
+from utilities.internal_logger.logger import logger
+from interfaces.models.conversation_handler_states import ConversationStates
+from telegram_event_handlers.conversations.validation.helpers import ConversationValidatorHelpers
 
 # Fetch bot configuration with hydra compose api
 # https://hydra.cc/docs/advanced/compose_api/
-<<<<<<< HEAD:source/group_eq_bot/telegram_handlers/conversations/validation/handler.py
-initialize(version_base="1.2", config_path="../../../configurations", job_name="conversation_validation_handler")
-=======
 initialize(version_base="1.2", config_path="../../configurations", job_name="conversation_validation_handler")
->>>>>>> 0b8149e (fix/elasticsearch-update-method-resolving, revamped the codebase structure for further usecases.):source/group_eq_bot/interfaces/telegram_event_handlers/conversation_validation_handler.py
 configurations = compose(config_name="configuration")
 GlobalHydra.instance().clear()
 

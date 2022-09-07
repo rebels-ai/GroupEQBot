@@ -3,14 +3,14 @@ from dataclasses import dataclass, field
 from telegram.ext import ContextTypes
 from telegram import ChatPermissions
 
-from group_eq_bot.interfaces.models.member import MemberStatus
-from group_eq_bot.interfaces.models.internal_event import ExpectedInternalEvent
+from interfaces.models.member import MemberStatus
+from interfaces.models.internal_event import ExpectedInternalEvent
 
-from group_eq_bot.storage.interfaces.documents.user import EventsDatabaseUserInterface
-from group_eq_bot.storage.interfaces.documents.chat import EventsDatabaseChatInterface
-from group_eq_bot.storage.interfaces.documents.event import EventsDatabaseEventInterface
+from storage.interfaces.documents.user import EventsDatabaseUserInterface
+from storage.interfaces.documents.chat import EventsDatabaseChatInterface
+from storage.interfaces.documents.event import EventsDatabaseEventInterface
 
-from group_eq_bot.utilities.internal_logger.logger import logger
+from utilities.internal_logger.logger import logger
 
 
 @dataclass

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from telegram.ext import ContextTypes
 
-from group_eq_bot.interfaces.models.internal_event import ExpectedInternalEvent
-from group_eq_bot.utilities.internal_logger.logger import logger
+from interfaces.models.internal_event import ExpectedInternalEvent
+from utilities.internal_logger.logger import logger
 
 
 @dataclass
