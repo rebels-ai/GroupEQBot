@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
-from elasticsearch_dsl import Document
+from elasticsearch_dsl import Document, UpdateByQuery
 from elasticsearch.exceptions import NotFoundError
 
 from utilities.internal_logger.logger import logger
@@ -94,6 +94,8 @@ class EventsDatabaseChatInterface:
 
         logger.info(f'[EventsDatabaseChatInterface] INDEX NAME -- {self.index} ')
 
+        # either index does not exist at all
+        # or document does not exist
         document_from_database = self.get_document_from_index()
         if document_from_database is None:
             self.document.save(index=self.index)
@@ -103,7 +105,10 @@ class EventsDatabaseChatInterface:
         chat_type_match = self.chat_type_matches(document=document_from_database)
 
         if not chat_name_match and not chat_type_match:
-
+            query = UpdateByQuery(using=connection, index=self.index)
+            query = query.script(source=[above query], params={'search_id': addrss, 'answer': upd_addrss)
+            res = ubq.execute ()
+            self.document.chat.chat_name =
             connection.update(index=self.index)
 
             # self.document.update(index=self.index,
@@ -115,11 +120,14 @@ class EventsDatabaseChatInterface:
             return
 
         elif not chat_name_match:
-            self.document.update(index=self.index,
-                                 detect_noop=False,
-                                 refresh=True,
-                                 doc_as_upsert=True,
-                                 chat_name=self.internal_event.chat_name)
+            connection.update(index=self.index,
+                              body=self.document)
+
+            # self.document.update(index=self.index,
+            #                      detect_noop=False,
+            #                      refresh=True,
+            #                      doc_as_upsert=True,
+            #                      chat_name=self.internal_event.chat_name)
             return
 
         elif not chat_type_match:
