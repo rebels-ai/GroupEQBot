@@ -22,7 +22,7 @@ class EventsDatabaseUserInterface:
             "index is dynamically generated as" - <bot.configs.name>-<bot.configs.version>-user-chatID-userID
     """
 
-    DOCUMENT_KEY = "doc"
+    DOCUMENT_KEY = "doc"  # required elasticsearch document (inside index) key, to find body for update method
 
     internal_event: ExpectedInternalEvent
     document: UserDocument = field(init=False)
@@ -30,8 +30,8 @@ class EventsDatabaseUserInterface:
     index: str = field(init=False)
 
     def __post_init__(self):
-        self.document = self.generate_user_document_model()
         self.document_id = self.set_document_id()
+        self.document = self.generate_user_document_model()
         # reference to UserDocument index convention: <bot.configs.name>-<bot.configs.version>-user-chatID-userID
         self.index = f'{self.document.Index.name}-{abs(self.internal_event.chat_id)}-{self.internal_event.user_id}'
 

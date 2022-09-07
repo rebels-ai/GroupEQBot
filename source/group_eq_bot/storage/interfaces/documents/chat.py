@@ -23,6 +23,7 @@ class EventsDatabaseChatInterface:
     """
 
     INDEX_POSTFIX_CONVENTION = 'chats-name-id-mappings'
+    DOCUMENT_KEY = "doc"  # required elasticsearch document (inside index) key, to find body for update method
 
     internal_event: ExpectedInternalEvent
     document: ChatDocument = field(init=False)
@@ -30,8 +31,8 @@ class EventsDatabaseChatInterface:
     index: str = field(init=False)
 
     def __post_init__(self):
-        self.document = self.generate_chat_document_model()
         self.document_id = self.set_document_id()
+        self.document = self.generate_chat_document_model()
         # reference to ChatDocument index convention: <bot.configs.name>-<bot.configs.version>-chats-name-id-mappings
         self.index = f'{self.document.Index.name}-{self.INDEX_POSTFIX_CONVENTION}'
 
