@@ -23,6 +23,7 @@ class EventsDatabaseChatInterface:
     """
 
     INDEX_POSTFIX_CONVENTION = 'chats-name-id-mappings'
+    DOCUMENT_KEY = "doc"
 
     internal_event: ExpectedInternalEvent
     document: ChatDocument = field(init=False)
@@ -104,38 +105,10 @@ class EventsDatabaseChatInterface:
         chat_name_match = self.chat_name_matches(document=document_from_database)
         chat_type_match = self.chat_type_matches(document=document_from_database)
 
-        if not chat_name_match and not chat_type_match:
-            query = UpdateByQuery(using=connection, index=self.index)
-            query = query.script(source=[above query], params={'search_id': addrss, 'answer': upd_addrss)
-            res = ubq.execute ()
-            self.document.chat.chat_name =
-            connection.update(index=self.index)
-
-            # self.document.update(index=self.index,
-            #                      detect_noop=False,
-            #                      refresh=True,
-            #                      doc_as_upsert=True,
-            #                      chat_name=self.internal_event.chat_name,
-            #                      chat_type=self.internal_event.chat_type)
-            return
-
-        elif not chat_name_match:
+        if not chat_name_match or not chat_type_match:
             connection.update(index=self.index,
-                              body=self.document)
-
-            # self.document.update(index=self.index,
-            #                      detect_noop=False,
-            #                      refresh=True,
-            #                      doc_as_upsert=True,
-            #                      chat_name=self.internal_event.chat_name)
-            return
-
-        elif not chat_type_match:
-            self.document.update(index=self.index,
-                                 detect_noop=False,
-                                 refresh=True,
-                                 doc_as_upsert=True,
-                                 chat_type=self.internal_event.chat_type)
+                              id=document_from_database.chat.chat_id,
+                              body={self.DOCUMENT_KEY: self.document})
             return
 
         return
