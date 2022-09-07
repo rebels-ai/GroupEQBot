@@ -9,12 +9,12 @@ from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, fi
 
 from utilities.internal_logger.logger import logger
 from interfaces.models.conversation_handler_states import ConversationStates
-from telegram_event_handlers.conversations.validation.helpers import ConversationValidatorHelpers
+from interfaces.telegram_event_handlers.conversations.validation.helpers import ConversationValidatorHelpers
 
 
 # Fetch bot configuration with hydra compose api
 # https://hydra.cc/docs/advanced/compose_api/
-initialize(version_base="1.2", config_path="../../../configurations", job_name="conversation_validation_handler")
+initialize(version_base="1.2", config_path="../../../../configurations", job_name="conversation_validation_handler")
 configurations = compose(config_name="configuration")
 GlobalHydra.instance().clear()
 

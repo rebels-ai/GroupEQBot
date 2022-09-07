@@ -9,12 +9,12 @@ from telegram import ChatPermissions
 from telegram import Update as TelegramEvent
 from telegram.ext import ContextTypes
 
-from internal_logger.logger import logger
+from utilities.internal_logger.logger import logger
 
 
 # Fetch bot configuration with hydra compose api
 # https://hydra.cc/docs/advanced/compose_api/
-initialize(version_base="1.2", config_path="../../../configurations", job_name="conversation_validation_handler")
+initialize(version_base="1.2", config_path="../../../../configurations", job_name="conversation_validation_handler")
 configurations = compose(config_name="configuration")
 GlobalHydra.instance().clear()
 
