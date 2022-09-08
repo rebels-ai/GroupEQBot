@@ -17,6 +17,8 @@ events_driven_database:
     default_number_of_replicas: 0
   indices:
     template: ${administration.name}-${administration.version}
-  hosts:
+  available_hosts:
     localhost: 127.0.0.1
-    production: host.docker.internal
+    container: host.docker.internal
+  which_host_to_use:
+    host: ${events_driven_database.available_hosts.localhost}  # is used in source.group_eq_bot.storage.events_driven_database.connectors.connector

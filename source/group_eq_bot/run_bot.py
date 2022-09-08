@@ -3,14 +3,14 @@ import hydra
 from typing import Union, Any
 from telegram.ext import ApplicationBuilder, Application
 
-from handlers.chat_member_handler import MemberHandler
-from handlers.text_message_handler import TextMessageHandler
-from handlers.video_message_handler import VideoMessageHandler
-from handlers.audio_message_handler import AudioMessageHandler
-from handlers.document_message_handler import DocumentMessageHandler
-from handlers.conversation_validation_handler import ConversationValidatorHandler
+from interfaces.telegram_event_handlers.chat_member_handler import MemberHandler
+from interfaces.telegram_event_handlers.text_message_handler import TextMessageHandler
+from interfaces.telegram_event_handlers.video_message_handler import VideoMessageHandler
+from interfaces.telegram_event_handlers.audio_message_handler import AudioMessageHandler
+from interfaces.telegram_event_handlers.document_message_handler import DocumentMessageHandler
+from interfaces.telegram_event_handlers.conversation_validation_handler import ConversationValidatorHandler
 
-from internal_logger.logger import logger
+from utilities.internal_logger.logger import logger
 
 HYDRA_VERSION = '1.2'
 CONFIGURATIONS_PATH = 'configurations'
@@ -52,7 +52,7 @@ def build_application(token: str) -> Union[Application, TypeError]:
 
 
 def add_application_handlers(bot: Application) -> None:
-    """ Helper method, which adds handlers to TelegramBot Application. """
+    """ Helper method, which adds telegram_event_handlers to TelegramBot Application. """
 
     bot.add_handler(ConversationValidatorHandler)
     bot.add_handler(MemberHandler.handler)
@@ -68,6 +68,7 @@ def main(configurations):
 
     pre_validate_bot_token(token=configurations.administration.token)
     bot = build_application(token=configurations.administration.token)
+    add_application_handlers(bot=bot)
     bot.run_polling()
 
 
