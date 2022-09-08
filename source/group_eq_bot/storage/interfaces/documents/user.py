@@ -83,15 +83,15 @@ class EventsDatabaseUserInterface:
 
     def user_first_name_matches(self, document: Document) -> bool:
         """ Function, which checks whether EventUserFirstName equals DocumentUserFirstName. """
-        return True if document.user.first_name == self.internal_event.first_name else False
+        return True if self.internal_event.first_name in document.user.first_name else False
 
     def user_last_name_matches(self, document: Document) -> bool:
         """ Function, which checks whether EventUserLastName equals DocumentUserLastName. """
-        return True if document.user.last_name == self.internal_event.last_name else False
+        return True if self.internal_event.last_name in document.user.last_name else False
 
     def username_matches(self, document: Document) -> bool:
         """ Function, which checks whether EventUsername equals DocumentUsername. """
-        return True if document.user.username == self.internal_event.username else False
+        return True if self.internal_event.username in document.user.username else False
 
     def process(self):
         """ Entrypoint to EventsDatabaseUserInterface, holding the main logic. """
@@ -109,15 +109,30 @@ class EventsDatabaseUserInterface:
         change_happened = False
         if not self.user_first_name_matches(document=document_from_database):
             change_happened = True
-            document_from_database.user.first_name.append(self.document.user.first_name)
+            registered_first_names = document_from_database.user.first_name
+
+            if isinstance(registered_first_names, str):
+                document_from_database.user.first_name = [document_from_database.user.first_name, self.document.user.first_name]
+            else:
+                document_from_database.user.first_name.append(self.document.user.first_name) 
 
         if not self.user_last_name_matches(document=document_from_database):
             change_happened = True
-            document_from_database.user.last_name.append(self.document.user.last_name)
+            registered_last_names = document_from_database.user.last_name
+
+            if isinstance(registered_last_names, str):
+                document_from_database.user.last_name = [document_from_database.user.last_name, self.document.user.last_name]
+            else:
+                document_from_database.user.last_name.append(self.document.user.last_name)
 
         if not self.username_matches(document=document_from_database):
             change_happened = True
-            document_from_database.user.username.append (self.document.user.username)
+            registered_usernames = document_from_database.user.username
+
+            if isinstance(registered_usernames, str):
+                document_from_database.user.username = [document_from_database.user.username, self.document.user.username]
+            else:
+                document_from_database.user.username.append(self.document.user.username)
 
         if change_happened:
             connection.update(index=self.index,
