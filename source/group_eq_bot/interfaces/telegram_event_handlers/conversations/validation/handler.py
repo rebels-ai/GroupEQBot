@@ -39,8 +39,7 @@ class Validator:
         else:
             logger.info(f'User, who talks with bot: {event.message.from_user.full_name}')
 
-            question = ConversationValidatorHelpers.load_question('first')
-            await ConversationValidatorHelpers.reply(event=event, question=question)
+            await ConversationValidatorHelpers.reply_question(event=event, question_number='first')
             return ConversationStates.SECOND_QUESTION_STATE.value
 
     @staticmethod
@@ -53,8 +52,7 @@ class Validator:
 
         if validated_reply is True:
 
-            question = ConversationValidatorHelpers.load_question('second')
-            await ConversationValidatorHelpers.reply(event=event, question=question)
+            await ConversationValidatorHelpers.reply_question(event=event, question_number='second')
             return ConversationStates.THIRD_QUESTION_STATE.value
 
         else:
@@ -80,8 +78,7 @@ class Validator:
         validated_reply = ConversationValidatorHelpers(event=event, context=context).validate_reply(reply=reply)
 
         if validated_reply is True:
-            question = ConversationValidatorHelpers.load_question('third')
-            await ConversationValidatorHelpers.reply(event=event, question=question)
+            await ConversationValidatorHelpers.reply_question(event=event, question_number='third')
             return ConversationStates.FOURTH_QUESTION_STATE.value
 
         else:
@@ -107,8 +104,7 @@ class Validator:
         validated_reply = ConversationValidatorHelpers(event=event, context=context).validate_reply(reply=reply)
 
         if validated_reply is True:
-            question = ConversationValidatorHelpers.load_question('fourth')
-            await ConversationValidatorHelpers.reply(event=event, question=question)
+            await ConversationValidatorHelpers.reply_question(event=event, question_number='fourth')
             return ConversationStates.GOODBYE_STATE.value
 
         else:
@@ -135,8 +131,7 @@ class Validator:
             validate_reply(reply=reply, mathematical_question=True)
 
         if validated_reply is True:
-            question = ConversationValidatorHelpers.load_question('goodbye')
-            await ConversationValidatorHelpers.reply(event=event, question=question)
+            await ConversationValidatorHelpers.reply_question(event=event, question_number='goodbye')
             await ConversationValidatorHelpers(event=event, context=context).disable_restrictions_for_validated_member()
             return ConversationStates.FINISH_CONVERSATION_STATE.value
 

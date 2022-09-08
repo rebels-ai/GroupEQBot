@@ -10,7 +10,7 @@ from telegram import Update as TelegramEvent
 from telegram.ext import ContextTypes
 
 from utilities.internal_logger.logger import logger
-
+from interfaces.telegram_event_handlers.conversations.validation.reader import Reader
 
 # Fetch bot configuration with hydra compose api
 # https://hydra.cc/docs/advanced/compose_api/
@@ -126,18 +126,11 @@ class ConversationValidatorHelpers:
                                                user_id=self.event.message.from_user.id)
 
     @staticmethod
-    def load_question(question) -> Union[str, BufferedReader]:
-        """ Function, which loads question from with hydra """
-        if str(configurations.validation.questions_paths[question]).endswith('.txt'):
-            with open(configurations.validation.questions_paths[question], 'rt') as file:
-                question = file.read()
-        else:
-            question = open(configurations.validation.questions_paths[question], 'rb')
-        return question
+    async def reply_question(event: TelegramEvent, question_number: str):
+        """ Function, which will call reply text or audio depending on question extension."""
 
-    @staticmethod
-    async def reply(event: TelegramEvent, question):
-        """ Function, which will call reply text or audio depending on question loaded. """
+        question = Reader(configurations.validation.questions_paths[question_number]).read_question_file()
+
         if isinstance(question, str):
             await event.message.reply_text(text=question)
         elif isinstance(question, BufferedReader):
