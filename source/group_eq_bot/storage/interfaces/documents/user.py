@@ -3,7 +3,6 @@ from typing import Optional
 
 from elasticsearch_dsl import Document
 from elasticsearch.exceptions import NotFoundError
-
 from utilities.internal_logger.logger import logger
 
 from interfaces.models.internal_event import ExpectedInternalEvent
@@ -99,21 +98,30 @@ class EventsDatabaseUserInterface:
 
         logger.info(f'[EventsDatabaseUserInterface] INDEX NAME -- {self.index} ')
 
-        # either index does not exist at all
-        # or document does not exist
+        # either index does not exist at all or document with self.internal_event.user_id does not exist
         document_from_database = self.get_document_from_index()
         if document_from_database is None:
             self.document.save(index=self.index)
             return
-        
-        first_name_match = self.user_first_name_matches(document=document_from_database)
-        last_name_match = self.user_last_name_matches(document=document_from_database)
-        username_match = self.username_matches(document=document_from_database)
 
-        if not first_name_match or not last_name_match or not username_match:
+        # check if first_name | last_name | username has changed
+        # if yes, update certain field for read document from database
+        change_happened = False
+        if not self.user_first_name_matches(document=document_from_database):
+            change_happened = True
+            document_from_database.user.first_name.append(self.document.user.first_name)
+
+        if not self.user_last_name_matches(document=document_from_database):
+            change_happened = True
+            document_from_database.user.last_name.append(self.document.user.last_name)
+
+        if not self.username_matches(document=document_from_database):
+            change_happened = True
+            document_from_database.user.username.append (self.document.user.username)
+
+        if change_happened:
             connection.update(index=self.index,
                               id=self.document_id,
-                              body={self.DOCUMENT_KEY: self.document})
-            return
-
+                              body={self.DOCUMENT_KEY: document_from_database})
         return
+
