@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from io import BufferedReader
-from typing import Union
 
 from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
@@ -10,7 +9,7 @@ from telegram import Update as TelegramEvent
 from telegram.ext import ContextTypes
 
 from utilities.internal_logger.logger import logger
-from interfaces.telegram_event_handlers.conversations.validation.reader import Reader
+from utilities.driver.local.reader import Reader
 
 # Fetch bot configuration with hydra compose api
 # https://hydra.cc/docs/advanced/compose_api/
@@ -127,13 +126,13 @@ class ConversationValidatorHelpers:
 
     @staticmethod
     async def reply_question(event: TelegramEvent, question_number: str):
-        """ Function, which will call reply text or audio depending on question extension."""
+        """ Function, which will call reply text or voice depending on question extension."""
 
-        question = Reader(configurations.validation.questions_paths[question_number]).read_question_file()
+        question = Reader(configurations.validation.questions_paths[question_number]).open()
 
         if isinstance(question, str):
             await event.message.reply_text(text=question)
         elif isinstance(question, BufferedReader):
             await event.message.reply_voice(voice=question)
         else:
-            logger.warning('Question assets must be text or audio files')
+            logger.info('File read is not the text nor audio')

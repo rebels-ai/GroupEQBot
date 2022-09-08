@@ -1,48 +1,47 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from driver.local.audio.base import BaseAudioReader
-from driver.local.text.base import BaseTextReader
-from driver.models.supported_extensions import  SupportedFilesExtensions
+from utilities.driver.local.audio.base import BaseAudioReader
+from utilities.driver.local.text.base import BaseTextReader
+from utilities.driver.models.supported_extensions import  SupportedFilesExtensions
 
 
 @dataclass
 class Reader:
     path: Path  # full path to a particular file to open
 
-    def check_path_exists(self) -> None:
-        """  """
+    def __post_init__(self) -> None:
+        self.path = Path(self.path)
 
-        try:
-            path_exists = self.path.exists()
-        except NotFoundError:
-            raise f'{self.path} does not exist. Check configurations.'
+    def check_file_existance(self) -> None:
+        """ Function, which checks whether file exist in given path and is a file """
 
-        return 
+        if not self.path.exists():
+            raise FileNotFoundError(f'{self.path} path does not exist')
+        if not self.path.is_file():
+            raise FileNotFoundError(f'{self.path} is not a file')
 
-    def check_file_extension_match_supported_ones(self) -> None:
-        """  """
+    def matches_supported_extensions(self, file_extension) -> None:
+        """ Function, which checks whether file extention mathches supported ones """
 
-        extension = self.path.suffix  # idea to get the extension (without “.”)
-        extension_hits = True if extension in SupportedFilesExtensions else False
-
-        if extension_hits:
-            return 
+        available_extensions = SupportedFilesExtensions.list()
+        if file_extension in available_extensions:
+            return
         else:
-            raise NotFoundError(f'File extension is not supported by the reader. Supported ones are: {SupportedFilesExtensions}')  
+            raise FileNotFoundError(f'File extension is not supported by the reader. Supported ones are: {SupportedFilesExtensions.list()}')  
 
     def get_file_extension(self) -> str:
-        """  """
-        return self.path.suffix  # idea to get the extension (without “.”)
+        """ Function, which returns file extension without dot """
+        return self.path.suffix.replace('.', '')
 
     def open(self):
-        """  """
-        self.check_path_exists()
-        self.check_file_extension_match_supported_ones()
+        """ Function, which opens the file, depending on the extension """
 
+        self.check_file_existance()
         file_extension = self.get_file_extension()
+        self.matches_supported_extensions(file_extension)
 
-        if file_extension == SupportedFilesExtensions.audio:
-            return BaseAudioReader().open(path_to_open=self.path)
+        if file_extension == SupportedFilesExtensions.audio.value:
+            return BaseAudioReader().open(path_to_read=self.path)
         else:
-            return BaseTextReader().open(path_to_open=self.path)
+            return BaseTextReader().open(path_to_read=self.path)
