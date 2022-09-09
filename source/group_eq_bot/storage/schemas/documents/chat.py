@@ -14,8 +14,11 @@ GlobalHydra.instance().clear()
 
 class Chat(InnerDoc):
     chat_id = Long(required=True)
-    chat_name = Text(fields={"keyword": Keyword()}, required=True)
-    chat_type = Text(fields={"keyword": Keyword()}, required=True)
+    chat_name = Text(multi=True, fields={"keyword": Keyword()}, required=True)
+    chat_type = Text(multi=True, fields={"keyword": Keyword()}, required=True)
+
+    # list of user_id -- originally user_id is int type
+    chat_historic_members = Text(multi=True, fields={"keyword": Keyword()}, required=True)
 
 
 class ChatDocument(Document):

@@ -24,13 +24,15 @@ class EventsDatabaseUserInterface:
     DOCUMENT_KEY = "doc"  # required elasticsearch document (inside index) key, to find body for update method
 
     internal_event: ExpectedInternalEvent
-    document: UserDocument = field(init=False)
-    document_id: int = field(init=False)
-    index: str = field(init=False)
+
+    index: str = field(init=False)  # database index name
+    document_id: int = field(init=False)  # database index document id
+    document: UserDocument = field(init=False)  # database index document object
 
     def __post_init__(self):
         self.document_id = self.set_document_id()
         self.document = self.generate_user_document_model()
+
         # reference to UserDocument index convention: <bot.configs.name>-<bot.configs.version>-user-chatID-userID
         self.index = f'{self.document.Index.name}-{abs(self.internal_event.chat_id)}-{self.internal_event.user_id}'
 
@@ -48,7 +50,10 @@ class EventsDatabaseUserInterface:
             data_model = User(user_id=self.internal_event.user_id,
                               first_name=self.internal_event.first_name,
                               last_name=self.internal_event.last_name,
-                              username=self.internal_event.username)
+                              username=self.internal_event.username,
+                              current_status=self.internal_event.new_status,
+                              last_activity=self.internal_event.event_time)
+
         except Exception as error:
             logger.warning('Failed User model generation.')
             raise error
@@ -93,6 +98,10 @@ class EventsDatabaseUserInterface:
         """ Function, which checks whether EventUsername equals DocumentUsername. """
         return True if self.internal_event.username in document.user.username else False
 
+    def user_current_status_matches(self, document: Document) -> bool:
+        """ Function, which checks whether EventUserCurrentStatus equals DocumentUserCurrentStatus. """
+        return True if self.internal_event.new_status in document.user.current_status else False
+
     def process(self):
         """ Entrypoint to EventsDatabaseUserInterface, holding the main logic. """
 
@@ -104,8 +113,8 @@ class EventsDatabaseUserInterface:
             self.document.save(index=self.index)
             return
 
-        # check if first_name | last_name | username has changed
-        # if yes, update certain field for read document from database
+        # check if first_name | last_name | username | current_status has changed
+        # if yes, update certain field for document from database
         change_happened = False
         if not self.user_first_name_matches(document=document_from_database):
             change_happened = True
@@ -134,9 +143,14 @@ class EventsDatabaseUserInterface:
             else:
                 document_from_database.user.username.append(self.document.user.username)
 
+        if not self.user_current_status_matches(document=document_from_database):
+            change_happened = True
+            document_from_database.user.current_status = self.internal_event.new_status
+
         if change_happened:
             connection.update(index=self.index,
                               id=self.document_id,
                               body={self.DOCUMENT_KEY: document_from_database})
         return
+
 
