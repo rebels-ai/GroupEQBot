@@ -11,7 +11,6 @@ from utilities.internal_logger.logger import logger
 from interfaces.models.conversation_handler_states import ConversationStates
 from interfaces.telegram_event_handlers.conversations.validation.helpers import ConversationValidatorHelpers
 
-
 # Fetch bot configuration with hydra compose api
 # https://hydra.cc/docs/advanced/compose_api/
 initialize(version_base="1.2", config_path="../../../../configurations", job_name="conversation_validation_handler")
@@ -30,6 +29,8 @@ class Validator:
     async def invoke_first_question(event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> Union[int, None]:
         """ Function, which holds the logic for 1-st ConversationValidationHandler state. """
 
+        await ConversationValidatorHelpers.validate_and_save_to_event_database(event=event, context=context)
+    
         if await ConversationValidatorHelpers(event=event, context=context).check_if_chat_owner():
             logger.info(f'User, who talks with bot: {event.message.from_user.full_name}')
 
@@ -45,6 +46,8 @@ class Validator:
     @staticmethod
     async def invoke_second_question(event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> Union[int, None]:
         """ Function, which holds the logic for 2-nd ConversationValidationHandler state. """
+
+        await ConversationValidatorHelpers.validate_and_save_to_event_database(event=event, context=context)
 
         logger.info(f'User, who talks with bot: {event.message.from_user.full_name}')
         reply = ConversationValidatorHelpers(event=event, context=context).retrieve_answer_text_from_event()
@@ -73,6 +76,8 @@ class Validator:
     async def invoke_third_question(event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> Union[int, None]:
         """ Function, which holds the logic for 3-rd ConversationValidationHandler state. """
 
+        await ConversationValidatorHelpers.validate_and_save_to_event_database(event=event, context=context)
+
         logger.info(f'User, who talks with bot: {event.message.from_user.full_name}')
         reply = ConversationValidatorHelpers(event=event, context=context).retrieve_answer_text_from_event()
         validated_reply = ConversationValidatorHelpers(event=event, context=context).validate_reply(reply=reply)
@@ -99,6 +104,8 @@ class Validator:
     async def invoke_fourth_question(event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> Union[int, None]:
         """ Function, which holds the logic for 4-th ConversationValidationHandler state. """
 
+        await ConversationValidatorHelpers.validate_and_save_to_event_database(event=event, context=context)
+
         logger.info(f'User, who talks with bot: {event.message.from_user.full_name}')
         reply = ConversationValidatorHelpers(event=event, context=context).retrieve_answer_text_from_event()
         validated_reply = ConversationValidatorHelpers(event=event, context=context).validate_reply(reply=reply)
@@ -124,6 +131,8 @@ class Validator:
     @staticmethod
     async def say_goodbye(event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> Union[int, None]:
         """ Function, which holds the logic for the last ConversationValidationHandler state. """
+
+        await ConversationValidatorHelpers.validate_and_save_to_event_database(event=event, context=context)
 
         logger.info(f'User, who talks with bot: {event.message.from_user.full_name}')
         reply = ConversationValidatorHelpers(event=event, context=context).retrieve_answer_text_from_event()
@@ -152,6 +161,8 @@ class Validator:
     @staticmethod
     async def cancel_conversation(event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> int:
         """ Function, which holds the logic for the /cancel ConversationValidationHandler state. """
+
+        await ConversationValidatorHelpers.validate_and_save_to_event_database(event=event, context=context)
 
         logger.info(f'User who canceled conversation: {event.message.from_user.full_name}')
         await event.message.reply_text(text=" To try again type '/start' ")

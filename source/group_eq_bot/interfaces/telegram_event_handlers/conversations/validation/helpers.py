@@ -9,7 +9,9 @@ from telegram import Update as TelegramEvent
 from telegram.ext import ContextTypes
 
 from utilities.internal_logger.logger import logger
-from utilities.driver.local.reader import Reader
+from driver.local.reader import Reader
+from interfaces.telegram_event_validator.validator import EventValidator
+from interfaces.telegram_event_processors.public.message import MessageEventProcessor
 
 # Fetch bot configuration with hydra compose api
 # https://hydra.cc/docs/advanced/compose_api/
@@ -135,4 +137,15 @@ class ConversationValidatorHelpers:
         elif isinstance(question, BufferedReader):
             await event.message.reply_voice(voice=question)
         else:
-            logger.info('File read is not the text nor audio')
+            logger.info('File read is neither text nor audio')
+
+    async def validate_and_save_to_event_database(event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE):
+        """ Function, responsible for validating incoming TelegramEvent
+            and saving it to event database. """
+            
+        logger.info('[NEW MEMBER VALIDATION] New Event Registered.')
+        event = EventValidator(external_event=event).validated_internal_event
+        logger.info('[NEW MEMBER VALIDATION] New Event Validated and Casted in ExpectedInternalEvent.')
+
+        await MessageEventProcessor(internal_event=event,
+                                    context=context).process()

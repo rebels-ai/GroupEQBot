@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from utilities.driver.local.audio.base import BaseAudioReader
-from utilities.driver.local.text.base import BaseTextReader
-from utilities.driver.models.supported_extensions import  SupportedFilesExtensions
+from driver.local.audio.base import BaseAudioReader
+from driver.local.text.base import BaseTextReader
+from driver.models.supported_extensions import  SupportedFilesExtensions
 
 
 @dataclass
@@ -41,7 +41,7 @@ class Reader:
         file_extension = self.get_file_extension()
         self.matches_supported_extensions(file_extension)
 
-        if file_extension == SupportedFilesExtensions.audio.value:
-            return BaseAudioReader().open(path_to_read=self.path)
-        else:
+        if file_extension == SupportedFilesExtensions.text.value:
             return BaseTextReader().open(path_to_read=self.path)
+        else:
+            return BaseAudioReader().open(path_to_read=self.path)
