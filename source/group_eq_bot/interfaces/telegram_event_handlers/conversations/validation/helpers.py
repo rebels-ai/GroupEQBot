@@ -30,7 +30,7 @@ class ConversationValidatorHelpers:
     event: TelegramEvent
     context: CONTEXT_DEFAULT_TYPE
 
-    async def check_if_chat_owner(self):
+    async def check_if_chat_owner(self) -> bool:
         """ Function, which checks whether message author is a chat owner """
         member = await self.context.bot.get_chat_member(
             chat_id=self.event.effective_chat.id,

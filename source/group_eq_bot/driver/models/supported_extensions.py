@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 
 class SupportedFilesExtensions(Enum):
@@ -10,5 +11,5 @@ class SupportedFilesExtensions(Enum):
     audio_ogg = 'ogg'
 
     @classmethod
-    def list(cls):
+    def list(cls) -> List:
         return list(map(lambda c: c.value, cls))

@@ -1,5 +1,7 @@
 from dataclasses import dataclass
+from typing import Union
 from pathlib import Path
+from io import BufferedReader
 
 from driver.local.audio.base import BaseAudioReader
 from driver.local.text.base import BaseTextReader
@@ -21,7 +23,7 @@ class Reader:
         if not self.path.is_file():
             raise FileNotFoundError(f'{self.path} is not a file')
 
-    def matches_supported_extensions(self, file_extension) -> None:
+    def matches_supported_extensions(self, file_extension: str) -> None:
         """ Function, which checks whether file extention mathches supported ones """
 
         available_extensions = SupportedFilesExtensions.list()
@@ -34,7 +36,7 @@ class Reader:
         """ Function, which returns file extension without dot """
         return self.path.suffix.replace('.', '')
 
-    def open(self):
+    def open(self) -> Union[str, BufferedReader]:
         """ Function, which opens the file, depending on the extension """
 
         self.check_file_existance()
