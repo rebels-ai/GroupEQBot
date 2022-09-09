@@ -94,11 +94,11 @@ class EventsDatabaseChatInterface:
 
     def chat_name_matches(self, document: Document) -> bool:
         """ Function, which checks whether EventChatName equals DocumentChatName. """
-        return True if self.document.chat.chat_name == document.chat.chat_name else False
+        return True if self.document.chat.chat_name in document.chat.chat_name else False
 
     def chat_type_matches(self, document: Document) -> bool:
         """ Function, which checks whether EventChatType equals DocumentChatType. """
-        return True if self.document.chat.chat_type == document.chat.chat_type else False
+        return True if self.document.chat.chat_type in document.chat.chat_type else False
 
     def user_is_already_registered_in_chat(self, document: Document) -> bool:
         """ Function, which checks whether EventUserID is in Document. """

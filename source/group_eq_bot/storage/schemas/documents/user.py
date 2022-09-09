@@ -15,9 +15,8 @@ GlobalHydra.instance().clear()
 class User(InnerDoc):
     user_id = Text(fields={'keyword': Keyword()}, required=True)
     first_name = Text(multi=True, fields={'keyword': Keyword()}, required=True)
-    last_name = Text(multi=True, fields={'keyword': Keyword()}, required=True)
-    username = Text(multi=True, fields={'keyword': Keyword()}, required=True)
-    current_status = Text(fields={'keyword': Keyword()}, required=True)
+    last_name = Text(multi=True, fields={'keyword': Keyword()})
+    username = Text(multi=True, fields={'keyword': Keyword()})
     last_activity = Date(required=True)
 
 

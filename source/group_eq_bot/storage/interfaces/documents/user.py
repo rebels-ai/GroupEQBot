@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Optional
 
 from elasticsearch_dsl import Document
@@ -51,8 +52,7 @@ class EventsDatabaseUserInterface:
                               first_name=self.internal_event.first_name,
                               last_name=self.internal_event.last_name,
                               username=self.internal_event.username,
-                              current_status=self.internal_event.new_status,
-                              last_activity=self.internal_event.event_time)
+                              last_activity=datetime.now())  # @NOTE: last activity supposed to be taken from internal_event.event_time
 
         except Exception as error:
             logger.warning('Failed User model generation.')
@@ -98,9 +98,6 @@ class EventsDatabaseUserInterface:
         """ Function, which checks whether EventUsername equals DocumentUsername. """
         return True if self.internal_event.username in document.user.username else False
 
-    def user_current_status_matches(self, document: Document) -> bool:
-        """ Function, which checks whether EventUserCurrentStatus equals DocumentUserCurrentStatus. """
-        return True if self.internal_event.new_status in document.user.current_status else False
 
     def process(self):
         """ Entrypoint to EventsDatabaseUserInterface, holding the main logic. """
@@ -115,9 +112,8 @@ class EventsDatabaseUserInterface:
 
         # check if first_name | last_name | username | current_status has changed
         # if yes, update certain field for document from database
-        change_happened = False
+
         if not self.user_first_name_matches(document=document_from_database):
-            change_happened = True
             registered_first_names = document_from_database.user.first_name
 
             if isinstance(registered_first_names, str):
@@ -126,7 +122,6 @@ class EventsDatabaseUserInterface:
                 document_from_database.user.first_name.append(self.document.user.first_name) 
 
         if not self.user_last_name_matches(document=document_from_database):
-            change_happened = True
             registered_last_names = document_from_database.user.last_name
 
             if isinstance(registered_last_names, str):
@@ -135,7 +130,6 @@ class EventsDatabaseUserInterface:
                 document_from_database.user.last_name.append(self.document.user.last_name)
 
         if not self.username_matches(document=document_from_database):
-            change_happened = True
             registered_usernames = document_from_database.user.username
 
             if isinstance(registered_usernames, str):
@@ -143,14 +137,9 @@ class EventsDatabaseUserInterface:
             else:
                 document_from_database.user.username.append(self.document.user.username)
 
-        if not self.user_current_status_matches(document=document_from_database):
-            change_happened = True
-            document_from_database.user.current_status = self.internal_event.new_status
+        document_from_database.user.last_activity = datetime.now()
+        connection.update(index=self.index,
+                            id=self.document_id,
+                            body={self.DOCUMENT_KEY: document_from_database})
 
-        if change_happened:
-            connection.update(index=self.index,
-                              id=self.document_id,
-                              body={self.DOCUMENT_KEY: document_from_database})
         return
-
-
