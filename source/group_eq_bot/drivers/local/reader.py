@@ -3,9 +3,9 @@ from typing import Union
 from pathlib import Path
 from io import BufferedReader
 
-from driver.local.audio.base import BaseAudioReader
-from driver.local.text.base import BaseTextReader
-from driver.models.supported_extensions import  SupportedFilesExtensions
+from drivers.local.audio.base import BaseAudioReader
+from drivers.local.text.base import BaseTextReader
+from drivers.models.supported_extensions import  SupportedFilesExtensions
 
 
 @dataclass
