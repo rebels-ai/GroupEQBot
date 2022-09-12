@@ -98,7 +98,6 @@ class EventsDatabaseUserInterface:
         """ Function, which checks whether EventUsername equals DocumentUsername. """
         return True if self.internal_event.username in document.user.username else False
 
-
     def process(self):
         """ Entrypoint to EventsDatabaseUserInterface, holding the main logic. """
 
@@ -112,7 +111,6 @@ class EventsDatabaseUserInterface:
 
         # check if first_name | last_name | username | current_status has changed
         # if yes, update certain field for document from database
-
         if not self.user_first_name_matches(document=document_from_database):
             registered_first_names = document_from_database.user.first_name
 
@@ -139,7 +137,7 @@ class EventsDatabaseUserInterface:
 
         document_from_database.user.last_activity = datetime.now()
         connection.update(index=self.index,
-                            id=self.document_id,
-                            body={self.DOCUMENT_KEY: document_from_database})
+                          id=self.document_id,
+                          body={self.DOCUMENT_KEY: document_from_database})
 
         return

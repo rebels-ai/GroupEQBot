@@ -40,7 +40,7 @@ class EventsDatabaseChatInterface:
 
     def set_document_id(self) -> int:
         """ Method to set elasticsearch document id. """
-        return abs(self.internal_event.chat_id)
+        return c
 
     def generate_chat_model(self) -> Chat:
         """
