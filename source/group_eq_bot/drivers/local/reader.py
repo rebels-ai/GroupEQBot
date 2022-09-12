@@ -1,11 +1,12 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Union
 from pathlib import Path
 from io import BufferedReader
 
 from drivers.local.audio.base import BaseAudioReader
 from drivers.local.text.base import BaseTextReader
-from drivers.models.supported_extensions import  SupportedFilesExtensions
+from drivers.models.supported_audio_extensions import AudioExtensions
+from drivers.models.supported_text_extensions import TextExtensions
 
 
 @dataclass
@@ -14,25 +15,23 @@ class Reader:
 
     path: Path
 
-    def __post_init__(self) -> None:
+    def __post_init__(self):
         self.path = Path(self.path)
 
-    def check_file_existance(self) -> None:
-        """ Function, which checks whether file exist in given path and is a file """
+    def file_exists(self):
+        """ Function, which checks whether file exists at the given path"""
 
-        if not self.path.exists():
-            raise FileNotFoundError(f'{self.path} path does not exist')
         if not self.path.is_file():
-            raise FileNotFoundError(f'{self.path} is not a file')
+            raise FileNotFoundError(f'{self.path} is a wrong path or file does not exist')
 
-    def matches_supported_extensions(self, file_extension: str) -> None:
+    def extension_supported(self, extension: str) -> bool:
         """ Function, which checks whether file extention mathches supported ones """
 
-        available_extensions = SupportedFilesExtensions.list()
-        if file_extension in available_extensions:
-            return
+        available_extensions = TextExtensions.list() + AudioExtensions.list()
+        if extension in available_extensions:
+            return True
         else:
-            raise FileNotFoundError(f'File extension is not supported by the reader. Supported ones are: {SupportedFilesExtensions.list()}')  
+            raise OSError(f'File extension is not supported by the reader. Supported ones are: {available_extensions}')
 
     def get_file_extension(self) -> str:
         """ Function, which returns file extension without dot """
@@ -41,11 +40,10 @@ class Reader:
     def read(self) -> Union[str, BufferedReader]:
         """ Function, which opens the file, depending on the extension """
 
-        self.check_file_existance()
+        self.file_exists()
         file_extension = self.get_file_extension()
-        self.matches_supported_extensions(file_extension)
+        self.extension_supported(file_extension)
 
-        if file_extension == SupportedFilesExtensions.text.value:
-            return BaseTextReader().read(path_to_read=self.path)
-        else:
-            return BaseAudioReader().read(path_to_read=self.path)
+        text_extension = True if file_extension in TextExtensions.list() else False
+
+        return BaseTextReader().read(path_to_read=self.path) if text_extension else BaseAudioReader().read(path_to_read=self.path)
