@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Union
 from pathlib import Path
 from io import BufferedReader
@@ -10,7 +10,9 @@ from drivers.models.supported_extensions import  SupportedFilesExtensions
 
 @dataclass
 class Reader:
-    path: Path  # full path to a particular file to open
+    """ Files reader from specified path """
+
+    path: Path
 
     def __post_init__(self) -> None:
         self.path = Path(self.path)
@@ -36,7 +38,7 @@ class Reader:
         """ Function, which returns file extension without dot """
         return self.path.suffix.replace('.', '')
 
-    def open(self) -> Union[str, BufferedReader]:
+    def read(self) -> Union[str, BufferedReader]:
         """ Function, which opens the file, depending on the extension """
 
         self.check_file_existance()
@@ -44,6 +46,6 @@ class Reader:
         self.matches_supported_extensions(file_extension)
 
         if file_extension == SupportedFilesExtensions.text.value:
-            return BaseTextReader().open(path_to_read=self.path)
+            return BaseTextReader().read(path_to_read=self.path)
         else:
-            return BaseAudioReader().open(path_to_read=self.path)
+            return BaseAudioReader().read(path_to_read=self.path)

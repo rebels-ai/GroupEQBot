@@ -1,15 +1,72 @@
-## Available handlers of telegram updates:
+# GroupEQBot Handlers:
 
-- `command handler`: responsible for handling command messages like `/command`
+GroupEQBot handlers are the wrapper on top of native [Telegram Handlers](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.handlers-tree.html).
 
-- `text message handler`: responsible for handling text messages, excluding commands
+## Handler Interface Explanation
+Any of the GroupEQBot handlers interface is declared as:
+```python
+class {"HandlerType"}Handler:
+    filters_to_apply = { "Telegram filters to be used" }
+    callback_to_call = { "Function which will be called once such an event will be registered" }
 
-- `audio message handler`: handles updates with audio and voice messages
+    handler = {According to required {"HandlerType"} Telegram}Handler(filters=filters_to_apply,
+                             callback=callback_to_call)
+```
 
-- `video message handler`: handles messages, containing videos, video notes, stickers, animations and photos
+VideoMessageHandler  Example:
+```python
+class VideoMessageHandler:
+    filters_to_apply = filters.VIDEO | filters.VIDEO_NOTE | filters.Sticker.ALL | filters.ANIMATION | filters.PHOTO
+    callback_to_call = route_event
 
-- `document message handler`: handles messages with any types of files attached to them
+    handler = MessageHandler(filters=filters_to_apply,
+                             callback=callback_to_call)
+```
 
-- `chat member handler`: responsible for handling updates with any status changes of chat members, where bot is present
 
-- `conversation validation handler`: responsible for the validation procedure. Once member sent `/start` command, all following messages will be processed by this handler until validation ended or stopped manually.
+## Handlers
+
+#### Message Handlers
+Handles `commands`, `text`, `audio`, `video`, `document`, `voice`, `video note`, `sticker`, `animation`, `photo` message types
+
+##### Command Handler
+- Based on [Telegram Command Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.basehandler.html)
+- Stands for `registering` command messages like `/start`, `/end`, ...
+- Callback function: `interfaces.telegram_event_router.router.route_event`
+
+##### Text Message Handler
+- Based on [Telegram Message Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.messagehandler.html)
+- Stands for registering text messages, excluding commands
+- Callback function: `interfaces.telegram_event_router.router.route_event`
+
+##### Audio Message Handler
+- Based on [Telegram Message Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.messagehandler.html)
+- Stands for registering audio and voice messages
+- Callback function: `interfaces.telegram_event_router.router.route_event`
+
+##### Video Message Handler
+- Based on [Telegram Message Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.messagehandler.html)
+- Stands for registering messages, containing videos, video notes, stickers, animations and photos
+- Callback function: `interfaces.telegram_event_router.router.route_event`
+
+##### Document Message Handler
+- Based on [Telegram Message Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.messagehandler.html)
+- Stands for registering messages with any types of files attached to them
+- Callback function: `interfaces.telegram_event_router.router.route_event`
+
+#### Member Handlers
+Handles `chat_member` updates
+
+##### Member Handler
+- Based on [Telegram Chat Member Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.chatmemberhandler.html)
+- Stands for registering any status changes of chat members, where bot is present
+- Callback function: `interfaces.telegram_event_router.router.route_event`
+
+#### Conversation Handlers
+Holds `validation` logic
+
+##### Conversation Validation Handler
+- Based on [Telegram Conversation Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.conversationhandler.html), [Telegram Message Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.messagehandler.html) and [Telegram Command Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.basehandler.html)
+- Responsible for new member validation procedure. Process messages separately from other handlers.
+- Starting point: `/start` command
+- Callback: `interfaces.telegram_event_handlers.conversation_update.validator`

@@ -130,7 +130,7 @@ class ConversationValidatorHelpers:
     async def reply_question(event: TelegramEvent, question_number: str):
         """ Function, which will call reply text or voice depending on question extension."""
 
-        question = Reader(configurations.validation.questions_paths[question_number]).open()
+        question = Reader(configurations.validation.questions_paths[question_number]).read()
 
         if isinstance(question, str):
             await event.message.reply_text(text=question)
