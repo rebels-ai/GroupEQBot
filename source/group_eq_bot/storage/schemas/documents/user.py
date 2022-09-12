@@ -13,22 +13,11 @@ GlobalHydra.instance().clear()
 
 
 class User(InnerDoc):
-    """ @TODO: revisit and fill the remaining attributes.
-    Add:
-        validation_related ...
-        status_related: pair of values List[(status: status: status_change_time: datetime)]
-
-        last_seen: Date()
-        last_message_time: Date()
-        last_message_content: Date()
-
-        metrics: related to ML (give default values for certain metrics)
-    """
-
-    user_id = Text(fields={'keyword': Keyword()})
-    first_name = Text(fields={'keyword': Keyword()})
-    last_name = Text(fields={'keyword': Keyword()})
-    username = Text(fields={'keyword': Keyword()})
+    user_id = Text(fields={'keyword': Keyword()}, required=True)
+    first_name = Text(multi=True, fields={'keyword': Keyword()}, required=True)
+    last_name = Text(multi=True, fields={'keyword': Keyword()})
+    username = Text(multi=True, fields={'keyword': Keyword()})
+    last_activity = Date(required=True)
 
 
 class UserDocument(Document):

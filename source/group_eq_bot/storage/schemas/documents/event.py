@@ -35,7 +35,7 @@ class EventDocument(Document):
 
     Notes:
          index is formed as:
-            convention: <bot.configs.name>-<bot.configs.version>-event-chatID-userID
+            convention: c
                 <bot.configs.name>-<bot.configs.version> <-- is template, stored in configs
             example: who-is-1.0-event-9876518-1234567
     """

@@ -12,17 +12,22 @@ from storage.connectors.connector import connection
 
 @dataclass
 class EventsDatabaseEventInterface:
-    """
-    Conventions:
-        document:
-            "internal_event.user_id" - stands for "_id" of the elasticsearch document.
-        index:
-            "index is dynamically generated as" - <bot.configs.name>-<bot.configs.version>-event-chatID-userID
+    """ Main EventsDatabase interface for events.event related R/W operations.
+
+    Notes:
+        The conventions:
+            Index:
+                in terms of event, "index is dynamic":
+                    <bot.configs.name>-<bot.configs.version>-event-<chatID>-<userID>
+            DocumentID:
+                in terms of event, "document id is dynamic":
+                    internal_event.user_id - stands for "_id" of the elasticsearch document.
     """
 
     internal_event: ExpectedInternalEvent
-    document: EventDocument = field(init=False)
+
     index: str = field(init=False)
+    document: EventDocument = field(init=False)
 
     def generate_event_metadata_model(self) -> EventMetadata:
         """
@@ -119,8 +124,7 @@ class EventsDatabaseEventInterface:
         self.internal_event.event_type = self.internal_event.event_type.value
 
     def align_chat_type_for_raw_event(self):
-        """
-        Function, which aligns ExpectedInternalEvent data model chat_type field.
+        """ Function, which aligns ExpectedInternalEvent data model chat_type field.
 
         Notes:
             The model with aligned chat_type field,
@@ -129,8 +133,7 @@ class EventsDatabaseEventInterface:
         self.internal_event.chat_type = self.internal_event.chat_type.value
 
     def align_new_member_status_for_raw_event(self):
-        """
-        Function, which aligns ExpectedInternalEvent data model new_member_status field.
+        """ Function, which aligns ExpectedInternalEvent data model new_member_status field.
 
         Notes:
             The model with aligned chat_type field,
@@ -139,8 +142,7 @@ class EventsDatabaseEventInterface:
         self.internal_event.new_status = self.internal_event.new_status.value
 
     def align_old_member_status_for_raw_event(self):
-        """
-        Function, which aligns ExpectedInternalEvent data model new_member_status field.
+        """ Function, which aligns ExpectedInternalEvent data model new_member_status field.
 
         Notes:
             The model with aligned chat_type field,
@@ -155,7 +157,6 @@ class EventsDatabaseEventInterface:
         self.align_old_member_status_for_raw_event()
 
         self.document = self.generate_event_document_model()
-        # reference to EventDocument index convention: <bot.configs.name>-<bot.configs.version>-event-chatID-userID
         self.index = f'{self.document.Index.name}-{abs(self.internal_event.chat_id)}-{self.internal_event.user_id}'
 
     def process(self):
