@@ -171,7 +171,7 @@ class Validator:
 
 
 ConversationValidatorHandler = ConversationHandler(
-    entry_points=[CommandHandler('start', callback=Validator().invoke_first_question)],
+    entry_points=[CommandHandler('start_validation', callback=Validator().invoke_first_question)],
     states={
         ConversationStates.SECOND_QUESTION_STATE.value: [MessageHandler(filters.TEXT & ~filters.COMMAND,
                                                                         Validator().invoke_second_question)],
@@ -185,5 +185,5 @@ ConversationValidatorHandler = ConversationHandler(
         ConversationStates.GOODBYE_STATE.value: [MessageHandler(filters.TEXT & ~filters.COMMAND,
                                                                 Validator().say_goodbye)]
     },
-    fallbacks=[CommandHandler('cancel', callback=Validator().cancel_conversation)]
+    fallbacks=[CommandHandler('cancel_validation', callback=Validator().cancel_conversation)]
     )

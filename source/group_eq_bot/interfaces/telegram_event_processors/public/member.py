@@ -26,7 +26,8 @@ class MemberEventProcessor:
         """ Post initializer will retrieve and set from passed MemberEvent related values. """
         self.welcome_message_for_conversation_handler = f'Welcome on board @{self.internal_event.username} ! \n' \
                                                         f'Before to start enjoying tne chat, please introduce yourself answering couple of the questions. \n' \
-                                                        f'Click on "/start" to initiate conversation. '
+                                                        f'Click on "/start_validation" to initiate conversation. ' \
+                                                        f'You can stop validation process sending "/cancel_validation" ' \
 
     async def process(self) -> None:
         """ Entrypoint for the MemberProcessor, which based on the StatusChange event, invoke appropriate logic. """

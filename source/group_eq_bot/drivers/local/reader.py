@@ -18,16 +18,19 @@ class Reader:
     def __post_init__(self):
         self.path = Path(self.path)
 
-    def file_exists(self):
+    def file_exists(self) -> Union[bool, FileNotFoundError]:
         """ Function, which checks whether file exists at the given path"""
 
-        if not self.path.is_file():
+        if self.path.is_file():
+            return True
+        else:
             raise FileNotFoundError(f'{self.path} is a wrong path or file does not exist')
 
-    def extension_supported(self, extension: str) -> bool:
-        """ Function, which checks whether file extention mathches supported ones """
+    def extension_supported(self, extension: str) -> Union[bool, OSError]:
+        """ Function, which checks whether file extention matches supported ones """
 
         available_extensions = TextExtensions.list() + AudioExtensions.list()
+
         if extension in available_extensions:
             return True
         else:

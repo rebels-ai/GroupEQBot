@@ -30,9 +30,12 @@ class VideoMessageHandler:
 Handles `commands`, `text`, `audio`, `video`, `document`, `voice`, `video note`, `sticker`, `animation`, `photo` message types
 
 ##### Command Handler
+
+*At this moment none of the standalone commands are registered.*
+*There are two within conversation validation handler*
 - Based on [Telegram Command Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.basehandler.html)
 - Stands for `registering` command messages like `/start`, `/end`, ...
-- Callback function: `interfaces.telegram_event_router.router.route_event`
+- Callback function: 
 
 ##### Text Message Handler
 - Based on [Telegram Message Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.messagehandler.html)
@@ -68,5 +71,6 @@ Holds `validation` logic
 ##### Conversation Validation Handler
 - Based on [Telegram Conversation Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.conversationhandler.html), [Telegram Message Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.messagehandler.html) and [Telegram Command Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.basehandler.html)
 - Responsible for new member validation procedure. Process messages separately from other handlers.
-- Starting point: `/start` command
+- Starting point: `/start_validation` command
+- Stop: `/cancel_validation` command
 - Callback: `interfaces.telegram_event_handlers.conversation_update.validator`
