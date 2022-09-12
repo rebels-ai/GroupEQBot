@@ -14,12 +14,16 @@ from storage.connectors.connector import connection
 
 @dataclass
 class EventsDatabaseUserInterface:
-    """
-    Conventions:
-        document:
-            "internal_event.user_id" - stands for "_id" of the elasticsearch document.
-        index:
-            "index is dynamically generated as" - <bot.configs.name>-<bot.configs.version>-user-chatID-userID
+    """ Main EventsDatabase interface for events.user related R/W operations.
+
+    Notes:
+        The conventions:
+            Index:
+                in terms of event, "index is dynamic":
+                    <bot.configs.name>-<bot.configs.version>-user-<chatID>-<userID>
+            DocumentID:
+                in terms of event, "document id is dynamic":
+                    internal_event.user_id - stands for "_id" of the elasticsearch document.
     """
 
     DOCUMENT_KEY = "doc"  # required elasticsearch document (inside index) key, to find body for update method
