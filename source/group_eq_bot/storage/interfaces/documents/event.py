@@ -21,7 +21,7 @@ class EventsDatabaseEventInterface:
                     <bot.configs.name>-<bot.configs.version>-event-<chatID>-<userID>
             DocumentID:
                 in terms of event, "document id is dynamic":
-                    internal_event.user_id - stands for "_id" of the elasticsearch document.
+                    we do not provide any document id, instead elasticsearch will generate it's internal id by itself.
     """
 
     internal_event: ExpectedInternalEvent
