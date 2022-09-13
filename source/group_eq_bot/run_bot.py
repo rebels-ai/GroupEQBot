@@ -1,5 +1,3 @@
-import hydra
-
 from typing import Union, Any
 from telegram.ext import ApplicationBuilder, Application
 
@@ -11,14 +9,11 @@ from interfaces.telegram_event_handlers.message_update.document.handler import D
 from interfaces.telegram_event_handlers.conversation_update.handler import ConversationValidatorHandler
 
 from utilities.internal_logger.logger import logger
-
-HYDRA_VERSION = '1.2'
-CONFIGURATIONS_PATH = 'configurations'
-CONFIGURATIONS_NAME = 'configuration'
+from utilities.configurations_constructor.constructor import Constructor
 
 
-def pre_validate_bot_token(token: Any) -> Union[str, TypeError, ValueError, KeyError]:
-    """ Helper method, which applies checks whether correct token declared in configuration file. """
+def token_is_correct_format(token: Any) -> Union[bool, TypeError, ValueError, KeyError]:
+    """ Helper method, which applies checks whether correct bot token declared in configuration file. """
 
     if not isinstance(token, str):
         logger.error('TypeError, bot token has to be string.')
@@ -36,10 +31,10 @@ def pre_validate_bot_token(token: Any) -> Union[str, TypeError, ValueError, KeyE
         logger.error('ValueError, bot token contains only "Alphabets".')
         raise ValueError
 
-    return token
+    return True
 
 
-def build_application(token: str) -> Union[Application, TypeError]:
+def build(token: str) -> Union[Application, TypeError]:
     """ Helper method, which attempts to build TelegramBot Application. """
 
     try:
@@ -51,25 +46,32 @@ def build_application(token: str) -> Union[Application, TypeError]:
         raise
 
 
-def add_application_handlers(bot: Application) -> None:
+def add_handlers(bot: Application) -> Application:
     """ Helper method, which adds telegram_event_handlers to TelegramBot Application. """
 
-    bot.add_handler(ConversationValidatorHandler)
-    bot.add_handler(MemberHandler.handler)
-    bot.add_handler(TextMessageHandler.handler)
-    bot.add_handler(VideoMessageHandler.handler)
-    bot.add_handler(AudioMessageHandler.handler)
-    bot.add_handler(DocumentMessageHandler.handler)
+    try:
+        bot.add_handler(ConversationValidatorHandler)
+        bot.add_handler(MemberHandler.handler)
+        bot.add_handler(TextMessageHandler.handler)
+        bot.add_handler(VideoMessageHandler.handler)
+        bot.add_handler(AudioMessageHandler.handler)
+        bot.add_handler(DocumentMessageHandler.handler)
+    except Exception as error:
+        raise f'Exception registered during registering telegram handler. ' \
+              f'{error}'
+
+    return bot
 
 
-@hydra.main(version_base=HYDRA_VERSION, config_path=CONFIGURATIONS_PATH, config_name=CONFIGURATIONS_NAME)
-def main(configurations):
+def main():
     """ Function, which stands for pre-validating, building and launching `group_eq_bot` application. """
 
-    pre_validate_bot_token(token=configurations.administration.token)
-    bot = build_application(token=configurations.administration.token)
-    add_application_handlers(bot=bot)
-    bot.run_polling()
+    token = Constructor().configurations.bot.general.token
+
+    if token_is_correct_format(token=token):
+        bot = build(token=token)
+        bot = add_handlers(bot=bot)
+        bot.run_polling()
 
 
 if __name__ == '__main__':

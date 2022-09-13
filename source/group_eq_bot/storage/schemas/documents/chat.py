@@ -1,15 +1,5 @@
 from datetime import datetime
-
-from hydra import compose, initialize
-from hydra.core.global_hydra import GlobalHydra
-
 from elasticsearch_dsl import Document, InnerDoc, Date, Keyword, Text, Long, Object
-
-# Fetch bot configuration with hydra compose api
-# https://hydra.cc/docs/advanced/compose_api/
-initialize(version_base="1.2", config_path="../../../configurations", job_name="chat_schema")
-configurations = compose(config_name="configuration")
-GlobalHydra.instance().clear()
 
 
 class Chat(InnerDoc):

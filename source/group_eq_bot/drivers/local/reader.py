@@ -1,52 +1,66 @@
-from dataclasses import dataclass
-from typing import Union
 from pathlib import Path
 from io import BufferedReader
 
+from typing import Union, List
+from dataclasses import dataclass, field
+
 from drivers.local.audio.base import BaseAudioReader
 from drivers.local.text.base import BaseTextReader
+
 from drivers.models.supported_audio_extensions import AudioExtensions
 from drivers.models.supported_text_extensions import TextExtensions
 
 
 @dataclass
 class Reader:
-    """ Files reader from specified path """
+    """ Interface to read local files with different file extensions.
 
-    path: Path
+    Usage:
+        Reader(input_path=<particular_file_path>).read()
+    """
+
+    input_path: str = field(init=True)
+    path_to_read: Path = field(init=False)
+
+    file_extension: str = field(init=False)
+    supported_extensions: List = field(default_factory=lambda:(TextExtensions.list() + AudioExtensions.list()))
+
+    @staticmethod
+    def _cast_str_to_path(path: str) -> Path:
+        """ Helper method to cast input_path (str) to Path. """
+        return Path(path)
+
+    @staticmethod
+    def _get_file_extension(path: Path) -> str:
+        """ Helper method to get file extension. """
+        return path.suffix.replace ('.', '')
 
     def __post_init__(self):
-        self.path = Path(self.path)
+        self.path_to_read = self._cast_str_to_path(path=self.input_path)
+        self.file_extension = self._get_file_extension(path=self.path_to_read)
 
     def file_exists(self) -> Union[bool, FileNotFoundError]:
-        """ Function, which checks whether file exists at the given path"""
+        """ Function, which checks whether file exists at the given path. """
 
-        if self.path.is_file():
+        if self.path_to_read.is_file():
             return True
         else:
-            raise FileNotFoundError(f'{self.path} is a wrong path or file does not exist')
+            raise FileNotFoundError(f'Wrong path or file does not exist.')
 
-    def extension_supported(self, extension: str) -> Union[bool, OSError]:
-        """ Function, which checks whether file extention matches supported ones """
+    def correct_extension(self) -> Union[bool, OSError]:
+        """ Function, which checks whether file extension match supported ones. """
 
-        available_extensions = TextExtensions.list() + AudioExtensions.list()
-
-        if extension in available_extensions:
+        if self.file_extension in self.supported_extensions:
             return True
         else:
-            raise OSError(f'File extension is not supported by the reader. Supported ones are: {available_extensions}')
-
-    def get_file_extension(self) -> str:
-        """ Function, which returns file extension without dot """
-        return self.path.suffix.replace('.', '')
+            raise OSError(f'File extension is not supported by the Reader. '
+                          f'Supported ones are: {self.supported_extensions}')
 
     def read(self) -> Union[str, BufferedReader]:
-        """ Function, which opens the file, depending on the extension """
+        """ Entry point function, which reads file. """
 
-        self.file_exists()
-        file_extension = self.get_file_extension()
-        self.extension_supported(file_extension)
-
-        text_extension = True if file_extension in TextExtensions.list() else False
-
-        return BaseTextReader().read(path_to_read=self.path) if text_extension else BaseAudioReader().read(path_to_read=self.path)
+        if self.file_exists() and self.correct_extension():
+            if self.file_extension in TextExtensions.list():
+                return BaseTextReader().read(path=self.path_to_read)
+            else:
+                return BaseAudioReader().read(path=self.path_to_read)

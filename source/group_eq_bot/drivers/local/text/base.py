@@ -1,14 +1,17 @@
+from dataclasses import dataclass
 from pathlib import Path
 
 
+@dataclass
 class BaseTextReader:
-    """ Reader for any kind of text files """
+    """ Interface to read files with text extensions. """
 
-    @staticmethod
-    def read(path_to_read: Path) -> str:
-        """ Function, which reads the text from file at specified path """
+    _READER_MODE = 'rt'
 
-        with open(path_to_read, 'rt') as file:
+    def read(self, path: Path) -> str:
+        """ Function, which reads the text from file at specified path. """
+
+        with open(path, self._READER_MODE) as file:
             context = file.read()
 
         return context

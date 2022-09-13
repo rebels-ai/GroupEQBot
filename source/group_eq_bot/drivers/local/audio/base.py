@@ -1,11 +1,19 @@
-from io import BufferedReader
+from dataclasses import dataclass
+
 from pathlib import Path
+from io import BufferedReader
 
 
+@dataclass
 class BaseAudioReader:
-    """ Reader for audio files """
+    """ Interface to read files with audio extensions. """
 
-    @staticmethod
-    def read(path_to_read: Path) -> BufferedReader:
-        """ Function, which reads the audio file at specified path """
-        return open(path_to_read, 'rb')
+    _READER_MODE = 'rb'
+
+    def read(self, path: Path) -> BufferedReader:
+        """ Function, which reads the audio file at specified path.
+
+        Note:
+            function will return BufferReader.
+        """
+        return open(path, self._READER_MODE)
