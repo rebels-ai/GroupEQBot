@@ -1,6 +1,9 @@
 from datetime import datetime
 from elasticsearch_dsl import Document, InnerDoc, Date, Keyword, Text, Long, Object
 
+from utilities.configurations_constructor.constructor import Constructor
+CONFIGURATIONS = Constructor().configurations
+
 
 class Chat(InnerDoc):
     chat_id = Long(required=True)
@@ -31,8 +34,8 @@ class ChatDocument(Document):
         return super().save(** kwargs)
 
     class Index:
-        name = configurations.events_driven_database.indices.template
+        name = CONFIGURATIONS.events_database.indices.index_template
         settings = {
-            "number_of_shards": configurations.events_driven_database.settings.default_number_of_shards,
-            "number_of_replicas": configurations.events_driven_database.settings.default_number_of_replicas
+            "number_of_shards": CONFIGURATIONS.events_database.infrastructure.number_of_shards,
+            "number_of_replicas": CONFIGURATIONS.events_database.infrastructure.number_of_replicas
         }

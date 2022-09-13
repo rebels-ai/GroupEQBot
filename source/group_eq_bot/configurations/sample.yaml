@@ -27,7 +27,7 @@ events_database:
     number_of_shards: 2
     number_of_replicas: 0
     indices:
-      index_template: ${bot.configurations.name}-${bot.configurations.version}
+      index_template: ${bot.general.name}-${bot.general.version}
     available_hosts:
       localhost: 127.0.0.1
       container: host.docker.internal

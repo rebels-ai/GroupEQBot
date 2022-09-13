@@ -1,15 +1,8 @@
 from datetime import datetime
-
-from hydra import compose, initialize
-from hydra.core.global_hydra import GlobalHydra
-
 from elasticsearch_dsl import Document, InnerDoc, Object, Keyword, Text, Date
 
-# Fetch bot configuration with hydra compose api
-# https://hydra.cc/docs/advanced/compose_api/
-initialize(version_base="1.2", config_path="../../../configurations", job_name="user_schema")
-configurations = compose(config_name="configuration")
-GlobalHydra.instance().clear()
+from utilities.configurations_constructor.constructor import Constructor
+CONFIGURATIONS = Constructor().configurations
 
 
 class User(InnerDoc):
@@ -40,8 +33,8 @@ class UserDocument(Document):
         return super().save(**kwargs)
 
     class Index:
-        name = f'{configurations.events_driven_database.indices.template}-user'
+        name = f'{CONFIGURATIONS.events_database.indices.index_template}-user'
         settings = {
-            "number_of_shards": configurations.events_driven_database.settings.default_number_of_shards,
-            "number_of_replicas": configurations.events_driven_database.settings.default_number_of_replicas
+            "number_of_shards": CONFIGURATIONS.events_database.infrastructure.number_of_shards,
+            "number_of_replicas": CONFIGURATIONS.events_database.infrastructure.number_of_replicas
         }

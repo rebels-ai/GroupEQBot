@@ -1,9 +1,6 @@
 from dataclasses import dataclass
 from io import BufferedReader
 
-from hydra import compose, initialize
-from hydra.core.global_hydra import GlobalHydra
-
 from telegram import ChatPermissions
 from telegram import Update as TelegramEvent
 from telegram.ext import ContextTypes
@@ -13,14 +10,11 @@ from drivers.local.reader import Reader
 from interfaces.telegram_event_validator.validator import EventValidator
 from interfaces.telegram_event_processors.public.message import MessageEventProcessor
 
-# Fetch bot configuration with hydra compose api
-# https://hydra.cc/docs/advanced/compose_api/
-initialize(version_base="1.2", config_path="../../../configurations", job_name="conversation_validation_handler")
-configurations = compose(config_name="configuration")
-GlobalHydra.instance().clear()
+from utilities.configurations_constructor.constructor import Constructor
+CONFIGURATIONS = Constructor().configurations
 
-LIMIT_OF_ATTEMPTS_TO_FAIL_PER_QUESTION: int = int(configurations.validation.limit_of_attempts_to_fail_per_question)
-MATHEMATICAL_ANSWER: str = configurations.validation.mathematical_answer
+LIMIT_OF_ATTEMPTS_TO_FAIL_PER_QUESTION: int = int(CONFIGURATIONS.bot.validation.limit_of_attempts_to_fail_per_question)
+MATHEMATICAL_ANSWER: str = CONFIGURATIONS.bot.validation.mathematical_answer
 
 
 @dataclass

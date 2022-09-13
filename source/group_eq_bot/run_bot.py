@@ -1,77 +1,93 @@
 from typing import Union, Any
 from telegram.ext import ApplicationBuilder, Application
 
-from interfaces.telegram_event_handlers.member_update.handler import MemberHandler
-from interfaces.telegram_event_handlers.message_update.text.handler import TextMessageHandler
-from interfaces.telegram_event_handlers.message_update.video.handler import VideoMessageHandler
-from interfaces.telegram_event_handlers.message_update.audio.handler import AudioMessageHandler
-from interfaces.telegram_event_handlers.message_update.document.handler import DocumentMessageHandler
-from interfaces.telegram_event_handlers.conversation_update.handler import ConversationValidatorHandler
+from dataclasses import dataclass, field
 
 from utilities.internal_logger.logger import logger
 from utilities.configurations_constructor.constructor import Constructor
 
 
-def token_is_correct_format(token: Any) -> Union[bool, TypeError, ValueError, KeyError]:
-    """ Helper method, which applies checks whether correct bot token declared in configuration file. """
+@dataclass
+class BotBuilder:
+    token: Any = field(init=True)
+    bot: Application = field(init=False)
 
-    if not isinstance(token, str):
-        logger.error('TypeError, bot token has to be string.')
-        raise TypeError
+    def __post_init__(self):
+        self._token_is_correct_format()
+        self.__build()
+        self.__add_handlers()
 
-    if token is None:
-        logger.error('ValueError, missing bot token in configurations file.')
-        raise ValueError
+    def _token_is_correct_format(self) -> Union[None, TypeError, ValueError, KeyError]:
+        """ Helper method, which applies checks whether correct bot token declared in configuration file. """
 
-    if token.isnumeric():
-        logger.error('ValueError, bot token contains only "Numbers".')
-        raise ValueError
+        if not isinstance(self.token, str):
+            logger.error('TypeError, bot token has to be string.')
+            raise TypeError
 
-    if token.isalpha():
-        logger.error('ValueError, bot token contains only "Alphabets".')
-        raise ValueError
+        if self.token is None:
+            logger.error('ValueError, missing bot token in configurations file.')
+            raise ValueError
 
-    return True
+        if self.token.isnumeric():
+            logger.error('ValueError, bot token contains only "Numbers".')
+            raise ValueError
 
+        if self.token.isalpha():
+            logger.error('ValueError, bot token contains only "Alphabets".')
+            raise ValueError
 
-def build(token: str) -> Union[Application, TypeError]:
-    """ Helper method, which attempts to build TelegramBot Application. """
+        return
 
-    try:
-        bot = ApplicationBuilder().token(token).build()
-        return bot
+    def _add_member_handler(self):
+        from interfaces.telegram_event_handlers.member_update.handler import MemberHandler
+        self.bot.add_handler(MemberHandler.handler)
 
-    except TypeError:
-        logger.error('TypeError, Provided bot token does not exist.')
-        raise
+    def _add_text_handler(self):
+        from interfaces.telegram_event_handlers.message_update.text.handler import TextMessageHandler
+        self.bot.add_handler(TextMessageHandler.handler)
 
+    def _add_video_handler(self):
+        from interfaces.telegram_event_handlers.message_update.video.handler import VideoMessageHandler
+        self.bot.add_handler(VideoMessageHandler.handler)
 
-def add_handlers(bot: Application) -> Application:
-    """ Helper method, which adds telegram_event_handlers to TelegramBot Application. """
+    def _add_audio_handler(self):
+        from interfaces.telegram_event_handlers.message_update.audio.handler import AudioMessageHandler
+        self.bot.add_handler(AudioMessageHandler.handler)
 
-    try:
-        bot.add_handler(ConversationValidatorHandler)
-        bot.add_handler(MemberHandler.handler)
-        bot.add_handler(TextMessageHandler.handler)
-        bot.add_handler(VideoMessageHandler.handler)
-        bot.add_handler(AudioMessageHandler.handler)
-        bot.add_handler(DocumentMessageHandler.handler)
-    except Exception as error:
-        raise f'Exception registered during registering telegram handler. ' \
-              f'{error}'
+    def _add_document_handler(self):
+        from interfaces.telegram_event_handlers.message_update.document.handler import DocumentMessageHandler
+        self.bot.add_handler(DocumentMessageHandler.handler)
 
-    return bot
+    def _add_conversation_handler(self):
+        from interfaces.telegram_event_handlers.conversation_update.handler import ConversationValidatorHandler
+        self.bot.add_handler(ConversationValidatorHandler)
+
+    def __add_handlers(self):
+        """ Helper method, which adds telegram_event_handlers to TelegramBot Application. """
+
+        self._add_video_handler()
+        self._add_audio_handler()
+        self._add_text_handler()
+        self._add_member_handler()
+        self._add_document_handler()
+        self._add_conversation_handler()
+
+    def __build(self):
+        """ Method, which attempts to build TelegramBot Application. """
+        try:
+            self.bot = ApplicationBuilder().token(self.token).build()
+        except TypeError:
+            logger.error('TypeError, Provided bot token does not exist.')
+            raise
+
+    def launch(self):
+        self.bot.run_polling()
 
 
 def main():
     """ Function, which stands for pre-validating, building and launching `group_eq_bot` application. """
-
     token = Constructor().configurations.bot.general.token
-
-    if token_is_correct_format(token=token):
-        bot = build(token=token)
-        bot = add_handlers(bot=bot)
-        bot.run_polling()
+    BotBuilder(token=token).launch()
 
 
 if __name__ == '__main__':
