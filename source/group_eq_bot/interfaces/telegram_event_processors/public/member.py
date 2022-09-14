@@ -3,8 +3,8 @@ from dataclasses import dataclass, field
 from telegram.ext import ContextTypes
 from telegram import ChatPermissions
 
-from interfaces.models.member import MemberStatus
-from interfaces.models.internal_event import ExpectedInternalEvent
+from interfaces.models.internal_event.member_status import MemberStatus
+from interfaces.models.internal_event.event import ExpectedInternalEvent
 
 from storage.interfaces.documents.user import EventsDatabaseUserInterface
 from storage.interfaces.documents.chat import EventsDatabaseChatInterface

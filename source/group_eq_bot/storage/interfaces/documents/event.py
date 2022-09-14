@@ -5,7 +5,7 @@ from utilities.internal_logger.logger import logger
 from storage.schemas.documents.chat import Chat
 from storage.schemas.documents.user import User
 from storage.schemas.documents.event import EventDocument, EventMetadata, Event
-from interfaces.models.internal_event import ExpectedInternalEvent
+from interfaces.models.internal_event.event import ExpectedInternalEvent
 
 from storage.connectors.connector import connection
 

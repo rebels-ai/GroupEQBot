@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from telegram.ext import ContextTypes
 
-from interfaces.models.event import EventType
-from interfaces.models.internal_event import ExpectedInternalEvent
+from interfaces.models.internal_event.event_type import EventType
+from interfaces.models.internal_event.event import ExpectedInternalEvent
 
 from interfaces.telegram_event_processors.public.message import MessageEventProcessor
 from interfaces.telegram_event_processors.public.member import MemberEventProcessor

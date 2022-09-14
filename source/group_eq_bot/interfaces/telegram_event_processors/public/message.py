@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from telegram.ext import ContextTypes
-from interfaces.models.internal_event import ExpectedInternalEvent
+from interfaces.models.internal_event.event import ExpectedInternalEvent
 
 from storage.interfaces.documents.event import EventsDatabaseEventInterface
 from storage.interfaces.documents.chat import EventsDatabaseChatInterface

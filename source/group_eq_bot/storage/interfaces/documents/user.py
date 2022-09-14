@@ -6,7 +6,7 @@ from elasticsearch_dsl import Document
 from elasticsearch.exceptions import NotFoundError
 from utilities.internal_logger.logger import logger
 
-from interfaces.models.internal_event import ExpectedInternalEvent
+from interfaces.models.internal_event.event import ExpectedInternalEvent
 from storage.schemas.documents.user import User, UserDocument
 
 from storage.connectors.connector import connection
