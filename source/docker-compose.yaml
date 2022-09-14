@@ -12,6 +12,8 @@ services:
     build:
       context: group_eq_bot
       dockerfile: Dockerfile
+    profiles:
+      - server
 
   # events-storage (ElasticSearch) stands for storing under indexes TG events, TG groups and TG users
   events-database:
@@ -40,6 +42,8 @@ services:
       - "9200:9200"
     depends_on:
       - group-eq-bot
+    profiles:
+      - database
 
   # events-storage-manager (Kibana) stands for UI for managing & fetching | visualising data from events-storage (ElasticSearch)
   events-database-manager:
@@ -53,11 +57,25 @@ services:
     ports:
       - "5601:5601"
     depends_on:
-     - group-eq-bot
      - events-database
+    profiles:
+      - database
+
+  # jupyter notebook stands for data studio
+  data-studio:
+    image: jupyter/datascience-notebook:ubuntu-22.04
+    container_name: data-studio
+    ports:
+      - "8888:8888"
+    volumes:
+      - snapshots-data-studio:/data
+    profiles:
+      - data-studio
 
 volumes:
     snapshots-elasticsearch:
+      driver: local
+    snapshots-data-studio:
       driver: local
 
 networks:
