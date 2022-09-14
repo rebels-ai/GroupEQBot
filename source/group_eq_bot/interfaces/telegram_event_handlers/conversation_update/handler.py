@@ -1,5 +1,11 @@
 from telegram.ext import ConversationHandler
-from constructor.construct import HandlerConstructor
+from constructor.construct import Constructor
 
 
-ValidatorHandler = ConversationHandler(HandlerConstructor.build())
+# Constructor.states
+# Constructor.entrypoint
+# Constructor.fallbacks
+
+ValidatorHandler = ConversationHandler(entry_points=Constructor().entrypoint,
+                                       states=Constructor().states,
+                                       fallbacks=Constructor().fallbacks)

@@ -1,46 +1,38 @@
-from typing import Any
-
+from typing import Dict
 from dataclasses import dataclass, field
-from pydantic import ValidationError
 
-from utilities.configurations_constructor.constructor import Constructor as ConfigurationsConstructor
+from telegram.ext import CommandHandler
 
-from interfaces.models.validation.questions import Question, Questions
-
-"""
-1. Read questions attribute from configurations
-2. Validate whether question alignes with Question Data Model
-
-3. Based on QuestionType we need to build question(S) state(S)
-4. Pass that question state to ConversationHandler
-"""
+from interfaces.telegram_event_handlers.conversation_update.states.builder import StatesBuilder
+from interfaces.telegram_event_handlers.conversation_update.commands.start_validation import StartCommandBuilder
+from interfaces.telegram_event_handlers.conversation_update.questions.validator.validator import QuestionsValidator
+from interfaces.telegram_event_handlers.conversation_update.questions.preprocessor.preprocessor import QuestionsPreprocessor
 
 
 @dataclass
-class QuestionsValidator:
-    """ Interface to get and validate questions from configurations file.
+class Constructor:
+    """ Main Interface to dynamically build ConversationHandler
+    based on questions, defined in configurations file. """
 
-    Usage:
-        QuestionsValidator().questions
-    """
+    entrypoint: CommandHandler = field(init=False)
+    states: Dict = field(init=False)
+    fallbacks: CommandHandler = field(init=False)
 
-    configurator: ConfigurationsConstructor = field(default_factory=lambda: ConfigurationsConstructor())
-    questions: Any = field(init=False)
+    def process(self):
+        # validate questions
+        questions = QuestionsValidator().questions
 
-    def __post_init__(self):
-        self.get_questions_from_configurations()
-        self.validate_questions()
+        # form questions for states builder
+        classified_questions = QuestionsPreprocessor(questions=questions)
 
-    def get_questions_from_configurations(self):
-        """ Method, which parses list of questions, declared in configurations file. """
-        self.questions = self.configurator.configurations.bot.validation.questions
+        # form entrypoint
+        self.entrypoint = StartCommandBuilder(question=classified_questions.question_for_start_command).handler
 
-    def validate_questions(self):
-        """ Method, which validates questions from configurations file against Question data model. """
+        # form states
+        self.states = StatesBuilder(text_questions=classified_questions.text_questions,
+                                    audio_questions=classified_questions.audio_questions).states
 
-        try:
-            _questions_to_validate = [Question(**entry) for entry in self.questions]
-            self.questions = Questions(questions=_questions_to_validate).questions
-        except ValidationError as error:
-            raise error
+        return self
 
+
+cns = Constructor().process()
