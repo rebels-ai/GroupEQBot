@@ -70,17 +70,10 @@ class ExpectedInternalEvent(BaseModel):
 ```
 
 ### validation
-##### question.Question
+##### questions.Questions
 - Model stands for question data model, which is supposed to be used in ConversationHandler
 ```python
-class Question(BaseModel):
-    """ Question data model, which is supposed to be used in ConversationHandler. """
-
-    location_type: LocationType
-    question_type: QuestionType
-    question: Optional[str]
-    question_path: Optional[str]
-    index_number: int = Field(gt=0, lt=10)
-    answer: str
-    attempts_to_fail: int = Field(gt=0, lt=5)
+class Questions(BaseModel):
+    """ Questions data model, which is supposed to be used in ConversationHandler. """
+    questions: List[Question]
 ```

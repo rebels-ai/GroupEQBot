@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel, Field, root_validator, validator
 
 from interfaces.models.validation.location_type import LocationType
@@ -6,10 +6,11 @@ from interfaces.models.validation.question_type import QuestionType
 
 
 class Question(BaseModel):
-    """ Question data model, which is supposed to be used in ConversationHandler. """
+    """ Question data model, which is used within Questions data model. """
 
     location_type: LocationType
     question_type: QuestionType
+
     question: Optional[str]
     question_path: Optional[str]
     index_number: int = Field(gt=0, lt=10)
@@ -31,3 +32,18 @@ class Question(BaseModel):
 
         elif isinstance(question_path, str) and question is None:
             return values
+
+    @validator('question')
+    def set_question_none_type_if_none(cls, value):
+        """ Method, which cast str to None type if None was passed. """
+        return None if value == 'None' else value
+
+    @validator('question_path')
+    def set_question_path_none_type_if_none(cls, value):
+        """ Method, which cast str to None type if None was passed. """
+        return None if value == 'None' else value
+
+
+class Questions(BaseModel):
+    """ Questions data model, which is supposed to be used in ConversationHandler. """
+    questions: List[Question]
