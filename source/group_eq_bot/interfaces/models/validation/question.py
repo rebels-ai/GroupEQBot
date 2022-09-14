@@ -1,14 +1,33 @@
-from pydantic import BaseModel
+from typing import Optional
+from pydantic import BaseModel, Field, root_validator, validator
 
 from interfaces.models.validation.location_type import LocationType
 from interfaces.models.validation.question_type import QuestionType
 
 
-class Model(BaseModel):
+class Question(BaseModel):
+    """ Question data model, which is supposed to be used in ConversationHandler. """
+
     location_type: LocationType
     question_type: QuestionType
-    index_number: int
-    question: str
-    question_path: str
+    question: Optional[str]
+    question_path: Optional[str]
+    index_number: int = Field(gt=0, lt=10)
     answer: str
-    attempts_to_fail: int
+    attempts_to_fail: int = Field(gt=0, lt=5)
+
+    @root_validator()
+    def should_be_either_question_or_path(cls, values):
+        """ Validator, which checks whether question and question_path are correctly provided. """
+
+        question = values.get('question')
+        question_path = values.get('question_path')
+
+        if question is not None and question_path is not None:
+            raise ValueError(' Only one of `question` or `question_path` has to be provided. ')
+
+        elif isinstance(question, str) and question_path is None:
+            return values
+
+        elif isinstance(question_path, str) and question is None:
+            return values
