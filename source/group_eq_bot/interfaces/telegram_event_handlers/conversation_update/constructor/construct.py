@@ -3,7 +3,6 @@ from typing import Any
 from dataclasses import dataclass, field
 from pydantic import ValidationError
 
-from drivers.local.reader import Reader
 from utilities.configurations_constructor.constructor import Constructor as ConfigurationsConstructor
 
 from interfaces.models.validation.questions import Question, Questions
@@ -19,7 +18,11 @@ from interfaces.models.validation.questions import Question, Questions
 
 @dataclass
 class QuestionsValidator:
-    """ Interface to get and validate questions from configurations file. """
+    """ Interface to get and validate questions from configurations file.
+
+    Usage:
+        QuestionsValidator().questions
+    """
 
     configurator: ConfigurationsConstructor = field(default_factory=lambda: ConfigurationsConstructor())
     questions: Any = field(init=False)
