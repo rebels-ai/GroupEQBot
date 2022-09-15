@@ -17,24 +17,26 @@ class Constructor:
     """ Main Interface to dynamically build ConversationHandler
     based on questions, defined in configurations file. """
 
-    entrypoint: CommandHandler = field(init=False)
+    entrypoints: CommandHandler = field(init=False)
     states: Dict = field(init=False)
-    fallbacks: CommandHandler = field(init=False)
+    fallbacks: CommandHandler = field(default_factory=lambda: CancelCommandBuilder().handler)
 
     def process(self):
         # validate questions
         questions = QuestionsValidator().questions
 
         # form questions for states builder
-        classified_questions = QuestionsPreprocessor(questions=questions)
+        preprocessed_questions = QuestionsPreprocessor(questions=questions).processed_questions
 
-        # form entrypoint
-        self.entrypoint = StartCommandBuilder(question=classified_questions.question_for_start_command).handler
-        self.fallbacks = CancelCommandBuilder().handler
+        for question in preprocessed_questions:
 
-        # # form states
-        # self.states = StatesBuilder(text_questions=classified_questions.text_questions,
-        #                             audio_questions=classified_questions.audio_questions).states
+            # if StartCommand question
+            if question['question_index'] == 1:
+                _entrypoints = StartCommandBuilder(question=question).handler
+                self.entrypoints = _entrypoints
+
+            else:
+                pass
 
         return self
 

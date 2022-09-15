@@ -1,23 +1,30 @@
 from typing import List, Dict
 
 from dataclasses import dataclass, field
-from telegram.ext import MessageHandler
+from telegram.ext import MessageHandler, ContextTypes, filters
 
 from interfaces.models.validation.questions import Question
 
 
 @dataclass
 class StatesBuilder:
-    """ Interface, which builds states,
-    based on input questions. """
+    """ Interface, which builds states, based on input questions. """
 
-    audio_questions: List[Question] = field(init=True)
-    text_questions: List[Question] = field(init=True)
+    CONTEXT_DEFAULT_TYPE = ContextTypes.DEFAULT_TYPE
 
-    message_handler: MessageHandler = field(default_factory=lambda: MessageHandler())
-    states: Dict = field(init=False)
+    question: Dict = field(init=True)
+    default_message_handler: MessageHandler = field(default_factory=lambda: MessageHandler)
+    default_filters: filters = filters.TEXT & ~filters.COMMAND
 
-"""
-ConversationStates.SECOND_QUESTION_STATE.value: [MessageHandler(filters.TEXT & ~filters.COMMAND,
-                                                                Validator().invoke_second_question)]
-"""
+    state: Dict = field(init=False)
+    question_index: int = field(init=False)
+
+    def set_next_question_index(self):
+        self.question_index = self.question.get('index_number')
+
+    def __post_init__(self):
+        self.state = {self.question_index: [self.default_message_handler(self.default_filters),
+                                            callable_function]}
+
+    def callable_function(self,event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> int:
+        pass
