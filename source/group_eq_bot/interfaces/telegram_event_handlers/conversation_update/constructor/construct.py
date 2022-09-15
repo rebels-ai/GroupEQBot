@@ -21,14 +21,18 @@ class Constructor:
     states: Dict = field(init=False)
     fallbacks: CommandHandler = field(default_factory=lambda: CancelCommandBuilder().handler)
 
-    def process(self):
+    def __post_init__(self):
         # validate questions
         questions = QuestionsValidator().questions
 
         # form questions for states builder
         preprocessed_questions = QuestionsPreprocessor(questions=questions).processed_questions
 
+        questions_number = len(preprocessed_questions)
+        self.states = {}
+
         for question in preprocessed_questions:
+            right_answer = question.get('meta').answer
 
             # if StartCommand question
             if question['question_index'] == 1:
@@ -36,9 +40,10 @@ class Constructor:
                 self.entrypoints = _entrypoints
 
             else:
-                pass
+                state = StatesBuilder(question=question, questions_number=questions_number, right_answer=right_answer).state
+                self.states.update(state)
 
         return self
 
 
-cns = Constructor().process()
+cns = Constructor()

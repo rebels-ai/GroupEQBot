@@ -19,14 +19,14 @@ class StartCommandBuilder:
     handler: CommandHandler = field(init=False)
 
     def __post_init__(self):
-        self.handler = CommandHandler(command=self.command,
-                                      callback=self.callback_function)
+        self.handler = [CommandHandler(command=self.command,
+                                      callback=self.callback_function)]
 
     async def callback_function(self, event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> int:
         """ Method, which will be called as a callback for `start_validation` command. """
 
-        next_question_index = self.question.get('index_number') + 1
-        question_type = self.question.get('meta').get('question_type')
+        next_question_index = self.question.get('question_index') + 1
+        question_type = self.question.get('meta').question_type
 
         # if audio question
         if question_type == QuestionType.audio:
@@ -36,7 +36,7 @@ class StartCommandBuilder:
         elif question_type == QuestionType.text:
 
             # if text question declared in configurations file
-            if self.question.get('meta').get('question') is not None:
+            if self.question.get('meta').question is not None:
                 await event.message.reply_text(text=self.question.get('question_object'))
 
             # if text question saved in assets

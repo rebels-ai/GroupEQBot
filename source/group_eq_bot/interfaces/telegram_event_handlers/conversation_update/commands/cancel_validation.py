@@ -19,8 +19,8 @@ class CancelCommandBuilder:
     configurator: Constructor = field(default_factory=lambda: Constructor())
 
     def __post_init__(self):
-        self.handler = CommandHandler(command=self.command,
-                                      callback=self.callback_function)
+        self.handler = [CommandHandler(command=self.command,
+                                      callback=self.callback_function)]
 
     async def callback_function(self, event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> int:
         """ Method, which will be called as a callback for `cancel_validation` command. """

@@ -13,16 +13,17 @@ bot:
           {location_type: 'local', question_type: 'audio', index_number: 1, question: None, question_path: '/Users/macbook/rebels/GroupEQBot/GroupEQBot/source/group_eq_bot/assets/audio/first_question.m4a', answer: 'bla bla bla', attempts_to_fail: 3},
         ]
     welcome_message:
-      '''
+      '
       hi, GrouEQBot is here !
       You are asked to pass the validation process, before starting chatting.
       
       commands:
         \start_validation  - kick off validation process
         \cancel_validation - (you will be banned, if will cancel process) stop validation process       
-      '''
+      '
 
     validation_canceled_message: " To try again type '/start_validation'. "
+    validation_passed_message: " Congratulations, you passed the validation. Welcome! "
 
 events_database:
   infrastructure:

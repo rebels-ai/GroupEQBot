@@ -58,9 +58,14 @@ class BotBuilder:
         from interfaces.telegram_event_handlers.message_update.document.handler import DocumentMessageHandler
         self.bot.add_handler(DocumentMessageHandler.handler)
 
+    def _add_validation_handler(self):
+        from interfaces.telegram_event_handlers.conversation_update.handler import ValidatorHandler
+        self.bot.add_handler(ValidatorHandler)
+
     def __add_handlers(self):
         """ Helper method, which adds telegram_event_handlers to TelegramBot Application. """
 
+        self._add_validation_handler()
         self._add_video_handler()
         self._add_audio_handler()
         self._add_text_handler()
