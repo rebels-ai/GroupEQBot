@@ -4,7 +4,10 @@ from dataclasses import dataclass, field
 from telegram.ext import CommandHandler
 
 from interfaces.telegram_event_handlers.conversation_update.states.builder import StatesBuilder
+
 from interfaces.telegram_event_handlers.conversation_update.commands.start_validation import StartCommandBuilder
+from interfaces.telegram_event_handlers.conversation_update.commands.cancel_validation import CancelCommandBuilder
+
 from interfaces.telegram_event_handlers.conversation_update.questions.validator.validator import QuestionsValidator
 from interfaces.telegram_event_handlers.conversation_update.questions.preprocessor.preprocessor import QuestionsPreprocessor
 
@@ -27,10 +30,11 @@ class Constructor:
 
         # form entrypoint
         self.entrypoint = StartCommandBuilder(question=classified_questions.question_for_start_command).handler
+        self.fallbacks = CancelCommandBuilder().handler
 
-        # form states
-        self.states = StatesBuilder(text_questions=classified_questions.text_questions,
-                                    audio_questions=classified_questions.audio_questions).states
+        # # form states
+        # self.states = StatesBuilder(text_questions=classified_questions.text_questions,
+        #                             audio_questions=classified_questions.audio_questions).states
 
         return self
 

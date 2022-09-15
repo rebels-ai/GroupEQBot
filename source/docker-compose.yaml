@@ -40,6 +40,8 @@ services:
       - snapshots-elasticsearch:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
+    depends_on:
+      - group-eq-bot
     profiles:
       - database
 
@@ -59,14 +61,14 @@ services:
     profiles:
       - database
 
+  # jupyter notebook stands for data studio
   data-studio:
-    image: gcr.io/kaggle-images/python  # continuumio:anaconda3
+    image: jupyter/datascience-notebook:ubuntu-22.04
     container_name: data-studio
-    volumes:
-      - snapshots-data-studio:/data
-    command: jupyter notebook --port=8888 --no-browser --ip=0.0.0.0 --allow-root
     ports:
       - "8888:8888"
+    volumes:
+      - snapshots-data-studio:/data
     profiles:
       - data-studio
 
