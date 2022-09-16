@@ -21,9 +21,17 @@ bot:
         \start_validation  - kick off validation process
         \cancel_validation - (you will be banned, if will cancel process) stop validation process       
       '
+    remaining_attemps_message: |-
+            I got unexpected answer -_- Please listen to the question one more time!
 
+                          Left attempts for this question:
+    validation_failed_message: |-
+            I got too many unexpected answers and there are no more attempts.
+
+            Verification failed and you will not get the access to the group O_O.
     validation_canceled_message: " To try again type '/start_validation'. "
     validation_passed_message: " Congratulations, you passed the validation. Welcome! "
+    stop_validation_for_owner: 'You are the owner! No need to validate yourself ^_^ '
 
 events_database:
   infrastructure:

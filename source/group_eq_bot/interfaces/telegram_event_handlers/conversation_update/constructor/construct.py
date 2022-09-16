@@ -10,7 +10,7 @@ from interfaces.telegram_event_handlers.conversation_update.commands.cancel_vali
 
 from interfaces.telegram_event_handlers.conversation_update.questions.validator.validator import QuestionsValidator
 from interfaces.telegram_event_handlers.conversation_update.questions.preprocessor.preprocessor import QuestionsPreprocessor
-
+from interfaces.telegram_event_handlers.conversation_update.states.helpers import StatesHelpers
 
 @dataclass
 class Constructor:
@@ -18,7 +18,7 @@ class Constructor:
     based on questions, defined in configurations file. """
 
     entrypoints: CommandHandler = field(init=False)
-    states: Dict = field(init=False)
+    states: Dict = field(default_factory=lambda: {})
     fallbacks: CommandHandler = field(default_factory=lambda: CancelCommandBuilder().handler)
 
     def __post_init__(self):
@@ -27,9 +27,6 @@ class Constructor:
 
         # form questions for states builder
         preprocessed_questions = QuestionsPreprocessor(questions=questions).processed_questions
-
-        questions_number = len(preprocessed_questions)
-        self.states = {}
 
         for question in preprocessed_questions:
             right_answer = question.get('meta').answer
@@ -40,10 +37,10 @@ class Constructor:
                 self.entrypoints = _entrypoints
 
             else:
-                state = StatesBuilder(question=question, questions_number=questions_number, right_answer=right_answer).state
+                state = StatesBuilder(question=question).state
                 self.states.update(state)
 
+        final_state = StatesBuilder(final_question=True).state
+        self.states.update(final_state)
+
         return self
-
-
-cns = Constructor()

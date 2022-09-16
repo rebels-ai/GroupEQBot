@@ -1,13 +1,14 @@
 from dataclasses import dataclass, field
-from typing import Dict
+from typing import Dict, Optional
 
 from telegram import ChatPermissions
 from telegram import Update as TelegramEvent
 from telegram.ext import ContextTypes
 
-from utilities.internal_logger.logger import logger
 from interfaces.telegram_event_validator.validator import EventValidator
 from interfaces.telegram_event_processors.public.message import MessageEventProcessor
+from utilities.configurations_constructor.constructor import Constructor
+from utilities.internal_logger.logger import logger
 
 
 @dataclass
@@ -18,8 +19,8 @@ class StatesHelpers:
     event: TelegramEvent
     context: CONTEXT_DEFAULT_TYPE
 
-    right_answer: str
-    question: Dict = field(init=True)
+    question: Optional[Dict] = None
+    configurator: Constructor = field(default_factory=lambda: Constructor())
 
     def retrieve_member_answer(self) -> str:
         """ Helper function, which retrieves member reply from TelegramEvent. """
@@ -36,7 +37,7 @@ class StatesHelpers:
         """ Helper function which validates member's reply on any question. """
 
         member_answer = self.retrieve_member_answer()
-        right_answer = self.right_answer
+        right_answer = self.get_right_answer()
         return True if member_answer == right_answer else False
 
     def increment_mistakes_number(self, question_identifier: str) -> int:
@@ -51,23 +52,17 @@ class StatesHelpers:
     async def notify_about_remaining_attempts(self, mistakes_number: int) -> None:
         """ Function, which notifies the member's reply failure. """
 
-        attempts_limit = self.question.get('meta').attempts_to_fail
-        text = f'''
-            I got unexpected answer -_- Please listen to the question one more time! \n
-            Left attempts for this question: {attempts_limit - mistakes_number}.
-            '''
+        attempts_limit = self.get_attempts_number()
+        notification = self.configurator.configurations.bot.validation.remaining_attemps_message
+        text = f'{notification} {attempts_limit - mistakes_number}'
         await self.event.message.reply_text(text=text)
         return
 
     async def notify_about_failed_validation(self) -> None:
         """ Function, which notifies member's verification failure. """
 
-        text = f"""
-            I got too many unexpected answers and there are no more attempts. \n
-            Verification failed and you will not get the access to the group O_O.
-            """
-
-        await self.event.message.reply_text(text=text)
+        notification = self.configurator.configurations.bot.validation.validation_failed_message
+        await self.event.message.reply_text(text=notification)
         return
 
     async def disable_restrictions_for_validated_member(self):
@@ -107,3 +102,28 @@ class StatesHelpers:
 
         await MessageEventProcessor(internal_event=event,
                                     context=self.context).process()
+
+    @staticmethod
+    def get_questionnaire_size() -> int:
+        """ Function, which gets the amount of questions in validation process. """
+
+        return len(Constructor().configurations.bot.validation.questions)
+
+    def get_right_answer(self) -> str:
+        """ Function, which gets the right answer defined in configurations. """
+
+        return self.get_previous_question().answer
+
+    def get_attempts_number(self) -> str:
+        """ Function, which gets the attempts number for this question. """
+
+        return self.get_previous_question().attempts_to_fail
+
+    def get_previous_question(self) -> Dict:
+        """ Function, which gets previous question metadata. """
+
+        question_index = self.question.get('question_index') - 1 if self.question is not None else self.get_questionnaire_size()
+        questions_list = sorted(self.configurator.configurations.bot.validation.questions, key=lambda d: d['index_number'])
+        previous_question = questions_list[question_index - 1]  # questions indeces starts from 1, list indeces from 0
+
+        return previous_question
