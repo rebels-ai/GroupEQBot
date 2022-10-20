@@ -11,14 +11,12 @@ from interfaces.telegram_event_handlers.conversation_update.states.helpers impor
 
 from utilities.configurations_constructor.constructor import Constructor
 
+
 @dataclass
 class StatesBuilder:
     """ Interface, which builds states, based on input questions. """
 
     CONTEXT_DEFAULT_TYPE = ContextTypes.DEFAULT_TYPE
-
-    questions_number: int
-    right_answer: str
 
     question: Dict = field(init=True)
     default_message_handler: MessageHandler = field(default_factory=lambda: MessageHandler)
