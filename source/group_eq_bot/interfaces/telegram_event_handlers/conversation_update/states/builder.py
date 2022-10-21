@@ -1,14 +1,11 @@
-from typing import List, Dict
+from typing import Dict, Optional
 
 from dataclasses import dataclass, field
 from telegram import Update as TelegramEvent
 from telegram.ext import MessageHandler, ContextTypes, filters, ConversationHandler
 
-from interfaces.models.validation.questions import Question
 from interfaces.models.validation.question_type import QuestionType
-
 from interfaces.telegram_event_handlers.conversation_update.states.helpers import StatesHelpers
-
 from utilities.configurations_constructor.constructor import Constructor
 
 
@@ -18,44 +15,48 @@ class StatesBuilder:
 
     CONTEXT_DEFAULT_TYPE = ContextTypes.DEFAULT_TYPE
 
-    question: Dict = field(init=True)
+    question: Optional[Dict] = None
+    final_question: bool = False
+
     default_message_handler: MessageHandler = field(default_factory=lambda: MessageHandler)
     default_filters: filters = (filters.TEXT & ~filters.COMMAND)
 
     state: Dict = field(init=False)
     question_index: int = field(init=False)
-
     configurator: Constructor = field(default_factory=lambda: Constructor())
 
+    def set_question_index(self) -> int:
+        if not self.final_question:
+            return self.question['question_index']
+        else:
+            return StatesHelpers.get_questionnaire_size() + 1
+
     def __post_init__(self):
-        self.question_index = self.question['question_index']
+        self.question_index = self.set_question_index()
         self.state = {self.question_index: [self.default_message_handler(self.default_filters, self.callable_function)]}
 
     async def callable_function(self, event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> int:
-        """
-        Method, which will be called as a callback for each message within the conversation.
+        """ Method, which will be called as a callback for each message within the conversation. """
 
-        @FIXME: right_answer part does not work, we need to extract it from previous question
-        """
-        next_question_index = self.question.get('question_index') + 1
-        question_type = self.question.get('meta').question_type
+        next_question_index = self.question_index + 1
 
-        # await StatesHelpers(event=event, context=context, question=self.question).validate_and_save_to_event_database(event=event, context=context)
-        await event.message.reply_text(text=self.right_answer)
-        if StatesHelpers(event=event, 
-                         context=context, 
-                         question=self.question, 
-                         right_answer=self.right_answer).answer_is_correct():
+        await StatesHelpers(event=event,
+                            context=context,
+                            question=self.question).validate_and_save_to_event_database(event=event, context=context)
 
-            if self.question_index == self.questions_number:
+        if StatesHelpers(event=event,
+                         context=context,
+                         question=self.question).answer_is_correct():
+
+            if self.final_question:
                 await event.message.reply_text(text=self.configurator.configurations.bot.validation.validation_passed_message)
-                await StatesHelpers(event=event, 
-                                    context=context, 
-                                    question=self.question, 
-                                    right_answer=self.right_answer).disable_restrictions_for_validated_member()
+                await StatesHelpers(event=event,
+                                    context=context,
+                                    question=self.question).disable_restrictions_for_validated_member()
                 return ConversationHandler.END
 
             else:
+                question_type = self.question.get('meta').question_type
                 # if audio question
                 if question_type == QuestionType.audio:
                     await event.message.reply_voice(voice=self.question.get('question_object'))
@@ -74,25 +75,25 @@ class StatesBuilder:
                 return next_question_index
 
         else:
-            mistakes_number = StatesHelpers(event=event, 
-                                            context=context, 
-                                            question=self.question, 
-                                            right_answer=self.right_answer).increment_mistakes_number(question_identifier=self.question_index)
-            attempts_limit = self.question.get('meta').attempts_to_fail
+            mistakes_number = StatesHelpers(event=event,
+                                            context=context,
+                                            question=self.question).increment_mistakes_number(question_identifier=self.question_index)
+            # attempts_limit = self.question.get('meta').attempts_to_fail
+            attempts_limit = StatesHelpers(event=event,
+                                           context=context,
+                                           question=self.question).get_attempts_number()
+
             if mistakes_number < attempts_limit:
                 await StatesHelpers(event=event, 
                                     context=context, 
-                                    question=self.question, 
-                                    right_answer=self.right_answer).notify_about_remaining_attempts(mistakes_number=mistakes_number)
+                                    question=self.question).notify_about_remaining_attempts(mistakes_number=mistakes_number)
                 return  # return will keep the user on the same state
 
             else:
                 await StatesHelpers(event=event, 
                                     context=context, 
-                                    question=self.question, 
-                                    right_answer=self.right_answer).notify_about_failed_validation()
+                                    question=self.question).notify_about_failed_validation()
                 await StatesHelpers(event=event, 
                                     context=context, 
-                                    question=self.question, 
-                                    right_answer=self.right_answer).ban_member_who_failed_validation()
+                                    question=self.question).ban_member_who_failed_validation()
                 return ConversationHandler.END

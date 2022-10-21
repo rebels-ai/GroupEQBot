@@ -1,4 +1,6 @@
 # Telegram `GroupEQBot` 
+Registered telegram bot can be found in telegram passing `@GroupEQBot` in search bar.
+
 
 ## Motivation
 Nowadays, a buzzy request of any `telegram group` **owner/administrator** is to have a tool, which allows `detecting 
@@ -23,12 +25,8 @@ more `ethical`, `secured`, `targeted` and in general, `wholesome` is a right thi
   - ElasticSearch (stands for storing `events`, `users` and `groups` data)
   - Kibana (stands for UI to manage | query | visualise `events`, `users` and `groups` data)
 
+## System Design ![Screenshot 2022-10-09 at 18 05 02](https://user-images.githubusercontent.com/37558223/194764215-3d3584b9-b28b-4283-9d2c-44efee6db278.png)
 
-
-## Example
-### User attempts to pass the validation
-
-### General system flow overview
 
 
 ## System Configurations
@@ -49,10 +47,20 @@ $ nano configuration.yaml
 
 ## System Deployment
 ``
-From the "source" folder, invoke:
+If you would like to deploy all services:
 ``
 ```bash
 $ docker-compose up --build --force-recreate
+```
+
+``
+If you would like to deploy particular profile (sevice):
+``
+```bash
+$ docker compose --profile={profileName} up --build --force-recreate 
+```
+```bash
+e.g.: $ docker compose --profile={profileName} up --build --force-recreate
 ```
 
 

@@ -1,5 +1,4 @@
 python-telegram-bot==20.0a2
-dataclasses~=0.8
 pydantic~=1.9.1
 hydra-core==1.2.0
 omegaconf~=2.2.3
