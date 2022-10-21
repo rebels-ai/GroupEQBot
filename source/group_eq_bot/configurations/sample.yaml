@@ -8,9 +8,9 @@ bot:
     # this parameter is controlled in question schema (index_number)
     questions:
         [
-          {location_type: 'local', question_type: 'text', index_number: 2, question: None, question_path: '/Users/macbook/rebels/GroupEQBot/GroupEQBot/source/group_eq_bot/assets/text/first_question.txt', answer: 'Good, let"s move forwards.', attempts_to_fail: 2},
+          {location_type: 'local', question_type: 'text', index_number: 2, question: None, question_path: '${hydra:runtime.cwd}/assets/text/first_question.txt', answer: 'Good, let"s move forwards.', attempts_to_fail: 2},
           {location_type: 'local', question_type: 'text', index_number: 3, question: 'What"s your occupation ?', question_path: None, answer: 'Awesome, are you looking for a job now ?', attempts_to_fail: 2},
-          {location_type: 'local', question_type: 'audio', index_number: 1, question: None, question_path: '/Users/macbook/rebels/GroupEQBot/GroupEQBot/source/group_eq_bot/assets/audio/first_question.m4a', answer: 'bla bla bla', attempts_to_fail: 3},
+          {location_type: 'local', question_type: 'audio', index_number: 1, question: None, question_path: '${hydra:runtime.cwd}/assets/audio/first_question.m4a', answer: 'bla bla bla', attempts_to_fail: 3},
         ]
     welcome_message:
       '
