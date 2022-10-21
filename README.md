@@ -60,6 +60,8 @@ If you would like to deploy particular profile (sevice):
 $ docker compose --profile {profileName} up --build --force-recreate 
 ```
 ```bash
+e.g.: $ docker compose --profile server up --build --force-recreate
+or wilth multiple profiles
 e.g.: $ docker compose --profile server --profile database up --build --force-recreate
 ```
 

@@ -10,6 +10,9 @@ from drivers.local.text.base import BaseTextReader
 from drivers.models.supported_audio_extensions import AudioExtensions
 from drivers.models.supported_text_extensions import TextExtensions
 
+# covers importing when local | docker development
+from project_directory import group_eq_bot_root_directory
+
 
 @dataclass
 class Reader:
@@ -20,10 +23,11 @@ class Reader:
     """
 
     input_path: str = field(init=True)
-    path_to_read: Path = field(init=False)
 
+    path_to_read: Path = field(init=False)
     file_extension: str = field(init=False)
-    supported_extensions: List = field(default_factory=lambda:(TextExtensions.list() + AudioExtensions.list()))
+    project_root_directory: str = field(default_factory=lambda: group_eq_bot_root_directory)
+    supported_extensions: List = field(default_factory=lambda: (TextExtensions.list() + AudioExtensions.list()))
 
     @staticmethod
     def _cast_str_to_path(path: str) -> Path:
@@ -33,10 +37,10 @@ class Reader:
     @staticmethod
     def _get_file_extension(path: Path) -> str:
         """ Helper method to get file extension. """
-        return path.suffix.replace ('.', '')
+        return path.suffix.replace('.', '')
 
     def __post_init__(self):
-        self.path_to_read = self._cast_str_to_path(path=self.input_path)
+        self.path_to_read = self._cast_str_to_path(path=f'{self.project_root_directory}/{self.input_path}')
         self.file_extension = self._get_file_extension(path=self.path_to_read)
 
     def file_exists(self) -> Union[bool, FileNotFoundError]:
