@@ -42,7 +42,7 @@ class StatesBuilder:
 
         await StatesHelpers(event=event,
                             context=context,
-                            question=self.question).validate_and_save_to_event_database(event=event, context=context)
+                            question=self.question).validate_and_save_to_event_database()
 
         if StatesHelpers(event=event,
                          context=context,

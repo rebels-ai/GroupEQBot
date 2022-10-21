@@ -1,7 +1,8 @@
-from typing import Union, Any
-from telegram.ext import ApplicationBuilder, Application
-
+from typing import List, Union, Any
 from dataclasses import dataclass, field
+
+from telegram import Update
+from telegram.ext import ApplicationBuilder, Application
 
 from utilities.internal_logger.logger import logger
 from utilities.configurations_constructor.constructor import Constructor
@@ -11,6 +12,7 @@ from utilities.configurations_constructor.constructor import Constructor
 class BotBuilder:
     token: Any = field(init=True)
     bot: Application = field(init=False)
+    allowed_updates: List = field(default_factory=lambda: Update.ALL_TYPES)  # mandatory to specify parameter to catch all the telegram updates
 
     def __post_init__(self):
         self._token_is_correct_format()
@@ -81,7 +83,7 @@ class BotBuilder:
             raise
 
     def launch(self):
-        self.bot.run_polling()
+        self.bot.run_polling(allowed_updates=self.allowed_updates)
 
 
 def main():
