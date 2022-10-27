@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Optional, Union, List
+
 from pydantic import BaseModel, Field, validator
 
 
@@ -893,6 +894,7 @@ class ExpectedExternalEvent(BaseModel):
       from Telegram.
     At most one of the optional parameters can be present in any given update.
     """
+
     update_id: int
     message: Optional[Message] = None
     edited_message: Optional[Message] = None

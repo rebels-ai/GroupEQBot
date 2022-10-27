@@ -5,12 +5,12 @@ from typing import Optional
 from pydantic import ValidationError
 from telegram import Update as TelegramEvent
 
-from interfaces.models.chat import ChatType
-from interfaces.models.event import EventType
-from interfaces.models.member import MemberStatus
+from interfaces.models.internal_event.chat_type import ChatType
+from interfaces.models.internal_event.event_type import EventType
+from interfaces.models.internal_event.member_status import MemberStatus
 
-from interfaces.models.external_event import ExpectedExternalEvent
-from interfaces.models.internal_event import ExpectedInternalEvent
+from interfaces.models.external_event.event import ExpectedExternalEvent
+from interfaces.models.internal_event.event import ExpectedInternalEvent
 
 from utilities.internal_logger.logger import logger
 

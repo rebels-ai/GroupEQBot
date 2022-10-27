@@ -1,7 +1,7 @@
 from telegram.ext import ContextTypes
 from telegram import Update as TelegramEvent
 
-from interfaces.models.chat import ChatType
+from interfaces.models.internal_event.chat_type import ChatType
 from interfaces.telegram_event_validator.validator import EventValidator
 
 from interfaces.telegram_event_processors.public.processor import Processor as PublicEventProcessor

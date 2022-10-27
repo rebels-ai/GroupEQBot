@@ -1,24 +1,48 @@
-administration:
-  token:
-  name: group_eq_bot
-  version: 1.0
-validation:
-  limit_of_attempts_to_fail_per_question: 3
-  mathematical_answer: 40
-  questions_paths:
-    first: ${hydra:runtime.cwd}/assets/first_question.m4a
-    second: ${hydra:runtime.cwd}/assets/second_question.m4a
-    third: ${hydra:runtime.cwd}/assets/third_question.m4a
-    fourth: ${hydra:runtime.cwd}/assets/fourth_question.m4a
-    goodbye: ${hydra:runtime.cwd}/assets/say_goodbye.m4a
-events_driven_database:
-  settings:
-    default_number_of_shards: 2
-    default_number_of_replicas: 0
+bot:
+  general:
+    name: group_eq_bot
+    version: 1.0
+    token:
+  validation:
+    # now we support 10 questions overall
+    # this parameter is controlled in question schema (index_number)
+    questions:
+        [
+          {location_type: 'local', question_type: 'text', index_number: 2, question: None, question_path: '${hydra:runtime.cwd}/assets/text/first_question.txt', answer: 'Good, let"s move forwards.', attempts_to_fail: 2},
+          {location_type: 'local', question_type: 'text', index_number: 3, question: 'What"s your occupation ?', question_path: None, answer: 'Awesome, are you looking for a job now ?', attempts_to_fail: 2},
+          {location_type: 'local', question_type: 'audio', index_number: 1, question: None, question_path: '${hydra:runtime.cwd}/assets/audio/first_question.m4a', answer: 'bla bla bla', attempts_to_fail: 3},
+        ]
+    welcome_message:
+      '
+      hi, GrouEQBot is here !
+      You are asked to pass the validation process, before starting chatting.
+      
+      commands:
+        \start_validation  - kick off validation process
+        \cancel_validation - (you will be banned, if will cancel process) stop validation process       
+      '
+    remaining_attemps_message: |-
+            I got unexpected answer -_- Please listen to the question one more time!
+
+                          Left attempts for this question:
+    validation_failed_message: |-
+            I got too many unexpected answers and there are no more attempts.
+
+            Verification failed and you will not get the access to the group O_O.
+    validation_canceled_message: " To try again type '/start_validation'. "
+    validation_passed_message: " Congratulations, you passed the validation. Welcome! "
+    stop_validation_for_owner: 'You are the owner! No need to validate yourself ^_^ '
+
+events_database:
+  infrastructure:
+    number_of_shards: 2
+    number_of_replicas: 0
   indices:
-    template: ${administration.name}-${administration.version}
+    index_template: ${bot.general.name}-${bot.general.version}
   available_hosts:
     localhost: 127.0.0.1
     container: host.docker.internal
   which_host_to_use:
-    host: ${events_driven_database.available_hosts.localhost}  # is used in source.group_eq_bot.storage.events_driven_database.connectors.connector
+    host: ${events_database.available_hosts.container}  # is used in source.group_eq_bot.storage.events_driven_database.connectors.connector
+
+

@@ -3,14 +3,15 @@ from dataclasses import dataclass, field
 from telegram.ext import ContextTypes
 from telegram import ChatPermissions
 
-from interfaces.models.member import MemberStatus
-from interfaces.models.internal_event import ExpectedInternalEvent
+from interfaces.models.internal_event.member_status import MemberStatus
+from interfaces.models.internal_event.event import ExpectedInternalEvent
 
 from storage.interfaces.documents.user import EventsDatabaseUserInterface
 from storage.interfaces.documents.chat import EventsDatabaseChatInterface
 from storage.interfaces.documents.event import EventsDatabaseEventInterface
 
 from utilities.internal_logger.logger import logger
+from utilities.configurations_constructor.constructor import Constructor
 
 
 @dataclass
@@ -19,14 +20,7 @@ class MemberEventProcessor:
 
     internal_event: ExpectedInternalEvent
     context: ContextTypes.DEFAULT_TYPE
-
-    welcome_message_for_conversation_handler: str = field(init=False)
-
-    def __post_init__(self):
-        """ Post initializer will retrieve and set from passed MemberEvent related values. """
-        self.welcome_message_for_conversation_handler = f'Welcome on board @{self.internal_event.username} ! \n' \
-                                                        f'Before to start enjoying tne chat, please introduce yourself answering couple of the questions. \n' \
-                                                        f'Click on "/start" to initiate conversation. '
+    configurator: Constructor = field(default_factory=lambda: Constructor())
 
     async def process(self) -> None:
         """ Entrypoint for the MemberProcessor, which based on the StatusChange event, invoke appropriate logic. """
@@ -46,7 +40,7 @@ class MemberEventProcessor:
             EventsDatabaseChatInterface(internal_event=self.internal_event).process()
 
             await self.enable_restrictions_for_unvalidated_member()
-            await self.context.bot.send_message(text=self.welcome_message_for_conversation_handler,
+            await self.context.bot.send_message(text=self.configurator.configurations.bot.validation.welcome_message,
                                                 chat_id=self.internal_event.chat_id)
 
         # validation was kicked off
