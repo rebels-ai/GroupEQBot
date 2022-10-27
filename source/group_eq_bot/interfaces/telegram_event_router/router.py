@@ -19,13 +19,13 @@ async def route_event(event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> No
     event = EventValidator(external_event=event).validated_internal_event
     logger.info('[ROUTER] New Event Validated and Casted in ExpectedInternalEvent.')
 
-    if event.chat_type == ChatType.public:
+    if event.chat_type.value in ChatType.public.value:
         logger.info('[ROUTER] ChatType -- "PUBLIC" ')
         logger.info('[ROUTER] Routing to PublicEventProcessor ...')
         await PublicEventProcessor(internal_event=event,
                                    context=context).handle()
 
-    elif event.chat_type == ChatType.private:
+    elif event.chat_type.value == ChatType.private.value:
         logger.info('[ROUTER] ChatType -- "PRIVATE" ')
         logger.info('[ROUTER] Routing to PrivateEventProcessor ...')
         PrivateEventProcessor(internal_event=event,
