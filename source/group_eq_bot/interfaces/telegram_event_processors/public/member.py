@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 
 from telegram.ext import ContextTypes
-from telegram import ChatPermissions
+from telegram import ChatPermissions, InlineKeyboardButton, InlineKeyboardMarkup
 
 from interfaces.models.internal_event.member_status import MemberStatus
 from interfaces.models.internal_event.event import ExpectedInternalEvent
@@ -41,7 +41,9 @@ class MemberEventProcessor:
 
             await self.enable_restrictions_for_unvalidated_member()
             await self.context.bot.send_message(text=self.configurator.configurations.bot.validation.welcome_message,
-                                                chat_id=self.internal_event.chat_id)
+                                                chat_id=self.internal_event.chat_id,
+                                                disable_web_page_preview=False,
+                                                protect_content=True)
 
         # validation was kicked off
         elif self.internal_event.old_status == MemberStatus.member \
@@ -84,33 +86,33 @@ class MemberEventProcessor:
                 and self.internal_event.new_status == MemberStatus.left:
 
             logger.info('[MemberEventProcessor] attempting to write to storage ...')
-            EventsDatabaseEventInterface(internal_event=self.internal_event).process()
-            EventsDatabaseUserInterface(internal_event=self.internal_event).process()
-            EventsDatabaseChatInterface(internal_event=self.internal_event).process()
+            # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
+            # EventsDatabaseUserInterface(internal_event=self.internal_event).process()
+            # EventsDatabaseChatInterface(internal_event=self.internal_event).process()
 
         # member was banned by administrator of the group
         elif self.internal_event.old_status == MemberStatus.member \
                 and self.internal_event.new_status == MemberStatus.banned:
 
             logger.info('[MemberEventProcessor] attempting to write to storage ...')
-            EventsDatabaseEventInterface(internal_event=self.internal_event).process()
-            EventsDatabaseUserInterface(internal_event=self.internal_event).process()
-            EventsDatabaseChatInterface(internal_event=self.internal_event).process()
+            # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
+            # EventsDatabaseUserInterface(internal_event=self.internal_event).process()
+            # EventsDatabaseChatInterface(internal_event=self.internal_event).process()
 
         # member was removed from banned members by the administrator, but not added in the group back
         elif self.internal_event.old_status == MemberStatus.banned \
                 and self.internal_event.new_status == MemberStatus.left:
 
             logger.info('[MemberEventProcessor] attempting to write to storage ...')
-            EventsDatabaseEventInterface(internal_event=self.internal_event).process()
-            EventsDatabaseUserInterface(internal_event=self.internal_event).process()
-            EventsDatabaseChatInterface(internal_event=self.internal_event).process()
+            # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
+            # EventsDatabaseUserInterface(internal_event=self.internal_event).process()
+            # EventsDatabaseChatInterface(internal_event=self.internal_event).process()
 
         # unknown member event occurred
         else:
-            EventsDatabaseEventInterface(internal_event=self.internal_event).process()
-            EventsDatabaseUserInterface(internal_event=self.internal_event).process()
-            EventsDatabaseChatInterface(internal_event=self.internal_event).process()
+            # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
+            # EventsDatabaseUserInterface(internal_event=self.internal_event).process()
+            # EventsDatabaseChatInterface(internal_event=self.internal_event).process()
             logger.warning('Unknown member event occurred'
                            f'{self.internal_event}')
         return

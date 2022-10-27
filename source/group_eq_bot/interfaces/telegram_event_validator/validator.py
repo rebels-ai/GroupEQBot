@@ -19,7 +19,7 @@ from utilities.internal_logger.logger import logger
 class EventValidator:
     """ Helper interface for router to retrieve basic metadata of the event. """
 
-    CHAT_NAME_IF_PRIVATE_MESSAGE_TYPE = 'who-is-bot-private-chat'
+    CHAT_NAME_IF_PRIVATE_MESSAGE_TYPE = 'group-eq-bot-private-chat'
 
     external_event: TelegramEvent
     validated_external_event: ExpectedExternalEvent = field(init=False)
@@ -67,7 +67,16 @@ class EventValidator:
             # [PUBLIC] MemberEvent
             chat_type = self.validated_external_event.chat_member.chat.type
 
-        return ChatType.public if chat_type == ChatType.public.value else ChatType.private
+        if ChatType.group.value == chat_type:
+            return ChatType.group
+
+        elif ChatType.supergroup.value == chat_type:
+            return ChatType.supergroup
+
+        elif ChatType.private.value == chat_type:
+            return ChatType.private
+
+        raise ValueError(f'[EventValidator] Registered unsupported ChatType: {chat_type}')
 
     def get_event_type(self) -> EventType:
         """ Function to get event_type from Message|Member event.

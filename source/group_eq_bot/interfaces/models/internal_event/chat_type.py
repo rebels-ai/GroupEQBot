@@ -13,4 +13,5 @@ class ChatType(Enum):
     """
 
     private = 'private'
-    public = ['supergroup', 'group']
+    group = 'group'
+    supergroup = 'supergroup'
