@@ -31,6 +31,9 @@ class Processor:
             logger.info('[PROCESSOR] telegram_event_router to Public MemberEventProcessor ...')
             await MemberEventProcessor(internal_event=self.internal_event,
                                        context=self.context).process()
+
+        # @TODO: elif self.internal_event.event_type == EventType.button
+        #        
         else:
             logger.warning(f'[PROCESSOR] EventProcessor registered unknown EventType.'
                            f'{self.internal_event.event_type}')

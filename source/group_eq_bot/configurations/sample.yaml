@@ -13,7 +13,10 @@ bot:
           {location_type: 'local', question_type: 'text', index_number: 3, question: 'What"s your occupation ?', question_path: None, answer: 'Awesome, are you looking for a job now ?', attempts_to_fail: 2},
           {location_type: 'local', question_type: 'audio', index_number: 1, question: None, question_path: '${hydra:runtime.cwd}/assets/audio/first_question.m4a', answer: 'bla bla bla', attempts_to_fail: 3},
         ]
-    welcome_message: 'You have to pass the validation here: ${bot.general.link}'
+    welcome_message: |-
+        К нам хочет присоединиться USERNAME
+                      Cообщение для нового участника
+        ||Поговори со мной, чтобы иметь полный доступ к этой группе||
     remaining_attemps_message: |-
             I got unexpected answer -_- Please listen to the question one more time!
 
