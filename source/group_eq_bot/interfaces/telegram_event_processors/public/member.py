@@ -31,9 +31,8 @@ class MemberEventProcessor:
         # either new member, who tries to join the group, who was not in the group before
         # or who was in the group in the past and left by (him/her)self
         # or who was removed from banned and added back to the group.
-        if self.internal_event.old_status == MemberStatus.left \
-                or self.internal_event.old_status == MemberStatus.banned \
-                and self.internal_event.new_status == MemberStatus.member:
+        if (self.internal_event.old_status == MemberStatus.left or self.internal_event.old_status == MemberStatus.banned and self.internal_event.new_status == MemberStatus.member) \
+            or (self.internal_event.old_status == MemberStatus.restricted and self.internal_event.new_status == MemberStatus.restricted):
 
             logger.info('[MemberEventProcessor] attempting to write to storage ...')
             # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
@@ -43,9 +42,11 @@ class MemberEventProcessor:
             user_mention = f'[{self.internal_event.first_name}](tg://user?{self.internal_event.user_id})'
 
             # @TODO: Move to dedicated directory where buttons live
-            # keyboard = [[InlineKeyboardButton(text='Начать проверку', url=self.configurator.configurations.bot.general.link)]]
-            keyboard = [[InlineKeyboardButton(text='Начать проверку @GroupEQBot', callback_data='Button clicked')]]
+            keyboard = [[InlineKeyboardButton(text='Начать проверку', url=self.configurator.configurations.bot.general.link)]]
+            # keyboard = [[InlineKeyboardButton(text='Начать проверку @GroupEQBot', callback_data='Button clicked')]]
             reply_markup = InlineKeyboardMarkup(keyboard)
+
+            self.context.user_data['chat_id'] = self.internal_event.chat_id
 
             await self.enable_restrictions_for_unvalidated_member()
             await self.context.bot.send_message(
@@ -62,7 +63,7 @@ class MemberEventProcessor:
             logger.info('[MemberEventProcessor] attempting to write to storage ...')
             # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
             # EventsDatabaseUserInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseChatInterface (internal_event=self.internal_event).process()
+            # EventsDatabaseChatInterface(internal_event=self.internal_event).process()
 
         # validation was passed successfully
         elif self.internal_event.old_status == MemberStatus.restricted \
@@ -71,13 +72,14 @@ class MemberEventProcessor:
             logger.info('[MemberEventProcessor] attempting to write to storage ...')
             # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
             # EventsDatabaseUserInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseChatInterface (internal_event=self.internal_event).process()
+            # EventsDatabaseChatInterface(internal_event=self.internal_event).process()
 
+        # @TODO: Rethink member processor structure, because of some scenarious like this
         # validation was not passed successfully, member left during validation process
-        elif self.internal_event.old_status == MemberStatus.restricted \
-                and self.internal_event.new_status == MemberStatus.restricted:
+        # elif self.internal_event.old_status == MemberStatus.restricted \
+        #         and self.internal_event.new_status == MemberStatus.restricted:
 
-            logger.info('[MemberEventProcessor] attempting to write to storage ...')
+        #     logger.info('[MemberEventProcessor] attempting to write to storage ...')
             # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
             # EventsDatabaseUserInterface(internal_event=self.internal_event).process()
             # EventsDatabaseChatInterface(internal_event=self.internal_event).process()

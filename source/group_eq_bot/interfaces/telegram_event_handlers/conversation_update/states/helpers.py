@@ -67,12 +67,19 @@ class StatesHelpers:
         await self.event.message.reply_text(text=notification)
         return
 
+    def get_chat_id_for_validation(self) -> Optional[int]:
+        """ Function, which finds chat id which member recently joined,
+        and passing the validation process. """
+
+        return self.context.user_data.get('chat_id', 0)
+
     async def disable_restrictions_for_validated_member(self):
         """ Function, which changes status from restricted on member,
         disabling restrictions for user, who passed the validation.  """
 
+        chat_id = self.get_chat_id_for_validation()
         await self.context.bot.restrict_chat_member(
-            chat_id=self.event.message.chat.id,
+            chat_id=chat_id,
             user_id=self.event.message.from_user.id,
 
             permissions=ChatPermissions(
@@ -86,13 +93,16 @@ class StatesHelpers:
                 can_add_web_page_previews=True
             )
         )
+        self.context.user_data.clear()
 
     async def ban_member_who_failed_validation(self):
         """ Function, which changes status from restricted on restricted,
         banning user, who failed validation process. """
 
-        await self.context.bot.ban_chat_member(chat_id=self.event.message.chat.id,
+        chat_id = self.get_chat_id_for_validation()
+        await self.context.bot.ban_chat_member(chat_id=chat_id,
                                                user_id=self.event.message.from_user.id)
+        self.context.user_data.clear()
 
     async def validate_and_save_to_event_database(self):
         """ Function, responsible for validating incoming TelegramEvent
