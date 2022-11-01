@@ -38,13 +38,7 @@ class MemberEventProcessor:
         if (self.internal_event.old_status == MemberStatus.left or self.internal_event.old_status == MemberStatus.banned and self.internal_event.new_status == MemberStatus.member) \
             or (self.internal_event.old_status == MemberStatus.restricted and self.internal_event.new_status == MemberStatus.restricted):
 
-            # logger.info('[MemberEventProcessor] attempting to write to storage ...')
-            # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseUserInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseChatInterface(internal_event=self.internal_event).process()
-
-            self.context.user_data['chat_id'] = self.internal_event.chat_id
-
+            self._write_event_to_datase()
             await self.enable_restrictions_for_unvalidated_member()
 
             await self.context.bot.send_message(
@@ -54,75 +48,41 @@ class MemberEventProcessor:
                 chat_id=self.internal_event.chat_id,
                 text=self.configurator.configurations.bot.validation.welcome_message.replace('USERNAME', f'[{self.internal_event.first_name}](tg://user?{self.internal_event.user_id})'))
 
+            self.context.user_data['chat_id'] = self.internal_event.chat_id
+            
         # validation was kicked off
         elif self.internal_event.old_status == MemberStatus.member \
                 and self.internal_event.new_status == MemberStatus.restricted:
-
-            logger.info('[MemberEventProcessor] attempting to write to storage ...')
-            # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseUserInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseChatInterface(internal_event=self.internal_event).process()
+                self._write_event_to_datase()
 
         # validation was passed successfully
         elif self.internal_event.old_status == MemberStatus.restricted \
                 and self.internal_event.new_status == MemberStatus.member:
-
-            logger.info('[MemberEventProcessor] attempting to write to storage ...')
-            # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseUserInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseChatInterface(internal_event=self.internal_event).process()
-
-        # @TODO: Rethink member processor structure, because of some scenarious like this
-        # validation was not passed successfully, member left during validation process
-        # elif self.internal_event.old_status == MemberStatus.restricted \
-        #         and self.internal_event.new_status == MemberStatus.restricted:
-
-        #     logger.info('[MemberEventProcessor] attempting to write to storage ...')
-            # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseUserInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseChatInterface(internal_event=self.internal_event).process()
+                self._write_event_to_datase()
 
         # validation was failed, member was banned
         elif self.internal_event.old_status == MemberStatus.restricted \
                 and self.internal_event.new_status == MemberStatus.banned:
-
-            logger.info('[MemberEventProcessor] attempting to write to storage ...')
-            # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseUserInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseChatInterface(internal_event=self.internal_event).process()
+                self._write_event_to_datase()
 
         # member left the group by (him/her)self after passed validation
         elif self.internal_event.old_status == MemberStatus.member \
                 and self.internal_event.new_status == MemberStatus.left:
-
-            logger.info('[MemberEventProcessor] attempting to write to storage ...')
-            # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseUserInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseChatInterface(internal_event=self.internal_event).process()
+                self._write_event_to_datase()
 
         # member was banned by administrator of the group
         elif self.internal_event.old_status == MemberStatus.member \
                 and self.internal_event.new_status == MemberStatus.banned:
-
-            logger.info('[MemberEventProcessor] attempting to write to storage ...')
-            # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseUserInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseChatInterface(internal_event=self.internal_event).process()
+                self._write_event_to_datase()
 
         # member was removed from banned members by the administrator, but not added in the group back
         elif self.internal_event.old_status == MemberStatus.banned \
                 and self.internal_event.new_status == MemberStatus.left:
-
-            logger.info('[MemberEventProcessor] attempting to write to storage ...')
-            # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseUserInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseChatInterface(internal_event=self.internal_event).process()
+                self._write_event_to_datase()
 
         # unknown member event occurred
         else:
-            # EventsDatabaseEventInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseUserInterface(internal_event=self.internal_event).process()
-            # EventsDatabaseChatInterface(internal_event=self.internal_event).process()
+            self._write_event_to_datase()
             logger.warning('Unknown member event occurred'
                            f'{self.internal_event}')
         return
@@ -147,6 +107,11 @@ class MemberEventProcessor:
             )
         )
 
+    def _write_event_to_datase(self):
+        logger.info('[MemberEventProcessor] attempting to write to storage ...')
+        EventsDatabaseEventInterface(internal_event=self.internal_event).process()
+        EventsDatabaseUserInterface(internal_event=self.internal_event).process()
+        EventsDatabaseChatInterface(internal_event=self.internal_event).process()
 
     def _get_reply_markup(self):
         button = UrlButton(text=self.configurator.configurations.bot.validation.bot_button_text,
