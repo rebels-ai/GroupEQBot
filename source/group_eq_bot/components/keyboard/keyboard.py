@@ -10,8 +10,4 @@ class Keyboard:
     buttons: List[UrlButton] = field(init=True)
 
     def __post_init__(self):
-        if isinstance(self.buttons, UrlButton):
-            return [self.buttons]
-        
-        elif isinstance(self.buttons, List):
-            return self.buttons
+        return [self.buttons]

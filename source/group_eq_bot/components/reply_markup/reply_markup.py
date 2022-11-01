@@ -10,4 +10,4 @@ class ReplyMarkup:
     object: Any = field(init=True)
     
     def __post_init__(self):
-        return [InlineKeyboardMarkup(self.object)]
+        return InlineKeyboardMarkup(self.object)

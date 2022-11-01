@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from telegram import ChatPermissions
+from telegram import ChatPermissions, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 
@@ -35,20 +35,22 @@ class MemberEventProcessor:
         # either new member, who tries to join the group, who was not in the group before
         # or who was in the group in the past and left by (him/her)self
         # or who was removed from banned and added back to the group.
-        if (self.internal_event.old_status == MemberStatus.left or self.internal_event.old_status == MemberStatus.banned and self.internal_event.new_status == MemberStatus.member) \
-            or (self.internal_event.old_status == MemberStatus.restricted and self.internal_event.new_status == MemberStatus.restricted):
+        if self.internal_event.old_status == MemberStatus.left \
+            or self.internal_event.old_status == MemberStatus.banned \
+                and self.internal_event.new_status == MemberStatus.member:
 
             self._write_event_to_datase()
             await self.enable_restrictions_for_unvalidated_member()
+
+            self.context.user_data['chat_id'] = self.internal_event.chat_id
 
             await self.context.bot.send_message(
                 reply_markup=self._get_reply_markup(),
                 protect_content=True,
                 parse_mode=ParseMode.MARKDOWN_V2,
                 chat_id=self.internal_event.chat_id,
-                text=self.configurator.configurations.bot.validation.welcome_message.replace('USERNAME', f'[{self.internal_event.first_name}](tg://user?{self.internal_event.user_id})'))
+                text=self.configurator.configurations.bot.validation.welcome_message.replace('USERNAME', f'[{self.internal_event.first_name}](tg://user?id={self.internal_event.user_id})'))
 
-            self.context.user_data['chat_id'] = self.internal_event.chat_id
             
         # validation was kicked off
         elif self.internal_event.old_status == MemberStatus.member \
@@ -65,6 +67,11 @@ class MemberEventProcessor:
                 and self.internal_event.new_status == MemberStatus.banned:
                 self._write_event_to_datase()
 
+        # member left the group by (him/her)self before passing validation
+        elif self.internal_event.old_status == MemberStatus.restricted \
+            and self.internal_event.new_status == MemberStatus.restricted:
+                self._write_event_to_datase()
+
         # member left the group by (him/her)self after passed validation
         elif self.internal_event.old_status == MemberStatus.member \
                 and self.internal_event.new_status == MemberStatus.left:
@@ -77,6 +84,11 @@ class MemberEventProcessor:
 
         # member was removed from banned members by the administrator, but not added in the group back
         elif self.internal_event.old_status == MemberStatus.banned \
+                and self.internal_event.new_status == MemberStatus.left:
+                self._write_event_to_datase()
+
+        # member left the group before passing validation and the administrator disabled restrictions
+        elif self.internal_event.old_status == MemberStatus.restricted \
                 and self.internal_event.new_status == MemberStatus.left:
                 self._write_event_to_datase()
 
@@ -114,10 +126,13 @@ class MemberEventProcessor:
         EventsDatabaseChatInterface(internal_event=self.internal_event).process()
 
     def _get_reply_markup(self):
-        button = UrlButton(text=self.configurator.configurations.bot.validation.bot_button_text,
-                            url=self.configurator.configurations.bot.general.url)
+        # button = UrlButton(text=self.configurator.configurations.bot.validation.bot_button_text,
+        #                     url=self.configurator.configurations.bot.general.url)
 
-        keyboard = Keyboard(buttons=button)
-        reply = ReplyMarkup(object=keyboard)
+        # keyboard = Keyboard(buttons=[button])
+        # reply = ReplyMarkup(object=keyboard)
+        keyboard = [[InlineKeyboardButton(text=self.configurator.configurations.bot.validation.bot_button_text, 
+                                          url=self.configurator.configurations.bot.general.url)]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
 
-        return reply
+        return reply_markup
