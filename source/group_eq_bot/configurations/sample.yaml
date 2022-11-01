@@ -3,7 +3,7 @@ bot:
     name: group_eq_bot
     version: 1.0
     token:
-    link: t.me/GroupEQBot
+    url: t.me/GroupEQBot
   validation:
     # now we support 10 questions overall
     # this parameter is controlled in question schema (index_number)
@@ -14,9 +14,12 @@ bot:
           {location_type: 'local', question_type: 'audio', index_number: 1, question: None, question_path: '${hydra:runtime.cwd}/assets/audio/first_question.m4a', answer: 'bla bla bla', attempts_to_fail: 3},
         ]
     welcome_message: |-
+        👻:
         К нам хочет присоединиться USERNAME
-                      Cообщение для нового участника
-        ||Поговори со мной, чтобы иметь полный доступ к этой группе||
+
+        🎯
+        || USERNAME, Чтобы иметь полный доступ к этой группе, тебе нужно пройти валидацию. ||
+
     remaining_attemps_message: |-
             I got unexpected answer -_- Please listen to the question one more time!
 
@@ -28,6 +31,7 @@ bot:
     validation_canceled_message: " To try again type '/start_validation'. "
     validation_passed_message: " Congratulations, you passed the validation. Welcome! "
     stop_validation_for_owner: 'You are the owner! No need to validate yourself ^_^ '
+    bot_button_text: ' Чат со мной '
 
 events_database:
   infrastructure:
