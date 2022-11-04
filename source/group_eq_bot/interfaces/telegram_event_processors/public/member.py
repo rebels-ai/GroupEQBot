@@ -4,10 +4,6 @@ from telegram import ChatPermissions, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 
-from components.button.url_button import UrlButton
-from components.keyboard.keyboard import Keyboard
-from components.reply_markup.reply_markup import ReplyMarkup
-
 from interfaces.models.internal_event.member_status import MemberStatus
 from interfaces.models.internal_event.event import ExpectedInternalEvent
 
@@ -126,13 +122,11 @@ class MemberEventProcessor:
         EventsDatabaseChatInterface(internal_event=self.internal_event).process()
 
     def _get_reply_markup(self):
-        # button = UrlButton(text=self.configurator.configurations.bot.validation.bot_button_text,
-        #                     url=self.configurator.configurations.bot.general.url)
-
-        # keyboard = Keyboard(buttons=[button])
-        # reply = ReplyMarkup(object=keyboard)
-        keyboard = [[InlineKeyboardButton(text=self.configurator.configurations.bot.validation.bot_button_text, 
-                                          url=self.configurator.configurations.bot.general.url)]]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-
-        return reply_markup
+        keyboard = [
+            [InlineKeyboardButton(
+                text=self.configurator.configurations.bot.validation.bot_button_text,
+                 url=self.configurator.configurations.bot.general.url
+                 )
+            ]
+        ]
+        return InlineKeyboardMarkup(keyboard)

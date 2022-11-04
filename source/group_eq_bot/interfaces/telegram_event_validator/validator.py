@@ -56,17 +56,25 @@ class EventValidator:
                                                               event_time=self.get_event_time(),
                                                               message=self.get_message_text())
         logger.info('[EventValidator] Successfully casted ExpectedExternalEvent into ExpectedInternalEvent.')
-
+    
     def get_chat_type(self) -> ChatType:
         """ Function to get chat_type from Message|Member event. """
 
-        try:
-            # [PUBLIC | PRIVATE] MessageEvent
-            chat_type = self.validated_external_event.message.chat.type
-        except AttributeError:
-            # [PUBLIC] MemberEvent
-            chat_type = self.validated_external_event.chat_member.chat.type
-
+        message = self.validated_external_event.message
+        bot = self.validated_external_event.my_chat_member
+        member = self.validated_external_event.chat_member
+        
+        if message:
+           return self._retrieve_chat_type(chat_type=message.chat.type)
+                      
+        elif bot:
+            return self._retrieve_chat_type(chat_type=bot.chat.type)
+        
+        elif member:
+            return self._retrieve_chat_type(chat_type=bot.chat.type)
+    
+    @staticmethod
+    def _retrieve_chat_type(chat_type: str):
         if ChatType.group.value == chat_type:
             return ChatType.group
 
@@ -76,18 +84,17 @@ class EventValidator:
         elif ChatType.private.value == chat_type:
             return ChatType.private
 
-        raise ValueError(f'[EventValidator] Registered unsupported ChatType: {chat_type}')
-
     def get_event_type(self) -> EventType:
-        """ Function to get event_type from Message|Member event.
-        Notes:
-            @TODO: whether private conversation with bot is handled here
-            @NOTE: will be used, when we will manage PRIVATE conversation with bot + revamp return statement
-                hit_private_with_bot_event_type = self.validated_external_event.__fields__.get (EventType.private_with_bot.value, None)
-        """
+        """ Function to get event_type from Message | Member | Bot event. """
 
-        whether_message_event_type = self.validated_external_event.message
-        return EventType.message if whether_message_event_type is not None else EventType.member
+        if self.validated_external_event.message:
+            return EventType.message
+        
+        elif self.validated_external_event.chat_member:
+            return EventType.member    
+        
+        elif self.validated_external_event.my_chat_member:
+            return EventType.bot
 
     def get_chat_name(self) -> str:
         """ Function to get chat_name from Message|Member event. """

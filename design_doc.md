@@ -143,8 +143,6 @@ telegram --> update (MyChatMember Update) --> router --> PublicEventProcessor --
     if self.internal_event.event_type == EventType.bot:  # bot was added into the group
         BackgroundUsersInitializer()  # Bot gets the list of all the memberes ...
         BackgroundBotMetadataInitializer()  # Bot has to create entity in `BotMetadata` ...
-
-
 ```
 
 
