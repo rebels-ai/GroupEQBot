@@ -13,8 +13,8 @@ class StartCommandHelper:
     event: TelegramEvent
     context: CONTEXT_DEFAULT_TYPE
 
-    async def check_if_chat_owner(self) -> bool:
-        """ Check if message author is a chat owner """
+    async def chat_owner(self) -> bool:
+        """ Method, which checks whether message author is a chat owner. """
 
         member = await self.context.bot.get_chat_member(
             chat_id=self.event.effective_chat.id,
@@ -22,3 +22,8 @@ class StartCommandHelper:
             )
 
         return True if member.status == 'creator' else False
+
+    def passed_validation(self) -> bool:
+        """ Method, which supposed to check whether user had already passed the validation. """
+        
+        raise NotImplementedError

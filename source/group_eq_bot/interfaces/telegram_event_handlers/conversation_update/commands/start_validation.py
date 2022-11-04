@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from telegram import Update as TelegramEvent
 from telegram.ext import CommandHandler, ContextTypes, ConversationHandler
 
+from interfaces.models.internal_event.chat_type import ChatType
 from interfaces.models.validation.question_type import QuestionType
 from interfaces.telegram_event_handlers.conversation_update.commands.helper import StartCommandHelper
 from utilities.configurations_constructor.constructor import Constructor
@@ -27,30 +28,37 @@ class StartCommandBuilder:
                                       callback=self.callback_function)
 
     async def callback_function(self, event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> int:
-        """ Method, which will be called as a callback for `start_validation` command. """
+        """ Method, which will be called as a callback for `start_validation` command. 
+            
+            Note:
+                ConversationHandler supposed to be used only within private chat (bot:user)
+        """
 
-        if await StartCommandHelper(event=event, context=context).check_if_chat_owner():
-            logger.info(f'User, who talks with bot: {event.message.from_user.full_name}')
+        # ConversationHandler supposed to be used only within private chat (bot:user)
+        if event.message.chat.type == ChatType.private.value:
 
-            await event.message.reply_text(text=self.configurator.configurations.bot.validation.stop_validation_for_owner)
-            return ConversationHandler.END
+            if await StartCommandHelper(event=event, context=context).chat_owner():
+                logger.info(f'User, who talks with bot: {event.message.from_user.full_name}')
 
-        next_question_index = self.question.get('question_index') + 1
-        question_type = self.question.get('meta').question_type
+                await event.message.reply_text(text=self.configurator.configurations.bot.validation.stop_validation_for_owner)
+                return ConversationHandler.END
 
-        # if audio question
-        if question_type == QuestionType.audio:
-            await event.message.reply_voice(voice=self.question.get('question_object'))
+            next_question_index = self.question.get('question_index') + 1
+            question_type = self.question.get('meta').question_type
 
-        # if text question
-        elif question_type == QuestionType.text:
+            # if audio question
+            if question_type == QuestionType.audio:
+                await event.message.reply_voice(voice=self.question.get('question_object'))
 
-            # if text question declared in configurations file
-            if self.question.get('meta').question is not None:
-                await event.message.reply_text(text=self.question.get('question_object'))
+            # if text question
+            elif question_type == QuestionType.text:
 
-            # if text question saved in assets
-            else:
-                await event.message.reply_text(text=self.question.get('question_object'))
+                # if text question declared in configurations file
+                if self.question.get('meta').question is not None:
+                    await event.message.reply_text(text=self.question.get('question_object'))
 
-        return next_question_index
+                # if text question saved in assets
+                else:
+                    await event.message.reply_text(text=self.question.get('question_object'))
+
+            return next_question_index
