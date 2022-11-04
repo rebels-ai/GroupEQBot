@@ -21,5 +21,6 @@ class BotEventProcessor:
     context: ContextTypes.DEFAULT_TYPE
     configurator: Constructor = field(default_factory=lambda: Constructor())
 
-    def process(self):
+    async def process(self):
         logger.info(self.internal_event)
+        return
