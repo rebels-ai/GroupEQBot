@@ -20,7 +20,6 @@ class EventValidator:
     """ Helper interface for router to retrieve basic metadata of the event. """
 
     CHAT_NAME_IF_PRIVATE_MESSAGE_TYPE = 'group-eq-bot-private-chat'
-    USER_ID_FOR_BOT_EVENTS = 12345678
 
     external_event: TelegramEvent
     validated_external_event: ExpectedExternalEvent = field(init=False)
@@ -41,6 +40,7 @@ class EventValidator:
             raise error
 
     def generate_internal_event(self):
+        """ Function, which generates InternalEvent, extracting some data from ExternalEvent. """
         logger.info('[EventValidator] Attempting to cast ExpectedExternalEvent into ExpectedInternalEvent.')
         self.validated_internal_event = ExpectedInternalEvent(event=self.validated_external_event,
                                                               chat_type=self.get_chat_type(),
@@ -75,7 +75,8 @@ class EventValidator:
             return self._retrieve_chat_type(chat_type=member.chat.type)
     
     @staticmethod
-    def _retrieve_chat_type(chat_type: str):
+    def _retrieve_chat_type(chat_type: str) -> ChatType:
+        """ Function, which returns ChatType model depending on value provided . """
         if ChatType.group.value == chat_type:
             return ChatType.group
 
@@ -105,10 +106,10 @@ class EventValidator:
         member = self.validated_external_event.chat_member
 
         if message:
-            return message.chat.title
+            return message.chat.title if message.chat.title is not None else self.CHAT_NAME_IF_PRIVATE_MESSAGE_TYPE
 
         elif bot:
-            return bot.chat.title  # bot name? 
+            return bot.chat.title if bot.chat.title is not None else self.CHAT_NAME_IF_PRIVATE_MESSAGE_TYPE
 
         elif member:
             return member.chat.title
@@ -144,7 +145,7 @@ class EventValidator:
             return message.from_user.id
 
         elif bot:
-            return self.USER_ID_FOR_BOT_EVENTS
+            return bot.new_chat_member.user.id  #
 
         elif member:
             return member.new_chat_member.user.id
@@ -157,19 +158,14 @@ class EventValidator:
         """
 
         message = self.validated_external_event.message
-        bot = self.validated_external_event.my_chat_member
-        member = self.validated_external_event.chat_member
 
         if message:
             return message.message_id
 
-        elif bot:
+        else:
             return None
 
-        elif member:
-            return None
-
-    def get_user_first_name(self) -> Optional[str]:
+    def get_user_first_name(self) -> str:
         """ Function to get first name from Message | Member | Bot event.
 
         Note:
@@ -184,7 +180,7 @@ class EventValidator:
             return message.from_user.first_name
 
         elif bot:
-            return self.CHAT_NAME_IF_PRIVATE_MESSAGE_TYPE
+            return bot.new_chat_member.user.first_name
 
         elif member:
             return member.new_chat_member.user.first_name
@@ -204,7 +200,7 @@ class EventValidator:
             return message.from_user.last_name
 
         elif bot:
-            return None
+            return bot.new_chat_member.user.last_name
 
         elif member:
             return member.new_chat_member.user.last_name
@@ -220,7 +216,7 @@ class EventValidator:
             return message.from_user.username
 
         elif bot:
-            return None
+            return bot.new_chat_member.user.username
 
         elif member:
             return member.new_chat_member.user.username
