@@ -7,10 +7,6 @@ from telegram.constants import ParseMode
 from interfaces.models.internal_event.member_status import MemberStatus
 from interfaces.models.internal_event.event import ExpectedInternalEvent
 
-from storage.interfaces.documents.user import EventsDatabaseUserInterface
-from storage.interfaces.documents.chat import EventsDatabaseChatInterface
-from storage.interfaces.documents.event import EventsDatabaseEventInterface
-
 from utilities.internal_logger.logger import logger
 from utilities.configurations_constructor.constructor import Constructor
 
@@ -117,9 +113,6 @@ class MemberEventProcessor:
 
     def _write_event_to_datase(self):
         logger.info('[MemberEventProcessor] attempting to write to storage ...')
-        EventsDatabaseEventInterface(internal_event=self.internal_event).process()
-        EventsDatabaseUserInterface(internal_event=self.internal_event).process()
-        EventsDatabaseChatInterface(internal_event=self.internal_event).process()
 
     def _get_reply_markup(self):
         keyboard = [

@@ -46,37 +46,27 @@ class Builder:
 
     @staticmethod
     def generate_event_id() -> int:
+        # @TODO: change back to uuid
         shortuuid.set_alphabet('0123456789')
         return int(shortuuid.random(length=16))
 
     def build_event(self):
-        self.event = Event(user_id=object.user_id,
-                           message_id=object.message_id,
-                           event_time=object.event_time,
-                           event_type=object.event_type,
-                           content=object.message,
-                           raw_event=object.dict())
+        self.event = Event(user_id=self.object.user_id,
+                           message_id=self.object.message_id,
+                           event_time=self.object.event_time,
+                           event_type=self.object.event_type,
+                           content=self.object.message,
+                           raw_event=self.object.dict())
 
     def build_schema(self):
         self.schema = GroupEvent(event_id=self.event_id,
                                  event=self.event)
 
     def build_index_name(self):
-        self.index_name = f'{self.schema.Index.name}-group-events-{abs(self.object.chat_id)}'
+        self.index_name = f'{self.schema.Index.name}-GroupEvents-{abs(self.object.chat_id)}'
 
     def build(self):
         self.build_event()
         self.build_schema()
         self.build_index_name()
         return self
-
-
-from interfaces.telegram_event_validator.validator import EventValidator
-from tests.data.telegram_fake_events import fake_public_message_event, fake_public_member_event, fake_private_member_event, fake_private_message_event
-
-object = EventValidator(fake_public_message_event).validated_internal_event
-
-
-document = Builder(object=object).build()
-
-print(document.schema.save(index=document.index_name))
