@@ -15,19 +15,19 @@ class ExpectedInternalEvent(BaseModel):
         arbitrary_types_allowed = True
 
     event: ExpectedExternalEvent
-    event_type: EventType
+    event_type: str
     event_time: float  # datetime converted into POSIX timestamp
 
     chat_id: int
-    chat_type: ChatType
+    chat_type: str
     chat_name: str
 
     user_id: int
     first_name: str
     last_name: Optional[str]
     username: Optional[str]
-    new_status: Optional[MemberStatus]
-    old_status: Optional[MemberStatus]
+    new_status: Optional[str]
+    old_status: Optional[str]
 
     message_id: Optional[int]  # refer to router.router_helper.get_message_id
     message: Optional[str]
