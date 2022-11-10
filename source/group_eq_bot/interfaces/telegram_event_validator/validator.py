@@ -27,6 +27,7 @@ class EventValidator:
 
     def __post_init__(self):
         self.validate_external_event()
+
         self.generate_internal_event()
 
     def validate_external_event(self):
@@ -56,7 +57,7 @@ class EventValidator:
                                                               event_time=self.get_event_time(),
                                                               message=self.get_message_text())
         logger.info('[EventValidator] Successfully casted ExpectedExternalEvent into ExpectedInternalEvent.')
-    
+
     def get_chat_type(self) -> ChatType:
         """ Function to get chat_type from Message|Member event. """
 
@@ -104,7 +105,6 @@ class EventValidator:
             chat_name = self.validated_external_event.message.chat.title
             # [PRIVATE] MessageEvent
             chat_name = self.CHAT_NAME_IF_PRIVATE_MESSAGE_TYPE if chat_name is None else chat_name
-
         except AttributeError:
             # [PUBLIC] MemberEvent
             chat_name = self.validated_external_event.chat_member.chat.title
