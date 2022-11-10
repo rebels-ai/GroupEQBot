@@ -26,6 +26,9 @@ Tasks:
 
 
 # Indeces
+
+ChatsNameIDMappings
+
 ```
 Description:
     Multiple Indeces containing list of users for according group and their metadata including validation info
