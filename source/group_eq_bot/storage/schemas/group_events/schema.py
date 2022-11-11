@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from interfaces.models.internal_event.event import ExpectedInternalEvent
 
 from elasticsearch_dsl import (
