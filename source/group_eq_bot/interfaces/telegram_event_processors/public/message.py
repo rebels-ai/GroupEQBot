@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 
 from telegram.ext import ContextTypes
-from interfaces.models.internal_event.event import ExpectedInternalEvent
 
+from interfaces.models.internal_event.event import ExpectedInternalEvent
 from utilities.internal_logger.logger import logger
+from storage.schemas.group_events.schema import Builder
 
 
 @dataclass
@@ -21,3 +22,6 @@ class MessageEventProcessor:
 
         logger.info('[MessageEventProcessor] is called ...')
         logger.info('[MessageEventProcessor] attempting to write to storage ...')
+
+        document = Builder(object=self.internal_event).build()
+        document.schema.save(index=document.index_name)

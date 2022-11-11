@@ -11,10 +11,10 @@ CONFIGURATIONS = Constructor().configurations
 
 class Event(Document):
     user_id = Long(required=True)
-    message_id = Long(required=True)
+    message_id = Long()
     event_time = Date(required=True)
     event_type = Text(required=True)
-    content = Text(required=True)
+    content = Text()
     raw_event = Object(required=True)
 
 
