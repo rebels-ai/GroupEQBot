@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
 
@@ -16,7 +17,7 @@ class ExpectedInternalEvent(BaseModel):
 
     event: ExpectedExternalEvent
     event_type: str
-    event_time: float  # datetime converted into POSIX timestamp
+    event_time: datetime  # datetime converted into POSIX timestamp
 
     chat_id: int
     chat_type: str

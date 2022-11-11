@@ -53,7 +53,7 @@ class Builder:
                                   event=self.event)
 
     def build_index_name(self):
-        self.index_name = f'{self.schema.Index.name}-BotMetadata'
+        self.index_name = f'{self.schema.Index.name}-bot-metadata'
 
     def build(self):
         self.build_event()

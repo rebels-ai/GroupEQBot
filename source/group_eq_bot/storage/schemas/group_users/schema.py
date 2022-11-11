@@ -77,7 +77,7 @@ class Builder:
                                 event=self.event)
 
     def build_index_name(self):
-        self.index_name = f'{self.schema.Index.name}-GroupUsers-{abs(self.object.chat_id)}'
+        self.index_name = f'{self.schema.Index.name}-group-users-{abs(self.object.chat_id)}'
 
     def build(self):
         self.build_status_data()

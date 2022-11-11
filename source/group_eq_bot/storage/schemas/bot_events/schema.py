@@ -9,17 +9,25 @@ from utilities.configurations_constructor.constructor import Constructor
 CONFIGURATIONS = Constructor().configurations
 
 
-class Event(Document):
-    user_id = Long(required=True)
+class Message(Document):
     message_id = Long(required=True)
     event_time = Date(required=True)
-    event_type = Text(required=True)
     content = Text(required=True)
     raw_event = Object(required=True)
 
 
-class GroupEvent(Document):
+class UserEvent(Document):
     event_id = Long(required=True)
+    message = Object(Message, required=True)
+
+
+class Event(Document):
+    user_id = Long(required=True)
+    user_event = Nested(UserEvent, required=True)
+
+
+class BotEvent(Document):
+    chat_id = Long(required=True)
     event = Nested(Event, required=True)
     created = Date()
 
@@ -40,6 +48,8 @@ class Builder:
     def __init__(self, object: ExpectedInternalEvent):
         self.object = object
         self.event_id = self.generate_event_id()
+        self.message = None
+        self.user_event = None
         self.event = None
         self.schema = None
         self.index_name = None
@@ -50,22 +60,30 @@ class Builder:
         shortuuid.set_alphabet('0123456789')
         return int(shortuuid.random(length=16))
 
-    def build_event(self):
-        self.event = Event(user_id=self.object.user_id,
-                           message_id=self.object.message_id,
+    def build_message(self):
+        self.message = Message(message_id=self.object.message_id,
                            event_time=self.object.event_time,
-                           event_type=self.object.event_type,
                            content=self.object.message,
                            raw_event=self.object.dict())
 
+    def build_user_event(self):
+        self.user_event = UserEvent(event_id=self.event_id,
+                               message=self.message)
+
+    def build_event(self):
+        self.event = Event(user_id=self.object.user_id,
+                           user_event=self.user_event)
+
     def build_schema(self):
-        self.schema = GroupEvent(event_id=self.event_id,
-                                 event=self.event)
+        self.schema = BotEvent(chat_id=abs(self.object.chat_id),
+                               event=self.event)
 
     def build_index_name(self):
-        self.index_name = f'{self.schema.Index.name}-group-events-{abs(self.object.chat_id)}'
+        self.index_name = f'{self.schema.Index.name}-bot-events'
 
     def build(self):
+        self.build_message()
+        self.build_user_event()
         self.build_event()
         self.build_schema()
         self.build_index_name()
