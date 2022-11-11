@@ -27,7 +27,6 @@ class EventValidator:
 
     def __post_init__(self):
         self.validate_external_event()
-
         self.generate_internal_event()
 
     def validate_external_event(self):
@@ -59,7 +58,7 @@ class EventValidator:
                                                               message=self.get_message_text())
         logger.info('[EventValidator] Successfully casted ExpectedExternalEvent into ExpectedInternalEvent.')
 
-    def get_chat_type(self) -> ChatType:
+    def get_chat_type(self) -> str:
         """ Function to get chat_type from Message|Member event. """
 
         message = self.validated_external_event.message
@@ -76,28 +75,28 @@ class EventValidator:
             return self._retrieve_chat_type(chat_type=member.chat.type)
     
     @staticmethod
-    def _retrieve_chat_type(chat_type: str) -> ChatType:
+    def _retrieve_chat_type(chat_type: str) -> str:
         """ Function, which returns ChatType model depending on value provided . """
         if ChatType.group.value == chat_type:
-            return ChatType.group
+            return ChatType.group.value
 
         elif ChatType.supergroup.value == chat_type:
-            return ChatType.supergroup
+            return ChatType.supergroup.value
 
         elif ChatType.private.value == chat_type:
-            return ChatType.private
+            return ChatType.private.value
 
-    def get_event_type(self) -> EventType:
+    def get_event_type(self) -> str:
         """ Function to get event_type from Message | Member | Bot event. """
 
         if self.validated_external_event.message:
-            return EventType.message
+            return EventType.message.value
         
         elif self.validated_external_event.chat_member:
-            return EventType.member    
+            return EventType.member.value
         
         elif self.validated_external_event.my_chat_member:
-            return EventType.bot
+            return EventType.bot.value
 
     def get_chat_name(self) -> str:
         """ Function to get chat_name from Message | Member | Bot event. """
@@ -222,7 +221,7 @@ class EventValidator:
         elif member:
             return member.new_chat_member.user.username
 
-    def get_user_new_status(self) -> Optional[MemberStatus]:
+    def get_user_new_status(self) -> Optional[str]:
         """ Function to get user new_status from Message | Member | Bot event. """
 
         message = self.validated_external_event.message
@@ -233,12 +232,12 @@ class EventValidator:
             return None
 
         elif bot:
-            return MemberStatus(bot.new_chat_member.status)
+            return MemberStatus(bot.new_chat_member.status).value
         
         elif member:
-            return MemberStatus(member.new_chat_member.status)
+            return MemberStatus(member.new_chat_member.status).value
 
-    def get_user_old_status(self) -> Optional[MemberStatus]:
+    def get_user_old_status(self) -> Optional[str]:
         """ Function to get user old_status from Message | Member | Bot event. """
 
         message = self.validated_external_event.message
@@ -249,10 +248,10 @@ class EventValidator:
             return None
 
         elif bot:
-            return MemberStatus(bot.old_chat_member.status)
+            return MemberStatus(bot.old_chat_member.status).value
         
         elif member:
-            return MemberStatus(member.old_chat_member.status)
+            return MemberStatus(member.old_chat_member.status).value
 
     def get_event_time(self) -> float:
         """ Function to get time from Message | Member | Bot event. """

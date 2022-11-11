@@ -19,7 +19,7 @@ async def route_event(event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> No
     event = EventValidator(external_event=event).validated_internal_event
     logger.info('[ROUTER] New Event Validated and Casted in ExpectedInternalEvent.')
     
-    chat_type = event.chat_type.value
+    chat_type = event.chat_type
 
     if chat_type in [ChatType.group.value, ChatType.supergroup.value]:
         logger.info(f'[ROUTER] ChatType -- "PUBLIC.{chat_type}"')

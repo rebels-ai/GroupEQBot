@@ -6,6 +6,7 @@ from utilities.internal_logger.logger import logger
 from utilities.configurations_constructor.constructor import Constructor
 
 from interfaces.models.internal_event.event import ExpectedInternalEvent
+from storage.schemas.bot_metadata.schema import Builder
 
 
 @dataclass
@@ -22,5 +23,10 @@ class BotEventProcessor:
     configurator: Constructor = field(default_factory=lambda: Constructor())
 
     async def process(self):
-        logger.info(self.internal_event)
+        logger.info('[BotEventProcessor] is called ...')
+        logger.info('[BotEventProcessor] attempting to write to storage ...')
+
+        document = Builder(object=self.internal_event).build()
+        document.schema.save(index=document.index_name)
+
         return
