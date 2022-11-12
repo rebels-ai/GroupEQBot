@@ -250,3 +250,40 @@ ConversationHandler
             - chat id (where user is trying to pass validation)
             - user + user start validation time + user end validation time + user cancel validation time
             ...
+
+
+_____________________
+
+
+## SYSTEM GENERAL FLOW
+
+Public events - group chats with bot
+
+Case 1: Bot was added to the group
+
+event: bot was added
+action: register event in DB in BotMetadata index, status 'member'
+
+Case 2: Bot status was changed to admin
+
+event: bot was added to admins
+action1: find previous bot event for this chat in DB in BotMetadata index, update status to 'admin'
+--->
+action2: fetch existing members, register them in DB in GroupUsers index
+
+Case 3: 
+
+event: bot was deleted from the group
+action: find previous bot event for this chat in DB in BotMetadata index, update status to 'left'
+    *mb add field 'active/inactive'
+
+Case 4:
+
+event: old_status - admin, new_status - member
+action: find previous bot event for this chat in DB in BotMetadata index, update status to 'member'
+
+
+
+questions:
+ - mb add field for "last_updated"?
+ - add field to schema bot active/inactive
