@@ -5,16 +5,17 @@ from telegram.ext import ContextTypes
 from utilities.internal_logger.logger import logger
 from utilities.configurations_constructor.constructor import Constructor
 
-from interfaces.models.internal_event.event import ExpectedInternalEvent
 from storage.schemas.bot_metadata.schema import Builder
+
+from interfaces.models.internal_event.event import ExpectedInternalEvent
 
 
 @dataclass
 class BotEventProcessor:
-    """ Main Interface to process Bot Updates.
+    """ Main Interface to process bot updates.
     
-    Notes:
-        Interface is suppsoed to be executed JUST and only in the use case, 
+    Constraint:
+        Interface is supposed to be executed JUST and only in the use case,
         when bot was added to the telegram group
     """
 

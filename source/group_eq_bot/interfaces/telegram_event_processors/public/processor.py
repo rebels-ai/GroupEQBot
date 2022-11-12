@@ -23,7 +23,7 @@ class Processor:
         
         event_type = self.internal_event.event_type
 
-        if event_type  == EventType.message.value:
+        if event_type == EventType.message.value:
             logger.info('[PROCESSOR] Event type -- "MESSAGE" ')
             logger.info('[PROCESSOR] telegram_event_router to Public MessageEventProcessor ...')
             await MessageEventProcessor(internal_event=self.internal_event,

@@ -253,7 +253,7 @@ class EventValidator:
         elif member:
             return MemberStatus(member.old_chat_member.status).value
 
-    def get_event_time(self) -> float:
+    def get_event_time(self) -> datetime:
         """ Function to get time from Message | Member | Bot event. """
 
         message = self.validated_external_event.message
@@ -269,12 +269,7 @@ class EventValidator:
         elif member:
             date = member.date
 
-        try:
-            timestamp = datetime.timestamp(date)
-        except OverflowError as error:
-            raise error
-
-        return timestamp
+        return date
 
     def get_message_text(self) -> Optional[str]:
         """ Function to get user message content from Message | Member | Bot event. """

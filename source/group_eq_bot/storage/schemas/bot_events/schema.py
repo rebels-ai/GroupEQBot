@@ -1,6 +1,6 @@
 import shortuuid
-from datetime import datetime
 
+from datetime import datetime
 from elasticsearch_dsl import Date, Document, Long, Nested, Object, Text
 
 from interfaces.models.internal_event.event import ExpectedInternalEvent
@@ -9,17 +9,25 @@ from utilities.configurations_constructor.constructor import Constructor
 from storage.connectors.connector import connection
 
 
-class Event(Document):
-    user_id = Long(required=True)
-    message_id = Long()
+class Message(Document):
+    message_id = Long(required=True)
     event_time = Date(required=True)
-    event_type = Text(required=True)
-    content = Text()
+    content = Text(required=True)
     raw_event = Object(required=True)
 
 
-class GroupEvent(Document):
+class UserEvent(Document):
     event_id = Long(required=True)
+    message = Object(Message, required=True)
+
+
+class Event(Document):
+    user_id = Long(required=True)
+    user_event = Nested(UserEvent, required=True)
+
+
+class BotEvent(Document):
+    chat_id = Long(required=True)
     event = Nested(Event, required=True)
     created = Date()
 
@@ -42,6 +50,8 @@ class Builder:
     def __init__(self, object: ExpectedInternalEvent):
         self.object = object
         self.event_id = self.generate_event_id()
+        self.message = None
+        self.user_event = None
         self.event = None
         self.schema = None
         self.index_name = None
@@ -49,7 +59,7 @@ class Builder:
     @staticmethod
     def generate_event_id() -> int:
         """
-            Notes: @TODO: change back to uuid + botEvent eventID is generated same way
+            Notes: @TODO: change back to uuid + groupEvent eventID is generated same way
         """
 
         shortuuid.set_alphabet('0123456789')
@@ -57,22 +67,28 @@ class Builder:
 
         return event_id
 
+    def build_message(self):
+        self.message = Message(
+            message_id=self.object.message_id, event_time=self.object.event_time,
+            content=self.object.message, raw_event=self.object.dict()
+        )
+
+    def build_user_event(self):
+        self.user_event = UserEvent(event_id=self.event_id, message=self.message)
+
     def build_event(self):
-        self.event = Event(user_id=self.object.user_id,
-                           message_id=self.object.message_id,
-                           event_time=self.object.event_time,
-                           event_type=self.object.event_type,
-                           content=self.object.message,
-                           raw_event=self.object.dict())
+        self.event = Event(user_id=self.object.user_id, user_event=self.user_event)
 
     def build_schema(self):
-        self.schema = GroupEvent(event_id=self.event_id,
-                                 event=self.event)
+        chat_id = abs(self.object.chat_id)
+        self.schema = BotEvent(chat_id=chat_id, event=self.event)
 
     def build_index_name(self):
-        self.index_name = f'{self.schema.Index.name}-group-events-{abs(self.object.chat_id)}'
+        self.index_name = f'{self.schema.Index.name}-bot-events'
 
     def build(self):
+        self.build_message()
+        self.build_user_event()
         self.build_event()
         self.build_schema()
         self.build_index_name()

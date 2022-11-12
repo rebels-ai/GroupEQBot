@@ -10,6 +10,7 @@ from interfaces.models.internal_event.event import ExpectedInternalEvent
 from utilities.internal_logger.logger import logger
 from utilities.configurations_constructor.constructor import Constructor
 
+from storage.schemas.group_events.schema import Builder
 
 @dataclass
 class MemberEventProcessor:
@@ -27,9 +28,9 @@ class MemberEventProcessor:
         # either new member, who tries to join the group, who was not in the group before
         # or who was in the group in the past and left by (him/her)self
         # or who was removed from banned and added back to the group.
-        if self.internal_event.old_status == MemberStatus.left \
-            or self.internal_event.old_status == MemberStatus.banned \
-                and self.internal_event.new_status == MemberStatus.member:
+        if self.internal_event.old_status == MemberStatus.left.value \
+            or self.internal_event.old_status == MemberStatus.banned.value \
+                and self.internal_event.new_status == MemberStatus.member.value:
 
             self._write_event_to_datase()
             await self.enable_restrictions_for_unvalidated_member()
@@ -45,43 +46,43 @@ class MemberEventProcessor:
 
             
         # validation was kicked off
-        elif self.internal_event.old_status == MemberStatus.member \
-                and self.internal_event.new_status == MemberStatus.restricted:
+        elif self.internal_event.old_status == MemberStatus.member.value \
+                and self.internal_event.new_status == MemberStatus.restricted.value:
                 self._write_event_to_datase()
 
         # validation was passed successfully
-        elif self.internal_event.old_status == MemberStatus.restricted \
-                and self.internal_event.new_status == MemberStatus.member:
+        elif self.internal_event.old_status == MemberStatus.restricted.value \
+                and self.internal_event.new_status == MemberStatus.member.value:
                 self._write_event_to_datase()
 
         # validation was failed, member was banned
-        elif self.internal_event.old_status == MemberStatus.restricted \
-                and self.internal_event.new_status == MemberStatus.banned:
+        elif self.internal_event.old_status == MemberStatus.restricted.value \
+                and self.internal_event.new_status == MemberStatus.banned.value:
                 self._write_event_to_datase()
 
         # member left the group by (him/her)self before passing validation
-        elif self.internal_event.old_status == MemberStatus.restricted \
-            and self.internal_event.new_status == MemberStatus.restricted:
+        elif self.internal_event.old_status == MemberStatus.restricted.value \
+            and self.internal_event.new_status == MemberStatus.restricted.value:
                 self._write_event_to_datase()
 
         # member left the group by (him/her)self after passed validation
-        elif self.internal_event.old_status == MemberStatus.member \
-                and self.internal_event.new_status == MemberStatus.left:
+        elif self.internal_event.old_status == MemberStatus.member.value \
+                and self.internal_event.new_status == MemberStatus.left.value:
                 self._write_event_to_datase()
 
         # member was banned by administrator of the group
-        elif self.internal_event.old_status == MemberStatus.member \
-                and self.internal_event.new_status == MemberStatus.banned:
+        elif self.internal_event.old_status == MemberStatus.member.value \
+                and self.internal_event.new_status == MemberStatus.banned.value:
                 self._write_event_to_datase()
 
         # member was removed from banned members by the administrator, but not added in the group back
-        elif self.internal_event.old_status == MemberStatus.banned \
-                and self.internal_event.new_status == MemberStatus.left:
+        elif self.internal_event.old_status == MemberStatus.banned.value \
+                and self.internal_event.new_status == MemberStatus.left.value:
                 self._write_event_to_datase()
 
         # member left the group before passing validation and the administrator disabled restrictions
-        elif self.internal_event.old_status == MemberStatus.restricted \
-                and self.internal_event.new_status == MemberStatus.left:
+        elif self.internal_event.old_status == MemberStatus.restricted.value \
+                and self.internal_event.new_status == MemberStatus.left.value:
                 self._write_event_to_datase()
 
         # unknown member event occurred
@@ -113,6 +114,9 @@ class MemberEventProcessor:
 
     def _write_event_to_datase(self):
         logger.info('[MemberEventProcessor] attempting to write to storage ...')
+
+        document = Builder(object=self.internal_event).build()
+        document.schema.save(index=document.index_name)
 
     def _get_reply_markup(self):
         keyboard = [

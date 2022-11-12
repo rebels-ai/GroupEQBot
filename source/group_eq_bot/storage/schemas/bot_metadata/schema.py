@@ -1,11 +1,11 @@
 from datetime import datetime
 
-from elasticsearch_dsl import Date, Document, Long, Nested, Object, Text
+from elasticsearch_dsl import Date, Document, Long, Object, Text
 
 from interfaces.models.internal_event.event import ExpectedInternalEvent
-from storage.connectors.connector import connection
 from utilities.configurations_constructor.constructor import Constructor
-CONFIGURATIONS = Constructor().configurations
+
+from storage.connectors.connector import connection
 
 
 class Event(Document):
@@ -22,6 +22,8 @@ class BotMetadata(Document):
     created = Date()
 
     class Index:
+        CONFIGURATIONS = Constructor ().configurations
+
         name = f"{CONFIGURATIONS.events_database.indices.index_template}"
         settings = {
             "number_of_shards": CONFIGURATIONS.events_database.infrastructure.number_of_shards,
@@ -42,18 +44,17 @@ class Builder:
         self.index_name = None
 
     def build_event(self):
-        self.event = Event(user_id_added_bot=self.object.event.my_chat_member.from_user.id,
-                           chat_name=self.object.chat_name,
-                           chat_type=self.object.chat_type,
-                           bot_add_time=self.object.event_time,
-                           bot_status=self.object.new_status)
+        self.event = Event(
+            user_id_added_bot=self.object.event.my_chat_member.from_user.id, chat_name=self.object.chat_name,
+            chat_type=self.object.chat_type, bot_add_time=self.object.event_time, bot_status=self.object.new_status
+        )
 
     def build_schema(self):
-        self.schema = BotMetadata(chat_id=abs(self.object.chat_id),
-                                  event=self.event)
+        chat_id = abs(self.object.chat_id)
+        self.schema = BotMetadata(chat_id=chat_id, event=self.event)
 
     def build_index_name(self):
-        self.index_name = f'{self.schema.Index.name}-BotMetadata'
+        self.index_name = f'{self.schema.Index.name}-bot-metadata'
 
     def build(self):
         self.build_event()
