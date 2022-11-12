@@ -1,11 +1,11 @@
 from datetime import datetime
 
-from elasticsearch_dsl import Date, Document, Long, Nested, Object, Text, Boolean, InnerDoc
+from storage.connectors.connector import connection
 
 from interfaces.models.internal_event.event import ExpectedInternalEvent
-from storage.connectors.connector import connection
 from utilities.configurations_constructor.constructor import Constructor
-CONFIGURATIONS = Constructor().configurations
+
+from elasticsearch_dsl import Date, Document, Long, Nested, Object, Text, Boolean
 
 
 class Status(Document):
@@ -42,6 +42,8 @@ class GroupUser(Document):
     created = Date()
 
     class Index:
+        CONFIGURATIONS = Constructor().configurations
+
         name = f"{CONFIGURATIONS.events_database.indices.index_template}"
         settings = {
             "number_of_shards": CONFIGURATIONS.events_database.infrastructure.number_of_shards,

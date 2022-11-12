@@ -1,11 +1,11 @@
 from datetime import datetime
 
-from elasticsearch_dsl import Date, Document, Long, Text
-
-from interfaces.models.internal_event.event import ExpectedInternalEvent
 from storage.connectors.connector import connection
+
+from elasticsearch_dsl import Date, Document, Long, Text
+from interfaces.models.internal_event.event import ExpectedInternalEvent
+
 from utilities.configurations_constructor.constructor import Constructor
-CONFIGURATIONS = Constructor().configurations
 
 
 class Chat(Document):
@@ -15,6 +15,8 @@ class Chat(Document):
     created = Date()
 
     class Index:
+        CONFIGURATIONS = Constructor().configurations
+
         name = f"{CONFIGURATIONS.events_database.indices.index_template}"
         settings = {
             "number_of_shards": CONFIGURATIONS.events_database.infrastructure.number_of_shards,
@@ -44,12 +46,3 @@ class Builder:
         self.build_schema()
         self.build_index_name()
         return self
-
-from interfaces.telegram_event_validator.validator import EventValidator
-from tests.data.telegram_fake_events import fake_public_message_event, fake_public_member_event, fake_private_member_event, fake_private_message_event
-
-object = EventValidator(fake_public_message_event).validated_internal_event
-
-document = Builder(object=object).build()
-
-print(document.schema.save(index=document.index_name))
