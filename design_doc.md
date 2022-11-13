@@ -287,3 +287,56 @@ action: find previous bot event for this chat in DB in BotMetadata index, update
 questions:
  - mb add field for "last_updated"?
  - add field to schema bot active/inactive
+
+
+## Validation flow
+
+if bot and user are presented in the same chat --> save all events
+Case 0:
+
+event: user started bot
+
+        if `context.user_data['chat_id']` is not empty
+            and bot and user are presented in the same chat --> save all events
+            and validation.passed == False
+        send user instruction for validation
+        save to BotEvent index
+
+        else:
+            
+@TODO: action on bot_member update for private chat
+
+Case 1:
+
+event: user started validation via cmd
+action: in start_validation cmd callback --> find doc in GroupUsers by user_id, index name includes `context.user_data['chat_id']` --> 
+--> if `validation.passed` == True:
+        --> send message to user
+            stop validation
+    else:
+        --> change field "start_date" 
+            continue validation
+
+* index_name = Configurator.bot_varsion + group-users + chat_id
+
+Case 2:
+
+event: user answers the question and still have attemps left
+action: create index BotEvent if not exist -> create doc in BotEvent if not exist (per chat) -> update doc for this chat for this user
+
+Case 3:
+
+event: user failed validation
+action: find doc in GroupUsers --> change field "end_date"
+action2: update doc in BotEvent
+
+Case 4:
+
+event: user passed validation
+action: find doc in GroupUsers --> change field "end_date" ans "passed"
+action2: update doc in BotEvent
+
+Case 6:
+
+event: user canceled validation
+action: ???
