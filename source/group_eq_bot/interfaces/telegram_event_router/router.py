@@ -30,7 +30,7 @@ async def route_event(event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> No
     else:
         logger.info(f'[ROUTER] ChatType -- "PRIVATE.{chat_type}"')
         logger.info('[ROUTER] Routing to PrivateEventProcessor ...')
-        PrivateEventProcessor(internal_event=event,
-                              context=context).handle()
+        await PrivateEventProcessor(internal_event=event,
+                                    context=context).handle()
 
     return

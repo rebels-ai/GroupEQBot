@@ -2,7 +2,7 @@ bot:
   general:
     name: group_eq_bot
     version: 1.0
-    token:
+    token: 
     url: t.me/GroupEQBot
   validation:
     # now we support 10 questions overall
@@ -32,6 +32,9 @@ bot:
     validation_passed_message: " Поздравляю, проверка пройдена. Добро пожаловать! "
     stop_validation_for_owner: 'Ты создатель этой группы! Тебя не нужно проверять ^_^ '
     bot_button_text: ' Чат со мной '
+    user_not_found: 'Я не нашел тебя в моих группах. Чтобы начать работу добавь меня в свою группу и надели админскими правами.'
+    already_passed: 'Ты уже прошел проверку, не пиши мне больше'
+    start_message_with_buttons: 'В каком чате ты хотел бы пройти валидацию?'
 
 events_database:
   infrastructure:

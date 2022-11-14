@@ -8,14 +8,10 @@ from utilities.configurations_constructor.constructor import Constructor
 from storage.connectors.connector import connection
 
 
-class Event(Document):
+class ChatsMapping(Document):
     chat_id = Long(required=True)
     chat_name = Text(required=True, multi=True)
     chat_type = Text(required=True)
-
-
-class ChatsMappings(Document):
-    event = Nested(Event, multi=True)
     created = Date()
 
     class Index:
@@ -36,24 +32,17 @@ class ChatsMappings(Document):
 class Builder:
     def __init__(self, object: ExpectedInternalEvent):
         self.object = object
-        self.event = None
         self.schema = None
         self.index_name = None
 
-    def build_event(self):
-        chat_id = abs(self.object.chat_id)
-        self.event = Event(
-            chat_id=chat_id, chat_name=self.object.chat_name, chat_type=self.object.chat_name
-        )
-
     def build_schema(self):
-        self.schema = ChatsMappings(event=self.event)
+        chat_id = abs(self.object.chat_id)
+        self.schema = ChatsMapping(chat_id=chat_id, chat_name=self.object.chat_name, chat_type=self.object.chat_type)
 
     def build_index_name(self):
         self.index_name = f'{self.schema.Index.name}-chats-name-id-mappings'
 
     def build(self):
-        self.build_event()
         self.build_schema()
         self.build_index_name()
 

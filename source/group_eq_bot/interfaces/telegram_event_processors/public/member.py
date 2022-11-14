@@ -4,13 +4,17 @@ from telegram import ChatPermissions, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 
+from elasticsearch_dsl import Q
 from interfaces.models.internal_event.member_status import MemberStatus
 from interfaces.models.internal_event.event import ExpectedInternalEvent
 
 from utilities.internal_logger.logger import logger
 from utilities.configurations_constructor.constructor import Constructor
 
-from storage.schemas.group_events.schema import Builder
+from storage.schemas.group_events.schema import Builder as EventBuilder
+from storage.schemas.group_users.schema import Builder as UserBuilder, GroupUser
+from storage.query.query import update_query, find_query
+
 
 @dataclass
 class MemberEventProcessor:
@@ -33,6 +37,8 @@ class MemberEventProcessor:
                 and self.internal_event.new_status == MemberStatus.member.value:
 
             self._write_event_to_datase()
+            self._write_user_to_database()
+
             await self.enable_restrictions_for_unvalidated_member()
 
             self.context.user_data['chat_id'] = self.internal_event.chat_id
@@ -115,8 +121,27 @@ class MemberEventProcessor:
     def _write_event_to_datase(self):
         logger.info('[MemberEventProcessor] attempting to write to storage ...')
 
-        document = Builder(object=self.internal_event).build()
-        document.schema.save(index=document.index_name)
+        event_document = EventBuilder(object=self.internal_event).build()
+        event_document.schema.save(index=event_document.index_name)
+
+    def _write_user_to_database(self):
+        logger.info('[MemberEventProcessor] attempting to write to storage ...')
+
+        query = Q('match', user_id=self.internal_event.user_id)
+        document = UserBuilder(object=self.internal_event).build()
+
+        index = document.schema._get_index()
+        user_document = find_query(query=query, index_name=document.index_name, doc_type=GroupUser)
+
+        if index is None or user_document is None:
+
+            document.schema.save(index=document.index_name)
+        else:
+            return
+            # source = "ctx._source.event.status = params.new_status"
+            # params = {"new_status": self.internal_event.new_status}
+
+            # update_query(query=query, index_name=document.index_name, doc_type=GroupUser, source=source, params=params)
 
     def _get_reply_markup(self):
         keyboard = [

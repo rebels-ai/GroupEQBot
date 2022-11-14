@@ -340,3 +340,47 @@ Case 6:
 
 event: user canceled validation
 action: ???
+
+
+## Validation flow vers.2
+
+new user joins the chat --> register member_update --> create doc in GroupUsers index for chat_id
+
+new user starts the bot --> register bot_private_update -->
+--> search query in all GroupUsers indeces 
+    with fields "user_id"
+    response = user_id, chat_id, validation.passed
+
+if user not found:
+    send message "u r not found in my chats. Or you were added after I started work in your group.
+                    If you want to use GroupEQBot add me to your group chat and give me admin rights"
+
+    *** Search how to stop user from sending cmds or messages to bot ***
+    or methods to restrict sending command (/start_validation)
+
+elif user found:
+    user_not_passed = []
+    for chat in chats where user is presented:
+        if validation.passed == False:
+            user_not_passed.append(chat_id)
+
+    if len(user_not_passed) == 0:
+        send message "validation already passed"
+
+        *** Search how to stop user from sending cmds or messages to bot ***
+        or methods to restrict sending command (/start_validation)
+
+
+    else:
+        query ChatsMappings using "chat_id"
+        response = {chat_id: chat_name, ...}
+
+        if len(response)==1:
+            single button
+        else:
+            many buttons
+
+            make button(callback=chat_id, text=chat_name)
+            keyboard.append(button)
+
+        button will be the entry_point of ConversationHandler

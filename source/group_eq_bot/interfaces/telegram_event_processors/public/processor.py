@@ -37,7 +37,7 @@ class Processor:
 
         elif event_type == EventType.bot.value:
             logger.info('[PROCESSOR] Event type -- "BOT" ')
-            logger.info('[PROCESSOR] telegram_event_router to BotEventProcessor ...')
+            logger.info('[PROCESSOR] telegram_event_router to Public BotEventProcessor ...')
             await BotEventProcessor(internal_event=self.internal_event,
                                     context=self.context).process()
 
