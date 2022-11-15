@@ -4,6 +4,7 @@ from telegram.ext import ContextTypes
 from interfaces.models.internal_event.event_type import EventType
 from interfaces.models.internal_event.event import ExpectedInternalEvent
 from interfaces.telegram_event_processors.private.bot import BotEventProcessor
+from interfaces.telegram_event_processors.private.message import MessageEventProcessor
 
 from utilities.internal_logger.logger import logger
 
@@ -16,8 +17,14 @@ class Processor:
 
     async def handle(self) -> None:
         logger.info('[PROCESSOR] is called.')
-
+ 
         event_type = self.internal_event.event_type
+
+        if event_type == EventType.message.value:
+            logger.info('[PROCESSOR] Event type -- "MESSAGE" ')
+            logger.info('[PROCESSOR] telegram_event_router to Public MessageEventProcessor ...')
+            await MessageEventProcessor(internal_event=self.internal_event,
+                                        context=self.context).process()
 
         if event_type == EventType.bot.value:
             logger.info('[PROCESSOR] Event type -- "BOT" ')

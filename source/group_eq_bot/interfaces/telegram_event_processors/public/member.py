@@ -41,8 +41,6 @@ class MemberEventProcessor:
 
             await self.enable_restrictions_for_unvalidated_member()
 
-            self.context.user_data['chat_id'] = self.internal_event.chat_id
-
             await self.context.bot.send_message(
                 reply_markup=self._get_reply_markup(),
                 protect_content=True,
@@ -133,7 +131,7 @@ class MemberEventProcessor:
         index = document.schema._get_index()
         user_document = find_query(query=query, index_name=document.index_name, doc_type=GroupUser)
 
-        if index is None or user_document is None:
+        if index is None or len(user_document) == 0:
 
             document.schema.save(index=document.index_name)
         else:

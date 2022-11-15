@@ -70,7 +70,7 @@ class BotEventProcessor:
         # @NOTE: Or user was in the group before the bot was added --> will be obsolete when fetch_users method implemented
         if len(user_documents.hits) == 0:
             await self.context.bot.send_message(chat_id=self.internal_event.chat_id, 
-                                                text=self.configurator.configurations.validation.user_not_found)
+                                                text=self.configurator.configurations.bot.validation.user_not_found)
 
         else:
             for doc in user_documents.hits:
@@ -79,7 +79,7 @@ class BotEventProcessor:
 
             if len(user_not_passed) == 0:
                 await self.context.bot.send_message(chat_id=self.internal_event.chat_id, 
-                                                    text=self.configurator.configurations.validation.already_passed)
+                                                    text=self.configurator.configurations.bot.validation.already_passed)
             else:
                 index_name = f'{ChatsMapping.Index.name}-chats-name-id-mappings'
                 chat_mappings = {}

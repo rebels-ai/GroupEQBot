@@ -6,7 +6,7 @@ from telegram import Update as TelegramEvent
 from telegram.ext import ContextTypes
 
 from interfaces.telegram_event_validator.validator import EventValidator
-from interfaces.telegram_event_processors.public.message import MessageEventProcessor
+from interfaces.telegram_event_processors.private.message import MessageEventProcessor
 from utilities.configurations_constructor.constructor import Constructor
 from utilities.internal_logger.logger import logger
 

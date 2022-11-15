@@ -1,11 +1,11 @@
 from typing import Dict
 from dataclasses import dataclass, field
 
-from telegram.ext import CommandHandler
+from telegram.ext import CommandHandler, CallbackQueryHandler
 
 from interfaces.telegram_event_handlers.conversation_update.states.builder import StatesBuilder
 
-from interfaces.telegram_event_handlers.conversation_update.commands.start_validation import StartCommandBuilder
+from interfaces.telegram_event_handlers.conversation_update.button.handler import StartBuilder
 from interfaces.telegram_event_handlers.conversation_update.commands.cancel_validation import CancelCommandBuilder
 
 from interfaces.telegram_event_handlers.conversation_update.questions.validator.validator import QuestionsValidator
@@ -17,7 +17,8 @@ class Constructor:
     """ Main Interface to dynamically build ConversationHandler
     based on questions, defined in configurations file. """
 
-    entrypoints: CommandHandler = field(init=False)  # not initialising here, instead traversing the questions
+    # entrypoints: CommandHandler = field(init=False)  # not initialising here, instead traversing the questions
+    entrypoints: CallbackQueryHandler = field(init=False)
     states: Dict = field(default_factory=lambda: {})
     fallbacks: CommandHandler = field(default_factory=lambda: CancelCommandBuilder().handler)
 
@@ -27,7 +28,7 @@ class Constructor:
 
         for question in preprocessed_questions:
             if question['question_index'] == 1:  # if StartCommand (1st question) question
-                _entrypoints = StartCommandBuilder(question=question).handler
+                _entrypoints = StartBuilder(question=question).handler
                 self.entrypoints = _entrypoints
 
             else:
