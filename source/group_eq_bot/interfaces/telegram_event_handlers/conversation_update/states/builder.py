@@ -53,6 +53,12 @@ class StatesBuilder:
                 await StatesHelpers(event=event,
                                     context=context,
                                     question=self.question).disable_restrictions_for_validated_member()
+                StatesHelpers(event=event,
+                              context=context,
+                              question=self.question).write_time_validation_finished()
+                StatesHelpers(event=event,
+                              context=context,
+                              question=self.question).mark_validation_passed()
                 return ConversationHandler.END
 
             else:

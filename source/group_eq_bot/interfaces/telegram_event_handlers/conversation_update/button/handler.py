@@ -1,14 +1,20 @@
 from typing import Dict
 from dataclasses import dataclass, field
+from datetime import datetime
 
 from telegram import Update as TelegramEvent
 from telegram.ext import CallbackQueryHandler, ContextTypes, ConversationHandler
+from elasticsearch_dsl import Q
 
 from interfaces.models.internal_event.chat_type import ChatType
 from interfaces.models.validation.question_type import QuestionType
 from interfaces.telegram_event_handlers.conversation_update.button.helper import StartHelper
+
 from utilities.configurations_constructor.constructor import Constructor
 from utilities.internal_logger.logger import logger
+
+from storage.schemas.group_users.schema import GroupUser
+from storage.query.query import search_in_existing_index, update_query
 
 
 @dataclass
@@ -42,7 +48,16 @@ class StartBuilder:
                 await event.callback_query.message.reply_text(text=self.configurator.configurations.bot.validation.stop_validation_for_owner)
                 return ConversationHandler.END
 
-            context.user_data['chat_id'] = -int(event.callback_query.data)
+            query = Q('match', user_id=event.callback_query.from_user.id)
+            index_name = f'{GroupUser.Index.name}-group-users-{event.callback_query.data}'
+            user_doc = search_in_existing_index(query=query, index_name=index_name, doc_type=GroupUser)
+
+            source = "ctx._source.event.validation.start_time = params.start_time"
+            params = {"start_time": datetime.now()}
+
+            update_query(query=query, index_name=index_name, doc_type=GroupUser, source=source, params=params)
+
+            context.chat_data['chat_id'] = -int(event.callback_query.data)
             next_question_index = self.question.get('question_index') + 1
             question_type = self.question.get('meta').question_type
 

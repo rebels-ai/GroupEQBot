@@ -20,12 +20,6 @@ class Processor:
  
         event_type = self.internal_event.event_type
 
-        if event_type == EventType.message.value:
-            logger.info('[PROCESSOR] Event type -- "MESSAGE" ')
-            logger.info('[PROCESSOR] telegram_event_router to Public MessageEventProcessor ...')
-            await MessageEventProcessor(internal_event=self.internal_event,
-                                        context=self.context).process()
-
         if event_type == EventType.bot.value:
             logger.info('[PROCESSOR] Event type -- "BOT" ')
             logger.info('[PROCESSOR] telegram_event_router to Private BotEventProcessor ...')

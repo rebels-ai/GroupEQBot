@@ -1,14 +1,20 @@
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Dict, Optional
 
 from telegram import ChatPermissions
 from telegram import Update as TelegramEvent
 from telegram.ext import ContextTypes
+from elasticsearch_dsl import Q
 
 from interfaces.telegram_event_validator.validator import EventValidator
 from interfaces.telegram_event_processors.private.message import MessageEventProcessor
+
 from utilities.configurations_constructor.constructor import Constructor
 from utilities.internal_logger.logger import logger
+
+from storage.schemas.group_users.schema import GroupUser
+from storage.query.query import search_in_existing_index, update_query
 
 
 @dataclass
@@ -71,7 +77,7 @@ class StatesHelpers:
         """ Function, which finds chat id which member recently joined,
         and passing the validation process. """
 
-        return self.context.user_data.get('chat_id', 0)
+        return self.context.chat_data.get('chat_id', 0)
 
     async def disable_restrictions_for_validated_member(self):
         """ Function, which changes status from restricted on member,
@@ -139,3 +145,27 @@ class StatesHelpers:
         previous_question = questions_list[question_index - 1]  # questions indexes starts from 1, list indexes from 0
 
         return previous_question
+
+    def write_time_validation_finished(self):
+        """ Function, which writes validation end_time when failed or passed. """
+
+        query = Q('match', user_id=self.event.effective_user.id)
+        chat_id = abs(self.get_chat_id_for_validation())
+        index_name = f'{GroupUser.Index.name}-group-users-{chat_id}'
+
+        source = "ctx._source.event.validation.end_time = params.end_time"
+        params = {"end_time": datetime.now()}
+
+        update_query(query=query, index_name=index_name, doc_type=GroupUser, source=source, params=params)
+
+    def mark_validation_passed(self):
+        """ Function, which writes in database when validation is passed. """
+
+        query = Q('match', user_id=self.event.effective_user.id)
+        chat_id = abs(self.get_chat_id_for_validation())
+        index_name = f'{GroupUser.Index.name}-group-users-{chat_id}'
+
+        source = "ctx._source.event.validation.passed = params.passed"
+        params = {"passed": True}
+
+        update_query(query=query, index_name=index_name, doc_type=GroupUser, source=source, params=params)

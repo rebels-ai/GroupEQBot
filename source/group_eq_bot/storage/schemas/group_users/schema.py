@@ -38,7 +38,7 @@ class Event(Document):
 
 class GroupUser(Document):
     user_id = Long(required=True)
-    event: Nested(Event, required=True)
+    event = Nested(Event, required=True)
     created = Date()
 
     class Index:
