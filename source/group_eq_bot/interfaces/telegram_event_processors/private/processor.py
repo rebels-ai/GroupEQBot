@@ -25,7 +25,7 @@ class Processor:
             logger.info('[PROCESSOR] telegram_event_router to Private BotEventProcessor ...')
             await BotEventProcessor(internal_event=self.internal_event,
                                     context=self.context).process()
-     
+
         else:
             logger.warning(f'[PROCESSOR] EventProcessor registered unknown EventType.'
                            f'{event_type}')

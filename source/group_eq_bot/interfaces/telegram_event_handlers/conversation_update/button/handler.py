@@ -18,7 +18,7 @@ from storage.query.query import search_in_existing_index, update_query
 
 
 @dataclass
-class StartBuilder:
+class StartButtonBuilder:
     """ Interface for button callback entrypoint of ConversationHandler. """
 
     CONTEXT_DEFAULT_TYPE = ContextTypes.DEFAULT_TYPE

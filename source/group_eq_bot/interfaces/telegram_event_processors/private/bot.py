@@ -18,7 +18,7 @@ from interfaces.models.internal_event.event import ExpectedInternalEvent
 @dataclass
 class BotEventProcessor:
     """ Main Interface to process bot updates.
-    
+
     Constraint:
         Interface is supposed to be executed JUST and only in the use case,
         when bot was added to the telegram group
@@ -39,7 +39,8 @@ class BotEventProcessor:
                 and self.internal_event.new_status == MemberStatus.member.value:
 
             self._write_event_to_datase()
-            await self.check_validation_status()
+            await self.context.bot.send_message(chat_id=self.internal_event.event.my_chat_member.from_user.id, 
+                                                text=self.configurator.configurations.bot.validation.instruction)
 
         # User stopped the bot
         elif self.internal_event.old_status == MemberStatus.member.value \
@@ -89,7 +90,7 @@ class BotEventProcessor:
                     for hit in response.hits:
                         d = {hit.chat_name: chat}
                         chat_mappings.update(d)
-                
+
                 keyboard = []
                 for name, id in chat_mappings.items():
                     button = [InlineKeyboardButton(text=name, callback_data=id)]

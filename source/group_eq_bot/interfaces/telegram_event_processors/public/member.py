@@ -134,12 +134,6 @@ class MemberEventProcessor:
         if index is None or len(user_document) == 0:
 
             document.schema.save(index=document.index_name)
-        else:
-            return
-            # source = "ctx._source.event.status = params.new_status"
-            # params = {"new_status": self.internal_event.new_status}
-
-            # update_query(query=query, index_name=document.index_name, doc_type=GroupUser, source=source, params=params)
 
     def _get_reply_markup(self):
         keyboard = [

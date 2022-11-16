@@ -1,0 +1,78 @@
+from dataclasses import dataclass, field
+
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update as TelegramEvent
+from telegram.ext import ContextTypes, CommandHandler
+from elasticsearch_dsl import Q
+
+from interfaces.models.internal_event.event import ExpectedInternalEvent
+
+from storage.schemas.group_users.schema import GroupUser
+from storage.schemas.chats_mappings.schema import ChatsMapping
+from storage.query.query import search_in_existing_index
+
+from utilities.configurations_constructor.constructor import Constructor
+from utilities.internal_logger.logger import logger
+
+
+@dataclass
+class StartValidation:
+    """ . """
+    CONTEXT_DEFAULT_TYPE = ContextTypes.DEFAULT_TYPE
+
+    # handler: CommandHandler = field(init=True)
+    command: str = 'start_validation'
+
+    configurator: Constructor = field(default_factory=lambda: Constructor())
+
+    callback_to_call = None
+
+    handler = CommandHandler(command=command,
+                             callback=callback_to_call)
+
+    def __init__(self):
+        self.callback_to_call = self.check_validation_status
+        self.handler = CommandHandler(command=self.command,
+                                      callback=self.callback_to_call)
+
+    async def check_validation_status(self, event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE):
+        """ . """
+
+        user_id = event.effective_user.id
+        query = Q('match', user_id=user_id)
+        index_name = f'{GroupUser.Index.name}-group-users-*'
+        user_documents = search_in_existing_index(query=query, index_name=index_name, doc_type=GroupUser)
+        user_not_passed = []
+
+        # User is not presented in any chats where bot is added
+        # @NOTE: Or user was in the group before the bot was added --> will be obsolete when fetch_users method implemented
+        if len(user_documents.hits) == 0:
+            await context.bot.send_message(chat_id=event.effective_chat.id,
+                                                text=self.configurator.configurations.bot.validation.user_not_found)
+
+        else:
+            for doc in user_documents.hits:
+                if doc.event.validation.passed == False:
+                    user_not_passed.append(doc.meta.index.replace(f'{GroupUser.Index.name}-group-users-', ''))
+
+            if len(user_not_passed) == 0:
+                await context.bot.send_message(chat_id=event.effective_chat.id,
+                                               text=self.configurator.configurations.bot.validation.already_passed)
+            else:
+                index_name = f'{ChatsMapping.Index.name}-chats-name-id-mappings'
+                chat_mappings = {}
+                for chat in user_not_passed:
+                    chats_query = Q('match', chat_id=chat)
+                    response = search_in_existing_index(query=chats_query, index_name=index_name, doc_type=ChatsMapping)
+                    for hit in response.hits:
+                        d = {hit.chat_name: chat}
+                        chat_mappings.update(d)
+                
+                keyboard = []
+                for name, id in chat_mappings.items():
+                    button = [InlineKeyboardButton(text=name, callback_data=id)]
+                    keyboard.append(button)
+
+                validation_options = InlineKeyboardMarkup(keyboard)
+
+                await context.bot.send_message(reply_markup=validation_options, chat_id=event.effective_chat.id,
+                                               text=self.configurator.configurations.bot.validation.start_message_with_buttons)
