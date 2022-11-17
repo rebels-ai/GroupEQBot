@@ -31,7 +31,6 @@ Schema:
                 start_time: Date (by default None)
                 end_time: Date   (by default None)
             }
-        
         statistics:
             {
                 total_messages_count: Long

@@ -56,6 +56,7 @@ class BotEventProcessor:
 
     def _write_event_to_datase(self):
         logger.info('[BotEventProcessor] attempting to write to storage ...')
+        # update BotEventsIndex
         pass
 
     async def check_validation_status(self):

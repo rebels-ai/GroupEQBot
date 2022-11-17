@@ -22,8 +22,3 @@ class StartHelper:
             )
 
         return True if member.status == 'creator' else False
-
-    def passed_validation(self) -> bool:
-        """ Method, which supposed to check whether user had already passed the validation. """
-        
-        raise NotImplementedError

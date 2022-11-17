@@ -24,5 +24,5 @@ class MessageEventProcessor:
         logger.info('[MessageEventProcessor] is called ...')
         logger.info('[MessageEventProcessor] attempting to write to storage ...')
 
-        # document = Builder(object=self.internal_event).build()
-        # document.schema.save(index=document.index_name)
+        document = Builder(object=self.internal_event).build()
+        document.schema.save(index=document.index_name)

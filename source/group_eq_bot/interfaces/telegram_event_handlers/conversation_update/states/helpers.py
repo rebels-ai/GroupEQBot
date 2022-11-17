@@ -13,8 +13,9 @@ from interfaces.telegram_event_processors.private.message import MessageEventPro
 from utilities.configurations_constructor.constructor import Constructor
 from utilities.internal_logger.logger import logger
 
+from storage.connectors.connector import connection
 from storage.schemas.group_users.schema import GroupUser
-from storage.query.query import search_in_existing_index, update_query
+from storage.query.query import update_query
 
 
 @dataclass
@@ -168,4 +169,5 @@ class StatesHelpers:
         source = "ctx._source.event.validation.passed = params.passed"
         params = {"passed": True}
 
+        connection.indices.refresh(index=index_name)
         update_query(query=query, index_name=index_name, doc_type=GroupUser, source=source, params=params)

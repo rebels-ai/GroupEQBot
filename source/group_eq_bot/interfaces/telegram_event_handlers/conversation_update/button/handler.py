@@ -14,7 +14,7 @@ from utilities.configurations_constructor.constructor import Constructor
 from utilities.internal_logger.logger import logger
 
 from storage.schemas.group_users.schema import GroupUser
-from storage.query.query import search_in_existing_index, update_query
+from storage.query.query import update_query
 
 
 @dataclass
@@ -39,6 +39,7 @@ class StartButtonBuilder:
                 ConversationHandler supposed to be used only within private chat (bot:user)
         """
 
+        await event.callback_query.edit_message_text(text=f"Validation started")  #  edit to remove buttons
         # ConversationHandler supposed to be used only within private chat (bot:user)
         if event.callback_query.message.chat.type == ChatType.private.value:
 
@@ -50,7 +51,6 @@ class StartButtonBuilder:
 
             query = Q('match', user_id=event.callback_query.from_user.id)
             index_name = f'{GroupUser.Index.name}-group-users-{event.callback_query.data}'
-            user_doc = search_in_existing_index(query=query, index_name=index_name, doc_type=GroupUser)
 
             source = "ctx._source.event.validation.start_time = params.start_time"
             params = {"start_time": datetime.now()}

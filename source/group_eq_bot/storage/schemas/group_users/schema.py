@@ -61,18 +61,50 @@ class Builder:
         self.object = object
         self.status = None
         self.validation = None
+        self.metadata = None
         self.event = None
         self.schema = None
         self.index_name = None
 
     def build_status_data(self):
-        self.status = Status(current_status=self.object.new_status)
+        current_status = self.object.new_status
+        change_history_status = {current_status: self.object.event_time}
+        self.status = Status(current_status=current_status, change_history_status=change_history_status)
 
     def build_validation(self):
         self.validation = Validation(passed=False)
 
+    def build_metadata(self):
+        event_time = self.object.event_time
+
+        #  lastname and username can be empty, None values are not accepted in DB
+        last_name = self.object.last_name
+        username = self.object.username
+
+        change_history_firstname = {self.object.first_name: event_time}
+
+        if last_name and not username:
+            change_history_lastname = {self.object.last_name: event_time}
+
+            self.metadata = Metadata(change_history_firstname=change_history_firstname, 
+                                     change_history_lastname=change_history_lastname)
+        
+        elif not last_name and username:
+            change_history_username = {self.object.username: event_time}
+
+            self.metadata = Metadata(change_history_firstname=change_history_firstname, 
+                                     change_history_username=change_history_username)
+
+        else:
+            change_history_lastname = {self.object.last_name: event_time}
+            change_history_username = {self.object.username: event_time}
+
+            self.metadata = Metadata(change_history_firstname=change_history_firstname, 
+                                     change_history_lastname=change_history_lastname,
+                                     change_history_username=change_history_username)
+
     def build_event(self):
-        self.event = Event(status=self.status, validation=self.validation)
+        self.event = Event(status=self.status, validation=self.validation, metadata=self.metadata)
 
     def build_schema(self):
         self.schema = GroupUser(user_id=self.object.user_id, event=self.event)
@@ -83,6 +115,7 @@ class Builder:
     def build(self):
         self.build_status_data()
         self.build_validation()
+        self.build_metadata()
         self.build_event()
         self.build_schema()
         self.build_index_name()

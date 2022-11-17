@@ -14,6 +14,7 @@ from utilities.configurations_constructor.constructor import Constructor
 from storage.schemas.group_events.schema import Builder as EventBuilder
 from storage.schemas.group_users.schema import Builder as UserBuilder, GroupUser
 from storage.query.query import update_query, find_query
+from storage.connectors.connector import connection
 
 
 @dataclass
@@ -53,41 +54,49 @@ class MemberEventProcessor:
         elif self.internal_event.old_status == MemberStatus.member.value \
                 and self.internal_event.new_status == MemberStatus.restricted.value:
                 self._write_event_to_datase()
+                self._write_user_to_database()
 
         # validation was passed successfully
         elif self.internal_event.old_status == MemberStatus.restricted.value \
                 and self.internal_event.new_status == MemberStatus.member.value:
                 self._write_event_to_datase()
+                self._write_user_to_database()
 
         # validation was failed, member was banned
         elif self.internal_event.old_status == MemberStatus.restricted.value \
                 and self.internal_event.new_status == MemberStatus.banned.value:
                 self._write_event_to_datase()
+                self._write_user_to_database()
 
         # member left the group by (him/her)self before passing validation
         elif self.internal_event.old_status == MemberStatus.restricted.value \
             and self.internal_event.new_status == MemberStatus.restricted.value:
                 self._write_event_to_datase()
+                self._write_user_to_database()
 
         # member left the group by (him/her)self after passed validation
         elif self.internal_event.old_status == MemberStatus.member.value \
                 and self.internal_event.new_status == MemberStatus.left.value:
                 self._write_event_to_datase()
+                self._write_user_to_database()
 
         # member was banned by administrator of the group
         elif self.internal_event.old_status == MemberStatus.member.value \
                 and self.internal_event.new_status == MemberStatus.banned.value:
                 self._write_event_to_datase()
+                self._write_user_to_database()
 
         # member was removed from banned members by the administrator, but not added in the group back
         elif self.internal_event.old_status == MemberStatus.banned.value \
                 and self.internal_event.new_status == MemberStatus.left.value:
                 self._write_event_to_datase()
+                self._write_user_to_database()
 
         # member left the group before passing validation and the administrator disabled restrictions
         elif self.internal_event.old_status == MemberStatus.restricted.value \
                 and self.internal_event.new_status == MemberStatus.left.value:
                 self._write_event_to_datase()
+                self._write_user_to_database()
 
         # unknown member event occurred
         else:
@@ -126,7 +135,7 @@ class MemberEventProcessor:
         logger.info('[MemberEventProcessor] attempting to write to storage ...')
 
         query = Q('match', user_id=self.internal_event.user_id)
-        document = UserBuilder(object=self.internal_event).build()
+        document = UserBuilder(object=self.internal_event, ).build()
 
         index = document.schema._get_index()
         user_document = find_query(query=query, index_name=document.index_name, doc_type=GroupUser)
@@ -134,6 +143,17 @@ class MemberEventProcessor:
         if index is None or len(user_document) == 0:
 
             document.schema.save(index=document.index_name)
+        else:
+            chat_id = abs(self.internal_event.chat_id)
+            index_name = f'{GroupUser.Index.name}-group-users-{chat_id}'
+
+            source = "ctx._source.event.status.current_status = params.current_status; ctx._source.event.status.change_history_status.add(params.change_history_status)"
+            params = {"current_status": self.internal_event.new_status,
+                      "change_history_status": {self.internal_event.new_status: self.internal_event.event_time}}
+
+            update_query(query=query, index_name=index_name, doc_type=GroupUser, source=source, params=params)
+            #  bot has to write in fields status.current_status and status.change_history_status 
+            return
 
     def _get_reply_markup(self):
         keyboard = [
