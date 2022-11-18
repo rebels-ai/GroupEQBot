@@ -68,7 +68,7 @@ class Builder:
 
     def build_status_data(self):
         current_status = self.object.new_status
-        change_history_status = {current_status: self.object.event_time}
+        change_history_status = [{current_status: self.object.event_time}]
         self.status = Status(current_status=current_status, change_history_status=change_history_status)
 
     def build_validation(self):
@@ -81,23 +81,23 @@ class Builder:
         last_name = self.object.last_name
         username = self.object.username
 
-        change_history_firstname = {self.object.first_name: event_time}
+        change_history_firstname = [{self.object.first_name: event_time}]
 
         if last_name and not username:
-            change_history_lastname = {self.object.last_name: event_time}
+            change_history_lastname = [{self.object.last_name: event_time}]
 
             self.metadata = Metadata(change_history_firstname=change_history_firstname, 
                                      change_history_lastname=change_history_lastname)
         
         elif not last_name and username:
-            change_history_username = {self.object.username: event_time}
+            change_history_username = [{self.object.username: event_time}]
 
             self.metadata = Metadata(change_history_firstname=change_history_firstname, 
                                      change_history_username=change_history_username)
 
         else:
-            change_history_lastname = {self.object.last_name: event_time}
-            change_history_username = {self.object.username: event_time}
+            change_history_lastname = [{self.object.last_name: event_time}]
+            change_history_username = [{self.object.username: event_time}]
 
             self.metadata = Metadata(change_history_firstname=change_history_firstname, 
                                      change_history_lastname=change_history_lastname,

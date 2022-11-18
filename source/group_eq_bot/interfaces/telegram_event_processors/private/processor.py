@@ -4,7 +4,7 @@ from telegram.ext import ContextTypes
 from interfaces.models.internal_event.event_type import EventType
 from interfaces.models.internal_event.event import ExpectedInternalEvent
 from interfaces.telegram_event_processors.private.bot import BotEventProcessor
-from interfaces.telegram_event_processors.private.message import MessageEventProcessor
+# from interfaces.telegram_event_processors.private.message import MessageEventProcessor
 
 from utilities.internal_logger.logger import logger
 
@@ -29,6 +29,5 @@ class Processor:
         else:
             logger.warning(f'[PROCESSOR] EventProcessor registered unknown EventType.'
                            f'{event_type}')
-        logger.info('[PROCESSOR] finished.')
 
         return

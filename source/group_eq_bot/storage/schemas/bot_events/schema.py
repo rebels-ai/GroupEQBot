@@ -10,7 +10,7 @@ from storage.connectors.connector import connection
 
 
 class Message(Document):
-    message_id = Long(required=True)
+    message_id = Long()
     event_time = Date(required=True)
     content = Text(required=True)
     raw_event = Object(required=True)
@@ -23,12 +23,12 @@ class UserEvent(Document):
 
 class Event(Document):
     user_id = Long(required=True)
-    user_event = Nested(UserEvent, required=True)
+    user_event = Nested(UserEvent, required=True, multi=True)
 
 
 class BotEvent(Document):
     chat_id = Long(required=True)
-    event = Nested(Event, required=True)
+    event = Nested(Event, required=True, multi=True)
     created = Date()
 
     class Index:
@@ -47,7 +47,7 @@ class BotEvent(Document):
 
 
 class Builder:
-    def __init__(self, object: ExpectedInternalEvent):
+    def __init__(self, object: ExpectedInternalEvent, chat_id: int):
         self.object = object
         self.event_id = self.generate_event_id()
         self.message = None
@@ -55,6 +55,7 @@ class Builder:
         self.event = None
         self.schema = None
         self.index_name = None
+        self.chat_id = chat_id
 
     @staticmethod
     def generate_event_id() -> int:
@@ -80,7 +81,7 @@ class Builder:
         self.event = Event(user_id=self.object.user_id, user_event=self.user_event)
 
     def build_schema(self):
-        chat_id = abs(self.object.chat_id)
+        chat_id = self.chat_id
         self.schema = BotEvent(chat_id=chat_id, event=self.event)
 
     def build_index_name(self):

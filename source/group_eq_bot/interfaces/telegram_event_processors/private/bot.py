@@ -55,49 +55,4 @@ class BotEventProcessor:
         return
 
     def _write_event_to_datase(self):
-        logger.info('[BotEventProcessor] attempting to write to storage ...')
-        # update BotEventsIndex
         pass
-
-    async def check_validation_status(self):
-        """ . """
-
-        user_id = self.internal_event.event.my_chat_member.from_user.id
-        query = Q('match', user_id=user_id)
-        index_name = f'{GroupUser.Index.name}-group-users-*'
-        user_documents = search_in_existing_index(query=query, index_name=index_name, doc_type=GroupUser)
-        user_not_passed = []
-
-        # User is not presented in any chats where bot is added
-        # @NOTE: Or user was in the group before the bot was added --> will be obsolete when fetch_users method implemented
-        if len(user_documents.hits) == 0:
-            await self.context.bot.send_message(chat_id=self.internal_event.chat_id, 
-                                                text=self.configurator.configurations.bot.validation.user_not_found)
-
-        else:
-            for doc in user_documents.hits:
-                if doc.event.validation.passed == False:
-                    user_not_passed.append(doc.meta.index.replace(f'{GroupUser.Index.name}-group-users-', ''))
-
-            if len(user_not_passed) == 0:
-                await self.context.bot.send_message(chat_id=self.internal_event.chat_id, 
-                                                    text=self.configurator.configurations.bot.validation.already_passed)
-            else:
-                index_name = f'{ChatsMapping.Index.name}-chats-name-id-mappings'
-                chat_mappings = {}
-                for chat in user_not_passed:
-                    chats_query = Q('match', chat_id=chat)
-                    response = search_in_existing_index(query=chats_query, index_name=index_name, doc_type=ChatsMapping)
-                    for hit in response.hits:
-                        d = {hit.chat_name: chat}
-                        chat_mappings.update(d)
-
-                keyboard = []
-                for name, id in chat_mappings.items():
-                    button = [InlineKeyboardButton(text=name, callback_data=id)]
-                    keyboard.append(button)
-
-                validation_options = InlineKeyboardMarkup(keyboard)
-
-                await self.context.bot.send_message(reply_markup=validation_options, chat_id=self.internal_event.chat_id,
-                                        text=self.configurator.configurations.bot.validation.start_message_with_buttons)

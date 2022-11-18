@@ -14,7 +14,6 @@ from utilities.configurations_constructor.constructor import Constructor
 from storage.schemas.group_events.schema import Builder as EventBuilder
 from storage.schemas.group_users.schema import Builder as UserBuilder, GroupUser
 from storage.query.query import update_query, find_query
-from storage.connectors.connector import connection
 
 
 @dataclass
@@ -135,7 +134,7 @@ class MemberEventProcessor:
         logger.info('[MemberEventProcessor] attempting to write to storage ...')
 
         query = Q('match', user_id=self.internal_event.user_id)
-        document = UserBuilder(object=self.internal_event, ).build()
+        document = UserBuilder(object=self.internal_event).build()
 
         index = document.schema._get_index()
         user_document = find_query(query=query, index_name=document.index_name, doc_type=GroupUser)
@@ -152,8 +151,6 @@ class MemberEventProcessor:
                       "change_history_status": {self.internal_event.new_status: self.internal_event.event_time}}
 
             update_query(query=query, index_name=index_name, doc_type=GroupUser, source=source, params=params)
-            #  bot has to write in fields status.current_status and status.change_history_status 
-            return
 
     def _get_reply_markup(self):
         keyboard = [

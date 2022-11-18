@@ -45,7 +45,7 @@ class BotBuilder:
         self.bot.add_handler(BotHandler.handler)
 
     def _add_start_validation_handler(self):
-        from interfaces.telegram_event_handlers.conversation_update.commands.start import StartValidation
+        from interfaces.telegram_event_handlers.conversation_update.commands.start_validation import StartValidation
         self.bot.add_handler(StartValidation.handler)
 
     def _add_member_handler(self):

@@ -406,32 +406,30 @@ _____________________
 
  ⁃ Bot restricts rights for the user
  ⁃ Create GroupEvents index entity (create event about user rights was restricted)
- ⁃ Update GroupUsers index entity (update user status changed) (** WIP)
+ ⁃ Update GroupUsers index entity (update user status changed)
  ⁃ Bot sends welcome message, asking to pass the validation
 
 # New member taps the button in public chat and starts the bot in private chat
- ⁃ Create | Update BotEvents index (create event about start command was clicked) (** WIP)
  ⁃ Bot sends instructions to the user
 
 # New member taps start_validation command
- ⁃ Update BotEvents index (create event about start_validation command was clicked) (** WIP)
- ⁃ Read from ALL GroupUsers idneces whether new member ID is presented in index
+ ⁃ Read from ALL GroupUsers indeces whether new member ID is presented in index
  ⁃ if user presented
  ⁃ Read chatNames from GroupChatIDMappings by chat_id
  ⁃ bot sends generated buttons with chatNames
- ⁃ Update BotEvents index (create event about clicking the button by user)
+ ⁃ Update BotEvents index (create event about clicking the button by user) (** WIP)
 
 —> once member clicked chatName button
   - Update GroupUsers index (updated user.validation.start_time attribute)
  ⁃ <-> new member answers on validation questions
  ⁃ Update BotEvents index (create event about new member answering validation questions) (** WIP)
  ⁃ if passed validation
- ⁃ Update GroupUsers index entity (update user status changed on member) (** WIP)
- ⁃ Update GroupUsers index entity (update user stop validation time) (** WIP)
- ⁃ if passed validation
- ⁃ Update GroupUsers index entity (update user status changed on banned) (** WIP)
- ⁃ Update GroupUsers index entity (update user stop validation time) (** WIP)
+ ⁃ Update GroupUsers index entity (update user status changed on member) (** test)
+ ⁃ Update GroupUsers index entity (update user stop validation time)
+ ⁃ if failed validation
+ ⁃ Update GroupUsers index entity (update user status changed on banned) (** test)
+ ⁃ Update GroupUsers index entity (update user stop validation time)
 
 
 Notes:
-- add link button to the graoup if validation passed
+- add link button to the group if validation passed

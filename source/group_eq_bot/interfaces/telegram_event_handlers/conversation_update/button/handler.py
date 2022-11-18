@@ -39,25 +39,29 @@ class StartButtonBuilder:
                 ConversationHandler supposed to be used only within private chat (bot:user)
         """
 
-        await event.callback_query.edit_message_text(text=f"Validation started")  #  edit to remove buttons
-        # ConversationHandler supposed to be used only within private chat (bot:user)
+        await event.callback_query.edit_message_text(text=f"Проверка началась:")  #  edit to remove buttons
+
+        str_chat_id = event.callback_query.data
+        logger.info('Attempting to write BotEvent to database...')
+        StartHelper(event=event, context=context).write_event_to_database(chat_id=str_chat_id)
+
         if event.callback_query.message.chat.type == ChatType.private.value:
 
-            if await StartHelper(event=event, context=context).chat_owner(chat_id=event.callback_query.data):
+            if await StartHelper(event=event, context=context).chat_owner(chat_id=str_chat_id):
                 logger.info(f'User, who talks with bot: {event.callback_query.from_user.full_name}')
 
                 await event.callback_query.message.reply_text(text=self.configurator.configurations.bot.validation.stop_validation_for_owner)
                 return ConversationHandler.END
 
             query = Q('match', user_id=event.callback_query.from_user.id)
-            index_name = f'{GroupUser.Index.name}-group-users-{event.callback_query.data}'
+            index_name = f'{GroupUser.Index.name}-group-users-{str_chat_id}'
 
             source = "ctx._source.event.validation.start_time = params.start_time"
             params = {"start_time": datetime.now()}
 
             update_query(query=query, index_name=index_name, doc_type=GroupUser, source=source, params=params)
 
-            context.chat_data['chat_id'] = -int(event.callback_query.data)
+            context.chat_data['chat_id'] = -int(str_chat_id)
             next_question_index = self.question.get('question_index') + 1
             question_type = self.question.get('meta').question_type
 

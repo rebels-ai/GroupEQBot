@@ -1,64 +1,71 @@
-from typing import Dict
 from dataclasses import dataclass, field
 
-from telegram import Update as TelegramEvent
-from telegram.ext import CommandHandler, ContextTypes, ConversationHandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update as TelegramEvent
+from telegram.ext import ContextTypes, CommandHandler
+from elasticsearch_dsl import Q
 
-from interfaces.models.internal_event.chat_type import ChatType
-from interfaces.models.validation.question_type import QuestionType
-from interfaces.telegram_event_handlers.conversation_update.commands.helper import StartCommandHelper
+from storage.schemas.group_users.schema import GroupUser
+from storage.schemas.chats_mappings.schema import ChatsMapping
+from storage.query.query import search_in_existing_index
+
 from utilities.configurations_constructor.constructor import Constructor
 from utilities.internal_logger.logger import logger
 
 
-@dataclass
-class StartCommandBuilder:
-    """ Interface for `start_validation` command of ConversationHandler. """
+configurator = Constructor()
+CONTEXT_DEFAULT_TYPE = ContextTypes.DEFAULT_TYPE
+async def check_validation_status(event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE):
+    """ . """
 
+    user_id = event.effective_user.id
+    query = Q('match', user_id=user_id)
+    index_name = f'{GroupUser.Index.name}-group-users-*'
+    user_documents = search_in_existing_index(query=query, index_name=index_name, doc_type=GroupUser)
+    user_not_passed = []
+
+    # User is not presented in any chats where bot is added
+    # @NOTE: Or user was in the group before the bot was added --> will be obsolete when fetch_users method implemented
+    if len(user_documents.hits) == 0:
+        await event.message.reply_text(text=configurator.configurations.bot.validation.user_not_found)
+
+    else:
+        for doc in user_documents.hits:
+            if doc.event.validation.passed == False:
+                user_not_passed.append(doc.meta.index.replace(f'{GroupUser.Index.name}-group-users-', ''))
+
+        if len(user_not_passed) == 0:
+            await event.message.reply_text(text=configurator.configurations.bot.validation.already_passed)
+        else:
+            index_name = f'{ChatsMapping.Index.name}-chats-name-id-mappings'
+            chat_mappings = {}
+            for chat in user_not_passed:
+                chats_query = Q('match', chat_id=chat)
+                response = search_in_existing_index(query=chats_query, index_name=index_name, doc_type=ChatsMapping)
+                for hit in response.hits:
+                    d = {hit.chat_name: chat}
+                    chat_mappings.update(d)
+            
+            keyboard = []
+            for name, id in chat_mappings.items():
+                button = [InlineKeyboardButton(text=name, callback_data=id)]
+                keyboard.append(button)
+
+            validation_options = InlineKeyboardMarkup(keyboard)
+
+            await event.message.reply_text(reply_markup=validation_options,
+                                           text=configurator.configurations.bot.validation.start_message_with_buttons)
+
+
+@dataclass
+class StartValidation:
+    """ . """
     CONTEXT_DEFAULT_TYPE = ContextTypes.DEFAULT_TYPE
 
-    question: Dict = field(init=True)
+    # handler: CommandHandler = field(init=False)
     command: str = 'start_validation'
 
-    handler: CommandHandler = field(init=False)
     configurator: Constructor = field(default_factory=lambda: Constructor())
 
-    def __post_init__(self):
-        self.handler = CommandHandler(command=self.command,
-                                      callback=self.callback_function)
-
-    async def callback_function(self, event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> int:
-        """ Method, which will be called as a callback for `start_validation` command. 
-            
-            Note:
-                ConversationHandler supposed to be used only within private chat (bot:user)
-        """
-
-        # ConversationHandler supposed to be used only within private chat (bot:user)
-        if event.message.chat.type == ChatType.private.value:
-
-            if await StartCommandHelper(event=event, context=context).chat_owner():
-                logger.info(f'User, who talks with bot: {event.message.from_user.full_name}')
-
-                await event.message.reply_text(text=self.configurator.configurations.bot.validation.stop_validation_for_owner)
-                return ConversationHandler.END
-
-            next_question_index = self.question.get('question_index') + 1
-            question_type = self.question.get('meta').question_type
-
-            # if audio question
-            if question_type == QuestionType.audio:
-                await event.message.reply_voice(voice=self.question.get('question_object'))
-
-            # if text question
-            elif question_type == QuestionType.text:
-
-                # if text question declared in configurations file
-                if self.question.get('meta').question is not None:
-                    await event.message.reply_text(text=self.question.get('question_object'))
-
-                # if text question saved in assets
-                else:
-                    await event.message.reply_text(text=self.question.get('question_object'))
-
-            return next_question_index
+    callback_to_call = check_validation_status
+    handler = CommandHandler(command=command,
+                             callback=callback_to_call)
