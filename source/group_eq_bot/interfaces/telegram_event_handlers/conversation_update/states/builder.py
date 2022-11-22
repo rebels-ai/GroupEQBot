@@ -99,6 +99,9 @@ class StatesBuilder:
                 await StatesHelpers(event=event, 
                                     context=context, 
                                     question=self.question).notify_about_failed_validation()
+                StatesHelpers(event=event,
+                              context=context,
+                              question=self.question).write_time_validation_finished()
                 await StatesHelpers(event=event, 
                                     context=context, 
                                     question=self.question).ban_member_who_failed_validation()

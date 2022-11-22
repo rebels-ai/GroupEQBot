@@ -14,6 +14,7 @@ from utilities.configurations_constructor.constructor import Constructor
 from storage.schemas.group_events.schema import Builder as EventBuilder
 from storage.schemas.group_users.schema import Builder as UserBuilder, GroupUser
 from storage.query.query import update_query, find_query
+from storage.connectors.connector import connection
 
 
 @dataclass
@@ -38,6 +39,10 @@ class MemberEventProcessor:
 
             self._write_event_to_datase()
             self._write_user_to_database()
+
+            # @TODO: Add member checking in DB
+            # if validation.passed == True --> send welcome back message
+            # if validation.passed == False --> enable restrictions --> send welcome message
 
             await self.enable_restrictions_for_unvalidated_member()
 
@@ -140,16 +145,14 @@ class MemberEventProcessor:
         user_document = find_query(query=query, index_name=document.index_name, doc_type=GroupUser)
 
         if index is None or len(user_document) == 0:
-
             document.schema.save(index=document.index_name)
         else:
             chat_id = abs(self.internal_event.chat_id)
             index_name = f'{GroupUser.Index.name}-group-users-{chat_id}'
-
+            connection.indices.refresh(index=document.index_name)
             source = "ctx._source.event.status.current_status = params.current_status; ctx._source.event.status.change_history_status.add(params.change_history_status)"
             params = {"current_status": self.internal_event.new_status,
                       "change_history_status": {self.internal_event.new_status: self.internal_event.event_time}}
-
             update_query(query=query, index_name=index_name, doc_type=GroupUser, source=source, params=params)
 
     def _get_reply_markup(self):

@@ -1,5 +1,5 @@
 import shortuuid
-
+from typing import List
 from datetime import datetime
 from elasticsearch_dsl import Date, Document, Long, Nested, Object, Text
 
@@ -23,12 +23,12 @@ class UserEvent(Document):
 
 class Event(Document):
     user_id = Long(required=True)
-    user_event = Nested(UserEvent, required=True, multi=True)
+    user_event = Object(UserEvent, required=True, multi=True)
 
 
 class BotEvent(Document):
     chat_id = Long(required=True)
-    event = Nested(Event, required=True, multi=True)
+    event = Object(Event, required=True, multi=True)
     created = Date()
 
     class Index:

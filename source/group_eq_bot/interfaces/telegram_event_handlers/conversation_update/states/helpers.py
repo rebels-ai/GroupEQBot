@@ -8,14 +8,13 @@ from telegram.ext import ContextTypes
 from elasticsearch_dsl import Q
 
 from interfaces.telegram_event_validator.validator import EventValidator
-# from interfaces.telegram_event_processors.private.message import MessageEventProcessor
 
 from utilities.configurations_constructor.constructor import Constructor
 from utilities.internal_logger.logger import logger
 
 from storage.connectors.connector import connection
 from storage.schemas.group_users.schema import GroupUser
-from storage.query.query import update_query, search_in_existing_index
+from storage.query.query import update_query
 from storage.schemas.bot_events.schema import Builder, BotEvent
 
 
@@ -120,16 +119,8 @@ class StatesHelpers:
         event = EventValidator(external_event=self.event).validated_internal_event
         logger.info('[NEW MEMBER VALIDATION] New Event Validated and Casted in ExpectedInternalEvent.')
 
-        abs_chat_id = abs(self.get_chat_id_for_validation())
-        chat_query = Q('match', chat_id=abs_chat_id)
-        user_query = Q('bool', must=[chat_query, Q('match', chat_id__user_id=self.event.effective_user.id)])
-
-        document = Builder(object=event, chat_id=abs_chat_id).build()
-
-        source = "ctx._source.event.user_event.add(params.user_event)"
-        params = {"user_event": document.user_event}
-
-        update_query(query=user_query, index_name=document.index_name, doc_type=BotEvent, source=source, params=params)
+        document = Builder(object=event, chat_id=abs(self.get_chat_id_for_validation())).build()
+        document.schema.save(index=document.index_name)
 
     @staticmethod
     def get_questionnaire_size() -> int:
@@ -165,7 +156,7 @@ class StatesHelpers:
 
         source = "ctx._source.event.validation.end_time = params.end_time"
         params = {"end_time": datetime.now()}
-
+        connection.indices.refresh(index=index_name)
         update_query(query=query, index_name=index_name, doc_type=GroupUser, source=source, params=params)
 
     def mark_validation_passed(self):

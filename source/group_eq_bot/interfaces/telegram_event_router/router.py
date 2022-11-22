@@ -21,7 +21,7 @@ async def route_event(event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> No
     
     chat_type = event.chat_type
 
-    if chat_type in [ChatType.group.value, ChatType.supergroup.value]:
+    if chat_type == ChatType.supergroup.value:
         logger.info(f'[ROUTER] ChatType -- "PUBLIC.{chat_type}"')
         logger.info('[ROUTER] Routing to PublicEventProcessor ...')
         await PublicEventProcessor(internal_event=event,

@@ -15,11 +15,9 @@ def find_query(query, index_name: str, doc_type):
 
     except Exception as error:
         r = []
-        print(error)
     return r
 
 def search_in_existing_index(query, index_name: str, doc_type):
     s = Search(using=connection, index=index_name, doc_type=doc_type).query(query)
     r = s.execute()
-    print(r)
     return r

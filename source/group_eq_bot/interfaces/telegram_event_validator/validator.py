@@ -77,10 +77,8 @@ class EventValidator:
     @staticmethod
     def _retrieve_chat_type(chat_type: str) -> str:
         """ Function, which returns ChatType model depending on value provided . """
-        if ChatType.group.value == chat_type:
-            return ChatType.group.value
 
-        elif ChatType.supergroup.value == chat_type:
+        if ChatType.supergroup.value == chat_type:
             return ChatType.supergroup.value
 
         elif ChatType.private.value == chat_type:

@@ -282,13 +282,6 @@ Case 4:
 event: old_status - admin, new_status - member
 action: find previous bot event for this chat in DB in BotMetadata index, update status to 'member'
 
-
-
-questions:
- - mb add field for "last_updated"?
- - add field to schema bot active/inactive
-
-
 ## Validation flow
 
 if bot and user are presented in the same chat --> save all events
@@ -309,7 +302,7 @@ event: user started bot
 Case 1:
 
 event: user started validation via cmd
-action: in start_validation cmd callback --> find doc in GroupUsers by user_id, index name includes `context.user_data['chat_id']` --> 
+action: in start_validation cmd callback --> find doc in GroupUsers by user_id, index name includes `context.user_data['chat_id']` 
 --> if `validation.passed` == True:
         --> send message to user
             stop validation
@@ -424,10 +417,10 @@ _____________________
  ⁃ <-> new member answers on validation questions
  ⁃ Update BotEvents index (create event about new member answering validation questions) (** WIP)
  ⁃ if passed validation
- ⁃ Update GroupUsers index entity (update user status changed on member) (** test)
+ ⁃ Update GroupUsers index entity (update user status changed on member)
  ⁃ Update GroupUsers index entity (update user stop validation time)
  ⁃ if failed validation
- ⁃ Update GroupUsers index entity (update user status changed on banned) (** test)
+ ⁃ Update GroupUsers index entity (update user status changed on banned)
  ⁃ Update GroupUsers index entity (update user stop validation time)
 
 
