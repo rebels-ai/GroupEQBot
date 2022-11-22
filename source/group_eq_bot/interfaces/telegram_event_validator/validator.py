@@ -1,6 +1,6 @@
-from dataclasses import dataclass, field
-from datetime import datetime
 from typing import Optional
+from datetime import datetime
+from dataclasses import dataclass, field
 
 from pydantic import ValidationError
 from telegram import Update as TelegramEvent
@@ -19,7 +19,7 @@ from utilities.internal_logger.logger import logger
 class EventValidator:
     """ Helper interface for router to retrieve basic metadata of the event. """
 
-    CHAT_NAME_IF_PRIVATE_MESSAGE_TYPE = 'who-is-bot-private-chat'
+    CHAT_NAME_IF_PRIVATE_MESSAGE_TYPE = 'group-eq-bot-private-chat'
 
     external_event: TelegramEvent
     validated_external_event: ExpectedExternalEvent = field(init=False)
@@ -40,6 +40,7 @@ class EventValidator:
             raise error
 
     def generate_internal_event(self):
+        """ Function, which generates InternalEvent, extracting some data from ExternalEvent. """
         logger.info('[EventValidator] Attempting to cast ExpectedExternalEvent into ExpectedInternalEvent.')
         self.validated_internal_event = ExpectedInternalEvent(event=self.validated_external_event,
                                                               chat_type=self.get_chat_type(),
@@ -57,193 +58,224 @@ class EventValidator:
                                                               message=self.get_message_text())
         logger.info('[EventValidator] Successfully casted ExpectedExternalEvent into ExpectedInternalEvent.')
 
-    def get_chat_type(self) -> ChatType:
+    def get_chat_type(self) -> str:
         """ Function to get chat_type from Message|Member event. """
 
-        try:
-            # [PUBLIC | PRIVATE] MessageEvent
-            chat_type = self.validated_external_event.message.chat.type
-        except AttributeError:
-            # [PUBLIC] MemberEvent
-            chat_type = self.validated_external_event.chat_member.chat.type
+        message = self.validated_external_event.message
+        bot = self.validated_external_event.my_chat_member
+        member = self.validated_external_event.chat_member
+        
+        if message:
+            return self._retrieve_chat_type(chat_type=message.chat.type)
+                      
+        elif bot:
+            return self._retrieve_chat_type(chat_type=bot.chat.type)
+        
+        elif member:
+            return self._retrieve_chat_type(chat_type=member.chat.type)
+    
+    @staticmethod
+    def _retrieve_chat_type(chat_type: str) -> str:
+        """ Function, which returns ChatType model depending on value provided . """
 
-        return ChatType.public if chat_type == ChatType.public.value else ChatType.private
+        if ChatType.supergroup.value == chat_type:
+            return ChatType.supergroup.value
 
-    def get_event_type(self) -> EventType:
-        """ Function to get event_type from Message|Member event.
-        Notes:
-            @TODO: whether private conversation with bot is handled here
-            @NOTE: will be used, when we will manage PRIVATE conversation with bot + revamp return statement
-                hit_private_with_bot_event_type = self.validated_external_event.__fields__.get (EventType.private_with_bot.value, None)
-        """
+        elif ChatType.private.value == chat_type:
+            return ChatType.private.value
 
-        whether_message_event_type = self.validated_external_event.message
-        return EventType.message if whether_message_event_type is not None else EventType.member
+    def get_event_type(self) -> str:
+        """ Function to get event_type from Message | Member | Bot event. """
+
+        if self.validated_external_event.message:
+            return EventType.message.value
+        
+        elif self.validated_external_event.chat_member:
+            return EventType.member.value
+        
+        elif self.validated_external_event.my_chat_member:
+            return EventType.bot.value
 
     def get_chat_name(self) -> str:
-        """ Function to get chat_name from Message|Member event. """
+        """ Function to get chat_name from Message | Member | Bot event. """
 
-        try:
-            # [PUBLIC] MessageEvent
-            chat_name = self.validated_external_event.message.chat.title
-            # [PRIVATE] MessageEvent
-            chat_name = self.CHAT_NAME_IF_PRIVATE_MESSAGE_TYPE if chat_name is None else chat_name
+        message = self.validated_external_event.message
+        bot = self.validated_external_event.my_chat_member
+        member = self.validated_external_event.chat_member
 
-        except AttributeError:
-            # [PUBLIC] MemberEvent
-            chat_name = self.validated_external_event.chat_member.chat.title
+        if message:
+            return message.chat.title if message.chat.title is not None else self.CHAT_NAME_IF_PRIVATE_MESSAGE_TYPE
 
-        return chat_name
+        elif bot:
+            return bot.chat.title if bot.chat.title is not None else self.CHAT_NAME_IF_PRIVATE_MESSAGE_TYPE
+
+        elif member:
+            return member.chat.title
 
     def get_chat_id(self) -> int:
-        """ Function to get chat_id from Message|Member event.
+        """ Function to get chat_id from Message | Member | Bot event.
         Note:
             public chat id: denoted with minus (e.g.: -1001609170602)
             private chat id: denoted with plus (e.g.: 249785414)
         """
 
-        try:
-            # [PUBLIC | PRIVATE] MessageEvent
-            chat_id = self.validated_external_event.message.chat.id
-        except AttributeError:
-            # [PUBLIC] MemberEvent
-            chat_id = self.validated_external_event.chat_member.chat.id
+        message = self.validated_external_event.message
+        bot = self.validated_external_event.my_chat_member
+        member = self.validated_external_event.chat_member
 
-        return chat_id
+        if message:
+            return message.chat.id
+
+        elif bot:
+            return bot.chat.id
+        
+        elif member:
+            return member.chat.id
 
     def get_user_id(self) -> int:
-        """ Function to get user_id from Message|Member event. """
+        """ Function to get user_id from Message | Member | Bot event. """
 
-        try:
-            # [PUBLIC | PRIVATE] MessageEvent
-            user_id = self.validated_external_event.message.from_user.id
-        except AttributeError:
-            # [PUBLIC] MemberEvent
-            user_id = self.validated_external_event.chat_member.new_chat_member.user.id
+        message = self.validated_external_event.message
+        bot = self.validated_external_event.my_chat_member
+        member = self.validated_external_event.chat_member
 
-        return user_id
+        if message:
+            return message.from_user.id
 
-    def get_message_id(self) -> int:
-        """ Function to get message_id from Message|Member event.
+        elif bot:
+            return bot.new_chat_member.user.id  #
+
+        elif member:
+            return member.new_chat_member.user.id
+
+    def get_message_id(self) -> Optional[int]:
+        """ Function to get message_id from Message | Member | Bot event.
         Note:
             if memberEvent occurred, message_id won't be provided by Telegram
             hence, None value will be declared. Further, with Elastic None will be casted.
         """
 
-        try:
-            # [PUBLIC | PRIVATE] MessageEvent
-            message_id = self.validated_external_event.message.message_id
-        except AttributeError:
-            # [PUBLIC] MemberEvent
-            message_id = None
+        message = self.validated_external_event.message
 
-        return message_id
+        if message:
+            return message.message_id
+
+        else:
+            return None
 
     def get_user_first_name(self) -> str:
-        """ Function to get first name from Message|Member event.
+        """ Function to get first name from Message | Member | Bot event.
 
         Note:
-            TelegramEvent(ExpectedExternalEvent) 'first_name' key is always presented 
+            TelegramEvent(ExpectedExternalEvent) 'first_name' key is always presented
         """
 
-        try:
-            # [PUBLIC | PRIVATE] MessageEvent
-            first_name = self.validated_external_event.message.from_user.first_name
-        except AttributeError:
-            # [PUBLIC] MemberEvent
-            first_name = self.validated_external_event.chat_member.new_chat_member.user.first_name
+        message = self.validated_external_event.message
+        bot = self.validated_external_event.my_chat_member
+        member = self.validated_external_event.chat_member
 
-        return first_name
+        if message:
+            return message.from_user.first_name
+
+        elif bot:
+            return bot.new_chat_member.user.first_name
+
+        elif member:
+            return member.new_chat_member.user.first_name
 
     def get_user_last_name(self) -> Optional[str]:
-        """ Function to get last name from Message|Member event. 
+        """ Function to get last name from Message | Member | Bot event. 
         
         Note:
             TelegramEvent(ExpectedExternalEvent) 'last_name' key is optional (can be either None or str)
         """
 
-        try:
-            # [PUBLIC | PRIVATE] MessageEvent
-            last_name = self.validated_external_event.message.from_user.last_name
-        except AttributeError:
-            last_name = None
-        
-        if last_name is None:
-            try:
-                # [PUBLIC] MemberEvent
-                last_name = self.validated_external_event.chat_member.new_chat_member.user.last_name
-            except AttributeError:
-                last_name = None
+        message = self.validated_external_event.message
+        bot = self.validated_external_event.my_chat_member
+        member = self.validated_external_event.chat_member
 
-        return last_name
+        if message:
+            return message.from_user.last_name
+
+        elif bot:
+            return bot.new_chat_member.user.last_name
+
+        elif member:
+            return member.new_chat_member.user.last_name
     
     def get_username(self) -> Optional[str]:
-        """ Function to get username from Message|Member event. """
+        """ Function to get username from Message | Member | Bot event. """
 
-        try:
-            # [PUBLIC | PRIVATE] MessageEvent
-            username = self.validated_external_event.message.from_user.username
-        except AttributeError:
-            username = None
+        message = self.validated_external_event.message
+        bot = self.validated_external_event.my_chat_member
+        member = self.validated_external_event.chat_member
 
-        if username is None:
-            try:
-                # [PUBLIC] MemberEvent
-                username = self.validated_external_event.chat_member.new_chat_member.user.username
-            except AttributeError:
-                username = None
+        if message:
+            return message.from_user.username
 
-        return username
+        elif bot:
+            return bot.new_chat_member.user.username
 
-    def get_user_new_status(self) -> Optional[MemberStatus]:
-        """ Function to get user new_status from Message|Member event. """
+        elif member:
+            return member.new_chat_member.user.username
 
-        try:
-            # [PUBLIC] MemberEvent
-            status = self.validated_external_event.chat_member.new_chat_member.status
-        except AttributeError:
-            # [PUBLIC | PRIVATE] MessageEvent
-            status = None
+    def get_user_new_status(self) -> Optional[str]:
+        """ Function to get user new_status from Message | Member | Bot event. """
 
-        return MemberStatus(status)
+        message = self.validated_external_event.message
+        bot = self.validated_external_event.my_chat_member
+        member = self.validated_external_event.chat_member
 
-    def get_user_old_status(self) -> Optional[MemberStatus]:
-        """ Function to get user old_status from Message|Member event. """
+        if message:
+            return None
 
-        try:
-            # [PUBLIC] MemberEvent
-            status = self.validated_external_event.chat_member.old_chat_member.status
-        except AttributeError:
-            # [PUBLIC | PRIVATE] MessageEvent
-            status = None
+        elif bot:
+            return MemberStatus(bot.new_chat_member.status).value
+        
+        elif member:
+            return MemberStatus(member.new_chat_member.status).value
 
-        return MemberStatus(status)
+    def get_user_old_status(self) -> Optional[str]:
+        """ Function to get user old_status from Message | Member | Bot event. """
 
-    def get_event_time(self) -> float:
-        """ Function to get time from Message|Member event. """
+        message = self.validated_external_event.message
+        bot = self.validated_external_event.my_chat_member
+        member = self.validated_external_event.chat_member
 
-        try:
-            # [PUBLIC] MemberEvent
-            date = self.validated_external_event.chat_member.date
-        except AttributeError:
-            # [PUBLIC | PRIVATE] MessageEvent
-            date = self.validated_external_event.message.date
+        if message:
+            return None
 
-        try:
-            timestamp = datetime.timestamp(date)
-        except OverflowError as error:
-            raise error
+        elif bot:
+            return MemberStatus(bot.old_chat_member.status).value
+        
+        elif member:
+            return MemberStatus(member.old_chat_member.status).value
 
-        return timestamp
+    def get_event_time(self) -> datetime:
+        """ Function to get time from Message | Member | Bot event. """
+
+        message = self.validated_external_event.message
+        bot = self.validated_external_event.my_chat_member
+        member = self.validated_external_event.chat_member
+
+        if message:
+            date = message.date
+
+        elif bot:
+            date = bot.date
+        
+        elif member:
+            date = member.date
+
+        return date
 
     def get_message_text(self) -> Optional[str]:
-        """ Function to get user message content from Message|Member event. """
+        """ Function to get user message content from Message | Member | Bot event. """
 
-        try:
-            # [PUBLIC | PRIVATE] MessageEvent
-            message_text = self.validated_external_event.message.text
-        except AttributeError:
-            # [PUBLIC] MemberEvent
-            message_text = None
+        message = self.validated_external_event.message
 
-        return message_text
+        if message:
+           return message.text
+
+        else:
+            return None

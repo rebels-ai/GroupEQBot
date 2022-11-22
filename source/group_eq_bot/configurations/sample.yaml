@@ -2,36 +2,41 @@ bot:
   general:
     name: group_eq_bot
     version: 1.0
-    token:
+    token: 
+    url: t.me/GroupEQBot
   validation:
     # now we support 10 questions overall
     # this parameter is controlled in question schema (index_number)
     questions:
         [
-          {location_type: 'local', question_type: 'text', index_number: 2, question: None, question_path: '${hydra:runtime.cwd}/assets/text/first_question.txt', answer: 'Good, let"s move forwards.', attempts_to_fail: 2},
-          {location_type: 'local', question_type: 'text', index_number: 3, question: 'What"s your occupation ?', question_path: None, answer: 'Awesome, are you looking for a job now ?', attempts_to_fail: 2},
-          {location_type: 'local', question_type: 'audio', index_number: 1, question: None, question_path: '${hydra:runtime.cwd}/assets/audio/first_question.m4a', answer: 'bla bla bla', attempts_to_fail: 3},
+          {location_type: 'local', question_type: 'text', index_number: 2, question: None, question_path: '/assets/text/first_question.txt', answer: '2nd', attempts_to_fail: 2},
+          {location_type: 'local', question_type: 'text', index_number: 3, question: 'What"s your occupation ?', question_path: None, answer: '3rd', attempts_to_fail: 2},
+          {location_type: 'local', question_type: 'audio', index_number: 1, question: None, question_path: '/assets/audio/first_question.m4a', answer: '1st', attempts_to_fail: 3},
         ]
-    welcome_message:
-      '
-      hi, GrouEQBot is here !
-      You are asked to pass the validation process, before starting chatting.
-      
-      commands:
-        \start_validation  - kick off validation process
-        \cancel_validation - (you will be banned, if will cancel process) stop validation process       
-      '
+    welcome_message: |-
+        👻:
+        К нам хочет присоединиться USERNAME
+
+        🎯
+        || USERNAME, Чтобы иметь полный доступ к этой группе, тебе нужно пройти валидацию. ||
+
     remaining_attemps_message: |-
-            I got unexpected answer -_- Please listen to the question one more time!
+            Я получил странный ответ -_- Попробуй еще раз!
 
-                          Left attempts for this question:
+            Попыток осталось:
     validation_failed_message: |-
-            I got too many unexpected answers and there are no more attempts.
+            Слишком много неправильных ответов, ты исчерпал все попытки.
 
-            Verification failed and you will not get the access to the group O_O.
-    validation_canceled_message: " To try again type '/start_validation'. "
-    validation_passed_message: " Congratulations, you passed the validation. Welcome! "
-    stop_validation_for_owner: 'You are the owner! No need to validate yourself ^_^ '
+            Проверка провалена, доступ в группу будет закрыт O_O.
+    validation_canceled_message: " Чтобы начать сначала нажми '/start_validation'. "
+    validation_passed_message: " Поздравляю, проверка пройдена. Добро пожаловать! "
+    stop_validation_for_owner: 'Ты создатель этой группы! Тебя не нужно проверять ^_^ '
+    bot_button_text: ' Чат со мной '
+    user_not_found: 'Я не нашел тебя в моих группах. Чтобы начать работу добавь меня в свою группу и надели админскими правами.'
+    already_passed: 'Ты уже прошел проверку, не пиши мне больше'
+    start_message_with_buttons: 'В каком чате ты хотел бы пройти валидацию?'
+    instruction: 'Привет! Чтобы пройти проверку и получить доступ к чату нажми /start_validation.
+                  Если ты админ группы, то чтобы начать работу со мной добавь меня в свою группу и дай админские права'
 
 events_database:
   infrastructure:

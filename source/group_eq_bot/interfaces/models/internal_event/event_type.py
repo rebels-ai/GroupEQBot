@@ -2,8 +2,16 @@ from enum import Enum
 
 
 class EventType(Enum):
-    """ Internal wrapper on EventType of telegram Update (TelegramEvent) definition used in ExpectedInternalEvent. """
+    """ Internal wrapper on EventType of telegram Update (TelegramEvent) definition used in ExpectedInternalEvent. 
+    
+    @TODO: re-write the description
+    Notes:
+        message: message will be registered from ChatType.private, ChatType.group, ChatType.supergroup
+            BUT:
+                ChatType.group, ChatType.supergroup events will be ingested into DB
+                ChatType.private will not be ingested into DB
+    """
 
-    message = 'message'  # Public | Private Message update
-    member = 'chat_member'  # Public Member status update
-    private_with_bot = 'my_chat_member'  # Public | Private who-is-bot status update
+    message = 'message'    
+    member = 'chat_member'  
+    bot = 'my_chat_member'
