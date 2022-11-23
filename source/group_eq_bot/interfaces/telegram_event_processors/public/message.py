@@ -16,7 +16,7 @@ class MessageEventProcessor:
 
     async def process(self):
         """
-        Entrypoint to process  Public | Private Message (ExpectedInternalEvent)
+        Entrypoint to process Public Message (ExpectedInternalEvent)
         event and write it to EventDrivenDatabase.
         """
 

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from telegram.ext import ContextTypes
 
 from interfaces.models.internal_event.event_type import EventType
@@ -13,13 +14,13 @@ from utilities.internal_logger.logger import logger
 
 @dataclass
 class Processor:
-    """ Public event processor interface, which stands for processing MESSAGE and MEMBER events. """
+    """ Public event processor interface, which stands for processing MESSAGE, MEMBER and BOT events. """
 
     internal_event: ExpectedInternalEvent
     context: ContextTypes.DEFAULT_TYPE
 
     async def handle(self) -> None:
-        """ Entrypoint for public processor which handles  Message | Member events. """
+        """ Entrypoint for public processor which handles Message | Member | Bot events. """
         
         event_type = self.internal_event.event_type
 

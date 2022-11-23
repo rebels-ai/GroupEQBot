@@ -1,21 +1,24 @@
 from dataclasses import dataclass
+
 from telegram.ext import ContextTypes
 
 from interfaces.models.internal_event.event_type import EventType
 from interfaces.models.internal_event.event import ExpectedInternalEvent
 from interfaces.telegram_event_processors.private.bot import BotEventProcessor
-# from interfaces.telegram_event_processors.private.message import MessageEventProcessor
 
 from utilities.internal_logger.logger import logger
 
 
 @dataclass
 class Processor:
+    """ Private event processor interface, which stands for processing BOT events. """
 
     internal_event: ExpectedInternalEvent
     context: ContextTypes.DEFAULT_TYPE
 
     async def handle(self) -> None:
+        """ Entrypoint for private processor which handles Bot events. """
+
         logger.info('[PROCESSOR] is called.')
  
         event_type = self.internal_event.event_type
