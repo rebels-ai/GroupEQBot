@@ -14,7 +14,7 @@ class MessageEventProcessor:
     internal_event: ExpectedInternalEvent
     context: ContextTypes.DEFAULT_TYPE
 
-    async def process(self):
+    async def process(self) -> None:
         """
         Entrypoint to process Public Message (ExpectedInternalEvent)
         event and write it to EventDrivenDatabase.
@@ -23,7 +23,7 @@ class MessageEventProcessor:
         logger.info('[MessageEventProcessor] is called ...')
         self._write_event_to_datase()
 
-    def _write_event_to_datase(self):
+    def _write_event_to_datase(self) -> None:
         """ Function, which generates Event document from ExpectedInternalEvent and saves it to database """
 
         logger.info('[MessageEventProcessor] attempting to write event document to storage ...')

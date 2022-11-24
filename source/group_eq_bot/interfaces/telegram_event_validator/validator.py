@@ -29,7 +29,7 @@ class EventValidator:
         self.validate_external_event()
         self.generate_internal_event()
 
-    def validate_external_event(self):
+    def validate_external_event(self) -> None:
         """ Function, which validates incoming TelegramEvent event with ExpectedExternalEvent. """
 
         try:
@@ -40,7 +40,7 @@ class EventValidator:
             logger.warning('[EventValidator] Failed validating TelegramEvent against ExpectedExternalEvent.')
             raise error
 
-    def generate_internal_event(self):
+    def generate_internal_event(self) -> None:
         """ Function, which generates InternalEvent, extracting some data from ExternalEvent. """
 
         logger.info('[EventValidator] Attempting to cast ExpectedExternalEvent into ExpectedInternalEvent.')

@@ -49,7 +49,7 @@ class StartButtonHelper:
 
         document.save(index=index_name)
 
-    def write_time_validation_started(self, chat_id: str):
+    def write_time_validation_started(self, chat_id: str) -> None:
         """ Function, which writes validation start_time in user document. """
 
         query = Q('match', user_id=self.event.effective_user.id)

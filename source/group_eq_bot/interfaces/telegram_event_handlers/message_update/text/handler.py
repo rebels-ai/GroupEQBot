@@ -6,6 +6,7 @@ from interfaces.telegram_event_router.router import route_event
 
 @dataclass
 class TextMessageHandler:
+    """ Handler builder for text message updates """
     filters_to_apply = filters.TEXT & ~filters.COMMAND
     callback_to_call = route_event
 

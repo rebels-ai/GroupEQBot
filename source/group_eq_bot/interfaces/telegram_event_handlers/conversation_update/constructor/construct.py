@@ -4,10 +4,8 @@ from dataclasses import dataclass, field
 from telegram.ext import CommandHandler, CallbackQueryHandler
 
 from interfaces.telegram_event_handlers.conversation_update.states.builder import StatesBuilder
-
 from interfaces.telegram_event_handlers.conversation_update.button.handler import StartButtonBuilder
 from interfaces.telegram_event_handlers.conversation_update.commands.cancel_validation import CancelCommandBuilder
-
 from interfaces.telegram_event_handlers.conversation_update.questions.validator.validator import QuestionsValidator
 from interfaces.telegram_event_handlers.conversation_update.questions.preprocessor.preprocessor import QuestionsPreprocessor
 

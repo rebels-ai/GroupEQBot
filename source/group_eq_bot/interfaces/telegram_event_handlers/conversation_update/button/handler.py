@@ -13,7 +13,7 @@ from utilities.configurations_constructor.constructor import Constructor
 
 @dataclass
 class StartButtonBuilder:
-    """ Interface for button callback entrypoint of ConversationHandler. """
+    """ Interface for button entrypoint of ConversationHandler. """
 
     CONTEXT_DEFAULT_TYPE = ContextTypes.DEFAULT_TYPE
 

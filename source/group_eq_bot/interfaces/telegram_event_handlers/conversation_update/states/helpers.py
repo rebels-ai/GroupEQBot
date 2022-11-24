@@ -80,7 +80,7 @@ class StatesHelpers:
 
         return self.context.chat_data.get('chat_id', 0)
 
-    async def disable_restrictions_for_validated_member(self):
+    async def disable_restrictions_for_validated_member(self) -> None:
         """ Function, which changes status from restricted on member,
         disabling restrictions for user, who passed the validation.  """
 
@@ -102,7 +102,7 @@ class StatesHelpers:
         )
         self.context.user_data.clear()
 
-    async def ban_member_who_failed_validation(self):
+    async def ban_member_who_failed_validation(self) -> None:
         """ Function, which changes status from restricted on restricted,
         banning user, who failed validation process. """
 
@@ -111,14 +111,14 @@ class StatesHelpers:
                                                user_id=self.event.message.from_user.id)
         self.context.user_data.clear()
 
-    async def validate_and_save_to_event_database(self):
+    async def validate_and_save_to_event_database(self) -> None:
         """ Function, responsible for validating incoming TelegramEvent
             and saving it to event database. """
 
-        logger.info('[NEW MEMBER VALIDATION] New Event Registered.')
         event = EventValidator(external_event=self.event).validated_internal_event
-        logger.info('[NEW MEMBER VALIDATION] New Event Validated and Casted in ExpectedInternalEvent.')
+        logger.info('[Validation] New Event Validated and Casted in ExpectedInternalEvent.')
 
+        logger.info('[Validation] attempting to save event doc to database.')
         document = Builder(object=event, chat_id=abs(self.get_chat_id_for_validation())).build()
         document.schema.save(index=document.index_name)
 
@@ -147,7 +147,7 @@ class StatesHelpers:
 
         return previous_question
 
-    def write_time_validation_finished(self):
+    def write_time_validation_finished(self) -> None:
         """ Function, which writes validation end_time when failed or passed. """
 
         query = Q('match', user_id=self.event.effective_user.id)
@@ -159,13 +159,12 @@ class StatesHelpers:
         connection.indices.refresh(index=index_name)
         update_query(query=query, index_name=index_name, doc_type=GroupUser, source=source, params=params)
 
-    def mark_validation_passed(self):
+    def mark_validation_passed(self) -> None:
         """ Function, which writes in database when validation is passed. """
 
         query = Q('match', user_id=self.event.effective_user.id)
         chat_id = abs(self.get_chat_id_for_validation())
         index_name = f'{GroupUser.Index.name}-group-users-{chat_id}'
-
         source = "ctx._source.event.validation.passed = params.passed"
         params = {"passed": True}
 

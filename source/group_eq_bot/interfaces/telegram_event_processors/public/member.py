@@ -107,7 +107,7 @@ class MemberEventProcessor:
                            f'{self.internal_event}')
         return
 
-    async def enable_restrictions_for_unvalidated_member(self):
+    async def enable_restrictions_for_unvalidated_member(self) -> None:
         """ Function, which changes status from member on restricted,
         enabling restrictions for user, who started validation process. """
 
@@ -128,7 +128,7 @@ class MemberEventProcessor:
             )
         )
 
-    def _write_event_to_datase(self):
+    def _write_event_to_datase(self) -> None:
         """ Function, which generates Event document from ExpectedInternalEvent and saves it to database """
 
         logger.info('[MemberEventProcessor] attempting to write event document to storage ...')
@@ -136,7 +136,7 @@ class MemberEventProcessor:
         event_document = EventBuilder(object=self.internal_event).build()
         event_document.schema.save(index=event_document.index_name)
 
-    def _write_user_to_database(self):
+    def _write_user_to_database(self) -> None:
         """ Function, which generates User document from ExpectedInternalEvent and saves it to database """
 
         logger.info('[MemberEventProcessor] attempting to write user document to storage ...')

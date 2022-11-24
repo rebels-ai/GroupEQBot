@@ -22,7 +22,7 @@ class BotEventProcessor:
     context: ContextTypes.DEFAULT_TYPE
     configurator: Constructor = field(default_factory=lambda: Constructor())
 
-    async def process(self):
+    async def process(self) -> None:
         """ Entrypoint for the BotEventProcessor, which based on the bot StatusChange event, invoke appropriate logic. """
 
         logger.info('[BotEventProcessor] is called ...')

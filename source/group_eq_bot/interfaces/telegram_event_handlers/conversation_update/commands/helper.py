@@ -5,9 +5,7 @@ from elasticsearch_dsl import Q
 from storage.schemas.group_users.schema import GroupUser
 from storage.schemas.chats_mappings.schema import ChatsMapping
 from storage.query.query import search_in_existing_index
-
 from utilities.configurations_constructor.constructor import Constructor
-from utilities.internal_logger.logger import logger
 
 
 configurator = Constructor()
