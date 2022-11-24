@@ -5,7 +5,6 @@ from elasticsearch_dsl import Date, Document, Long, Nested, Object, Text
 
 from interfaces.models.internal_event.event import ExpectedInternalEvent
 from utilities.configurations_constructor.constructor import Constructor
-
 from storage.connectors.connector import connection
 
 

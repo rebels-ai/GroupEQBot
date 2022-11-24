@@ -19,18 +19,18 @@ class Processor:
     async def handle(self) -> None:
         """ Entrypoint for private processor which handles Bot events. """
 
-        logger.info('[PROCESSOR] is called.')
+        logger.info('[Private Processor] is called.')
  
         event_type = self.internal_event.event_type
 
         if event_type == EventType.bot.value:
-            logger.info('[PROCESSOR] Event type -- "BOT" ')
-            logger.info('[PROCESSOR] telegram_event_router to Private BotEventProcessor ...')
+            logger.info('[Private Processor] Event type -- "BOT" ')
+            logger.info('[Private Processor] telegram_event_router to Private BotEventProcessor ...')
             await BotEventProcessor(internal_event=self.internal_event,
                                     context=self.context).process()
 
         else:
-            logger.warning(f'[PROCESSOR] EventProcessor registered unknown EventType.'
+            logger.warning(f'[Private Processor] registered unknown EventType.'
                            f'{event_type}')
 
         return

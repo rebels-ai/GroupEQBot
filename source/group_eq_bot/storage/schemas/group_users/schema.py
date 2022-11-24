@@ -1,11 +1,10 @@
 from datetime import datetime
 
-from storage.connectors.connector import connection
+from elasticsearch_dsl import Date, Document, Long, Nested, Object, Text, Boolean
 
 from interfaces.models.internal_event.event import ExpectedInternalEvent
 from utilities.configurations_constructor.constructor import Constructor
-
-from elasticsearch_dsl import Date, Document, Long, Nested, Object, Text, Boolean
+from storage.connectors.connector import connection
 
 
 class Status(Document):

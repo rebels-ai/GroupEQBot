@@ -15,7 +15,7 @@ from utilities.internal_logger.logger import logger
 from storage.connectors.connector import connection
 from storage.schemas.group_users.schema import GroupUser
 from storage.query.query import update_query
-from storage.schemas.bot_events.schema import Builder, BotEvent
+from storage.schemas.bot_events.schema import Builder
 
 
 @dataclass

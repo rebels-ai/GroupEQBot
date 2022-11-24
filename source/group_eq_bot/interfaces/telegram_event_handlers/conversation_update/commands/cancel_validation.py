@@ -27,4 +27,3 @@ class CancelCommandBuilder:
 
         await event.message.reply_text(text=self.configurator.configurations.bot.validation.validation_canceled_message)
         return self.callback_return_value
-

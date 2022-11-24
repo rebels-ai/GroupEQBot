@@ -27,7 +27,7 @@ class BotEventProcessor:
 
         logger.info('[BotEventProcessor] is called ...')
 
-        # User started conversation with bot
+        # User started conversation with bot with command /start
         if self.internal_event.old_status == MemberStatus.left.value \
             or self.internal_event.old_status == MemberStatus.banned.value \
                 and self.internal_event.new_status == MemberStatus.member.value:

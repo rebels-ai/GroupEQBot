@@ -5,6 +5,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 
 from elasticsearch_dsl import Q
+
 from interfaces.models.internal_event.member_status import MemberStatus
 from interfaces.models.internal_event.event import ExpectedInternalEvent
 
@@ -110,6 +111,7 @@ class MemberEventProcessor:
         """ Function, which changes status from member on restricted,
         enabling restrictions for user, who started validation process. """
 
+        logger.info('[MemberEventProcessor] attempting to enable restrictions on new member ...')
         await self.context.bot.restrict_chat_member(
             chat_id=self.internal_event.chat_id,
             user_id=self.internal_event.user_id,

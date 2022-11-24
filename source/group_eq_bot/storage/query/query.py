@@ -1,4 +1,4 @@
-from typing import Union, List
+from typing import Union, List, Dict
 
 from elasticsearch_dsl import UpdateByQuery, Search
 from elasticsearch_dsl.query import Query
@@ -7,7 +7,7 @@ from elasticsearch_dsl.response import Response
 from storage.connectors.connector import connection
 
 
-def update_query(query: Query, index_name: str, doc_type, source: str, params) -> None:
+def update_query(query: Query, index_name: str, doc_type, source: str, params: Dict) -> None:
     """ Function, which partially updates document in specified index. 
         Source and params are the path and values for those changes. """
 

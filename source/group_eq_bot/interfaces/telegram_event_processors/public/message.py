@@ -21,7 +21,12 @@ class MessageEventProcessor:
         """
 
         logger.info('[MessageEventProcessor] is called ...')
-        logger.info('[MessageEventProcessor] attempting to write to storage ...')
+        self._write_event_to_datase()
+
+    def _write_event_to_datase(self):
+        """ Function, which generates Event document from ExpectedInternalEvent and saves it to database """
+
+        logger.info('[MessageEventProcessor] attempting to write event document to storage ...')
 
         document = Builder(object=self.internal_event).build()
         document.schema.save(index=document.index_name)

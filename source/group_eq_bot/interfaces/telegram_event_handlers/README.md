@@ -63,13 +63,20 @@ class VideoMessageHandler:
 - Stands for registering any chat member status change
 - Callback function: `interfaces.telegram_event_router.router.route_event`
 
+##### Bot Handler
+- Based on [Telegram Chat Member Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.chatmemberhandler.html)
+- Stands for registering any bot status change
+- Callback function: `interfaces.telegram_event_router.router.route_event`
+
 ### conversation_update
 ##### Conversation Validation Handler
 - Based on:
   - [Telegram Conversation Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.conversationhandler.html)
+  - [Telegram Callback Query Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.callbackqueryhandler.html)
   - [Telegram Message Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.messagehandler.html)
   - [Telegram Command Handler](https://docs.python-telegram-bot.org/en/v20.0a4/telegram.ext.basehandler.html)
 - Responsible for new member validation process. Process messages separately from other handlers.
-- Starting point: `/start_validation` command
+- Initial check: `/start_validation` command
+- Entrypoint: `interfaces.telegram_event_handlers.conversation_update.button`
 - Stop: `/cancel_validation` command
-- Callback: `interfaces.telegram_event_handlers.conversation_update.validator`
+- Callback: `interfaces.telegram_event_handlers.conversation_update.constructor`

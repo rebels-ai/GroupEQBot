@@ -25,25 +25,25 @@ class Processor:
         event_type = self.internal_event.event_type
 
         if event_type == EventType.message.value:
-            logger.info('[PROCESSOR] Event type -- "MESSAGE" ')
-            logger.info('[PROCESSOR] telegram_event_router to Public MessageEventProcessor ...')
+            logger.info('[PublicProcessor] Event type -- "MESSAGE" ')
+            logger.info('[PublicProcessor] telegram_event_router to Public MessageEventProcessor ...')
             await MessageEventProcessor(internal_event=self.internal_event,
                                         context=self.context).process()
 
         elif event_type == EventType.member.value:
-            logger.info('[PROCESSOR] Event type -- "MEMBER" ')
-            logger.info('[PROCESSOR] telegram_event_router to Public MemberEventProcessor ...')
+            logger.info('[PublicProcessor] Event type -- "MEMBER" ')
+            logger.info('[PublicProcessor] telegram_event_router to Public MemberEventProcessor ...')
             await MemberEventProcessor(internal_event=self.internal_event,
                                        context=self.context).process()
 
         elif event_type == EventType.bot.value:
-            logger.info('[PROCESSOR] Event type -- "BOT" ')
-            logger.info('[PROCESSOR] telegram_event_router to Public BotEventProcessor ...')
+            logger.info('[PublicProcessor] Event type -- "BOT" ')
+            logger.info('[PublicProcessor] telegram_event_router to Public BotEventProcessor ...')
             await BotEventProcessor(internal_event=self.internal_event,
                                     context=self.context).process()
 
         # @TODO:potentially implement --> elif  == EventType.button        
         else:
-            logger.warning(f'[PROCESSOR] EventProcessor registered unknown EventType.'
+            logger.warning(f'[PublicProcessor] registered unknown EventType.'
                            f'{event_type}')
         return
