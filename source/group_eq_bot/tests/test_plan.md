@@ -10,7 +10,7 @@ System Action:
 - Create | Update DB BotMetadata index entity
 
     Fields to be used:
-    bot_status: member
+    - bot_status: member
 - Create | Update DB ChatNameIDMappings index entity
 
 ### Granting Bot in Supergroup admin rights
@@ -20,7 +20,7 @@ System Action:
 - Update DB BotMetadata index entity
 
     Fields to be used:
-    bot_status: administrator
+    - bot_status: administrator
 
 ### Demote/delete the bot from supergroup
 Description:  Owner/admin of the group demoted/deleted the bot
@@ -29,7 +29,7 @@ System Action:
 - Update DB BotMetadata index entity
 
     Fields to be used:
-    bot_status: 'left' | 'member' | 'restricted'
+    - bot_status: 'left' | 'member' | 'restricted'
 
 ## Message Events
 
@@ -89,6 +89,8 @@ Description: User left the group after validation was passed
 
 System Action:
 - Update DB GroupEvents index
+
+    Fields to be used:
     - change_historical_status: [{left: date}]
     - current_status: left
 
@@ -97,6 +99,8 @@ Description: User left the group before validation was passed
 
 System Action:
 - Update DB GroupEvents index
+
+    Fields to be used:
     - change_historical_status: [{restricted: date}]
     - current_status: restricted
 
@@ -127,10 +131,10 @@ elif user is presented
 
     elif user did not pass the validation
         bot sends generated buttons with chatNames
-        Create | Update BotEvents index
+        Create | Update DB BotEvents index
 ```
 
-#### User clicks /start_validation [2]
+### User clicks /start_validation [2]
 Description: Buttons from [1] appear if user hasn't passed the validation yet in chat where bot is present. User clicked one of the buttons.
 
 System Action:
@@ -144,8 +148,9 @@ Update BotEvents index with any user answers
 
 if user passed validation:
 
-    Bot sends congrats to user
-    Bot disables restrictions in the group chat
+    Bot replies with message
+    Bot disables restrictions for corresponding group
+
     Update GroupUsers index entity
         Fields to be used:
         change_historical_status: [{member: date}, {restricted: date}, {member: date}]
@@ -159,7 +164,8 @@ if user passed validation:
 
 elif user failed validation:
 
-    Bot bans user in the group chat
+    Bot bans user in corresponding group
+
     Update GroupUsers index entity
         Fields to be used:
         change_historical_status: [{member: date}, {restricted: date}, {member: date}, {banned: date}]
