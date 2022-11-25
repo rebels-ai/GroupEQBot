@@ -29,8 +29,9 @@ class EventValidator:
         self.validate_external_event()
         self.generate_internal_event()
 
-    def validate_external_event(self):
+    def validate_external_event(self) -> None:
         """ Function, which validates incoming TelegramEvent event with ExpectedExternalEvent. """
+
         try:
             logger.info('[EventValidator] Attempting to validate TelegramEvent against ExpectedExternalEvent.')
             self.validated_external_event = ExpectedExternalEvent(**self.external_event.to_dict())
@@ -39,8 +40,9 @@ class EventValidator:
             logger.warning('[EventValidator] Failed validating TelegramEvent against ExpectedExternalEvent.')
             raise error
 
-    def generate_internal_event(self):
+    def generate_internal_event(self) -> None:
         """ Function, which generates InternalEvent, extracting some data from ExternalEvent. """
+
         logger.info('[EventValidator] Attempting to cast ExpectedExternalEvent into ExpectedInternalEvent.')
         self.validated_internal_event = ExpectedInternalEvent(event=self.validated_external_event,
                                                               chat_type=self.get_chat_type(),

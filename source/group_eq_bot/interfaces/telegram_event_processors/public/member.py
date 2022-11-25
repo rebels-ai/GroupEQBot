@@ -5,6 +5,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 
 from elasticsearch_dsl import Q
+
 from interfaces.models.internal_event.member_status import MemberStatus
 from interfaces.models.internal_event.event import ExpectedInternalEvent
 
@@ -45,14 +46,11 @@ class MemberEventProcessor:
             # if validation.passed == False --> enable restrictions --> send welcome message
 
             await self.enable_restrictions_for_unvalidated_member()
-
             await self.context.bot.send_message(
                 reply_markup=self._get_reply_markup(),
-                protect_content=True,
                 parse_mode=ParseMode.MARKDOWN_V2,
                 chat_id=self.internal_event.chat_id,
                 text=self.configurator.configurations.bot.validation.welcome_message.replace('USERNAME', f'[{self.internal_event.first_name}](tg://user?id={self.internal_event.user_id})'))
-
             
         # validation was kicked off
         elif self.internal_event.old_status == MemberStatus.member.value \
@@ -109,10 +107,11 @@ class MemberEventProcessor:
                            f'{self.internal_event}')
         return
 
-    async def enable_restrictions_for_unvalidated_member(self):
+    async def enable_restrictions_for_unvalidated_member(self) -> None:
         """ Function, which changes status from member on restricted,
         enabling restrictions for user, who started validation process. """
 
+        logger.info('[MemberEventProcessor] attempting to enable restrictions on new member ...')
         await self.context.bot.restrict_chat_member(
             chat_id=self.internal_event.chat_id,
             user_id=self.internal_event.user_id,
@@ -129,14 +128,18 @@ class MemberEventProcessor:
             )
         )
 
-    def _write_event_to_datase(self):
-        logger.info('[MemberEventProcessor] attempting to write to storage ...')
+    def _write_event_to_datase(self) -> None:
+        """ Function, which generates Event document from ExpectedInternalEvent and saves it to database """
+
+        logger.info('[MemberEventProcessor] attempting to write event document to storage ...')
 
         event_document = EventBuilder(object=self.internal_event).build()
         event_document.schema.save(index=event_document.index_name)
 
-    def _write_user_to_database(self):
-        logger.info('[MemberEventProcessor] attempting to write to storage ...')
+    def _write_user_to_database(self) -> None:
+        """ Function, which generates User document from ExpectedInternalEvent and saves it to database """
+
+        logger.info('[MemberEventProcessor] attempting to write user document to storage ...')
 
         query = Q('match', user_id=self.internal_event.user_id)
         document = UserBuilder(object=self.internal_event).build()
@@ -156,6 +159,7 @@ class MemberEventProcessor:
             update_query(query=query, index_name=index_name, doc_type=GroupUser, source=source, params=params)
 
     def _get_reply_markup(self):
+        """ Function, which generates button for welcome message. """
         keyboard = [
             [InlineKeyboardButton(
                 text=self.configurator.configurations.bot.validation.bot_button_text,
