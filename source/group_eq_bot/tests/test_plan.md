@@ -1,4 +1,3 @@
-
 # Bot status updates
 
 ### Adding Bot into Supergroup 
@@ -17,16 +16,34 @@
 
 # Bot in supergroup behaviour
 
-### Sending messages | adding members
+### Sending messages
  ⁃ Create | Update DB GroupEvents index
     - should be separate index dedicated to one chat
 
-### Changing any member statuses 
+### User joined the group
  ⁃ Create | Update DB GroupEvents index
-    - should be separate index dedicated to one chat
-    - member previous status should be saved in db
-        - change_historical_status: [{old_status: date}]
-        - current_status: new_status
+    - change_historical_status: [{left/banned: date}]
+    - current_status: member
+
+### User rights were restricted
+ ⁃ Update DB GroupEvents index
+    - change_historical_status: [{member: date}]
+    - current_status: restricted
+
+### User restrictions were lifted
+ ⁃ Update DB GroupEvents index
+    - change_historical_status: [{restricted: date}]
+    - current_status: member
+
+### User was banned
+ ⁃ Update DB GroupEvents index
+    - change_historical_status: [{restricted/member: date}]
+    - current_status: banned
+
+### User left the group
+ ⁃ Update DB GroupEvents index
+    - change_historical_status: [{restricted/member: date}]
+    - current_status: left/restricted
 
 
 # New members in the supergroup
