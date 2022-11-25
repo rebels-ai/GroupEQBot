@@ -25,12 +25,12 @@ There are no any constraints in namings as well as structuring.
 ```
 
 # ACTION: documentation
-- [x] Assets (completly empty)
-- [x] Configurations (completly empty)
-- [x] Drivers (root is not finished - fulfill & apply changes to per each submodule)
-- [x] Interfaces (root is empty - fulfill & apply changes to per each submodule)
-- [x] Storage (apply changes)
-- [x] utilities (completly empty)
+- [] Assets (completly empty)
+- [] Configurations (completly empty)
+- [] Drivers (root is not finished - fulfill & apply changes to per each submodule)
+- [] Interfaces (root is empty - fulfill & apply changes to per each submodule)
+- [] Storage (apply changes)
+- [] utilities (completly empty)
 
 
 # Docstrings
@@ -49,7 +49,7 @@ class XYZ:
 ```
 
 # ACTION: docstrings
-- [x] Drivers
-- [x] Interfaces
-- [x] Storage
-- [x] utilities
+- [] Drivers
+- [] Interfaces
+- [] Storage
+- [] utilities
