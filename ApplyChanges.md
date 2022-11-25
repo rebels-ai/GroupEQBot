@@ -1,8 +1,11 @@
 
 # Documentation
 Apply general structure for the documentation:
+
     - problem statement (what the module (folder) stands for)
+
     - structure of folders with mindful description
+
     - technical description (if module is required to be described from technical point of view)
 
 Example:
