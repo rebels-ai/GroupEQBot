@@ -118,7 +118,7 @@ class MemberEventProcessor:
             user_id=self.internal_event.user_id,
 
             permissions=ChatPermissions(
-                can_send_messages=True,  # to be able to reply ConversationHandler messages
+                can_send_messages=False,
                 can_send_other_messages=False,
                 can_invite_users=False,
                 can_send_polls=False,

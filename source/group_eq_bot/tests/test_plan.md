@@ -1,94 +1,173 @@
-# Bot status updates
+# Use cases: Bot behaviour in group (supergroup)
 
-### Adding Bot into Supergroup 
- ⁃ Create | Update DB BotMetadata index entity
-    - bot.status should be 'member'
- ⁃ Create | Update DB ChatNameIDMappings index entity
+## Bot Events
+
+### Adding Bot into Supergroup
+Description: Owner/admin of the group added the bot
+
+System Action:
+
+- Create | Update DB BotMetadata index entity
+
+    Fields to be used:
+    bot_status: member
+- Create | Update DB ChatNameIDMappings index entity
 
 ### Granting Bot in Supergroup admin rights
- ⁃ Update bot.status attribute in DB BotMetadata index entity
-    - bot.status should be 'administrator'
+Description: Owner/admin of the group promoted the bot
+
+System Action:
+- Update DB BotMetadata index entity
+
+    Fields to be used:
+    bot_status: administrator
 
 ### Demote/delete the bot from supergroup
- ⁃ Update bot.status attribute in DB BotMetadata index entity
-    - bot.status should be 'left' | 'member' | 'restricted'
+Description:  Owner/admin of the group demoted/deleted the bot
 
+System Action:
+- Update DB BotMetadata index entity
 
-# Bot in supergroup behaviour
+    Fields to be used:
+    bot_status: 'left' | 'member' | 'restricted'
 
-### Sending messages
- ⁃ Create | Update DB GroupEvents index
-    - should be separate index dedicated to one chat
+## Message Events
+
+### User sent message
+Description: User sent any type of messages (text, videop, audio, etc.).
+             Bot should create separate index dedicated to one chat
+
+System Action:
+- Create | Update DB GroupEvents index
+
+## Member Events
 
 ### User joined the group
- ⁃ Create | Update DB GroupEvents index
-    - change_historical_status: [{left/banned: date}]
-    - current_status: member
+Description: User joined the group either by himself or was added by member
 
-### User rights were restricted
- ⁃ Update DB GroupEvents index
+System Action: 
+- Create | Update DB GroupEvents index
+
+    Fields to be used:
     - change_historical_status: [{member: date}]
+    - current_status: member
+- Bot restricts user rights (see: use case - user was restricted)
+- Bot sends weclome message with link to private chat
+
+### User was restricted
+Description: Bot restricts user right after he joined the group
+
+System Action:
+- Update DB GroupEvents index
+
+    Fields to be used:
+    - change_historical_status: [{member: date}, {restricted: date}]
     - current_status: restricted
 
-### User restrictions were lifted
- ⁃ Update DB GroupEvents index
-    - change_historical_status: [{restricted: date}]
+### User was unrestricted
+Description: Bot unrestricts user right after he passed the validation
+
+System Action:
+- Update DB GroupEvents index
+
+    Fields to be used:
+    - change_historical_status: [{member: date}, {restricted: date}, {member: date}]
     - current_status: member
 
 ### User was banned
- ⁃ Update DB GroupEvents index
-    - change_historical_status: [{restricted/member: date}]
+Description: Bot bans user if validation was failed for corresponding group
+
+System Action:
+- Update DB GroupEvents index
+
+    Fields to be used:
+    - change_historical_status: [{member: date}, {restricted: date}, {member: date}, {banned: date}]
     - current_status: banned
 
-### User left the group
- ⁃ Update DB GroupEvents index
-    - change_historical_status: [{restricted/member: date}]
-    - current_status: left/restricted
+### User left the group after validation was passed
+Description: User left the group after validation was passed
+
+System Action:
+- Update DB GroupEvents index
+    - change_historical_status: [{left: date}]
+    - current_status: left
+
+### User left the group before validation was passed
+Description: User left the group before validation was passed
+
+System Action:
+- Update DB GroupEvents index
+    - change_historical_status: [{restricted: date}]
+    - current_status: restricted
 
 
-# New members in the supergroup
-
-### New member joined
- ⁃ Create | Update GroupUsers index entity (create user in DB)
-     - should be separate index dedicated to one chat
- ⁃ Create | Update DB GroupEvents index
- ⁃ Bot restricts user rights - changed to restrict all, bcse they dont need to pass validation in group chat anymore
- ⁃ Bot sends weclome message with link to private chat
-
-
-# Private chat with bot
+# Use cases: Bot behaviour in private chat (1:1 with user)
 
 ### Any user starts the bot in private chat
-    - Bot send instruction for validation
+Description: Any user starts the bot in private chat
 
-### User clicks /start_validation
- ⁃ Read from ALL GroupUsers indeces whether new member ID is presented in index
+System Action:
+- Bot send instruction for validation
 
-#### User is not known by bot
-    - Bot sends message 'i dont know you'
+### User clicks /start_validation [1]
+Description: User starts validation process with bot command
 
-#### User is known by bot
- ⁃ Read chatNames from GroupChatIDMappings by chat_id
-    - user already passed validation
-        - bot sends messsage 'you already passed'
-    - user did not pass the validation
-        ⁃ bot sends generated buttons with chatNames
-        ⁃ Create | Update BotEvents index
+System Action:
+```
+Read from ALL GroupUsers indeces whether new member ID is presented in index
 
-#### User starts validation with clicking the button
- - Update GroupUsers index (updated user.validation.start_time attribute)
- - Update BotEvents index with this event
- ⁃ Update BotEvents index with any user answers
+if user is not presented in bot's groups 
+    Bot replies with message
 
-#### User passed validation
- - Bot sends congrats to user
- - Bot disables restrictions in the group chat
- ⁃ Update GroupUsers index entity (update user status changed on member)
- ⁃ Update GroupUsers index entity (update user stop validation time)
- - Update GroupEvents index with change status event
+elif user is presented
+    Read chatNames from GroupChatIDMappings by chat_id
 
-#### User failed validation
- - Bot banns user in the group chat
- ⁃ Update GroupUsers index entity (update user status changed on banned)
- ⁃ Update GroupUsers index entity (update user stop validation time)
- - Update GroupEvents index with change status event
+    if user already passed validation
+        bot replies with messsage
+
+    elif user did not pass the validation
+        bot sends generated buttons with chatNames
+        Create | Update BotEvents index
+```
+
+#### User clicks /start_validation [2]
+Description: Buttons from [1] appear if user hasn't passed the validation yet in chat where bot is present. User clicked one of the buttons.
+
+System Action:
+```
+Update GroupUsers index
+    Fields to be used:
+    user.validation.start_time: date
+
+Update BotEvents index with this event
+Update BotEvents index with any user answers
+
+if user passed validation:
+
+    Bot sends congrats to user
+    Bot disables restrictions in the group chat
+    Update GroupUsers index entity
+        Fields to be used:
+        change_historical_status: [{member: date}, {restricted: date}, {member: date}]
+        current_status: member
+
+    Update GroupUsers index entity
+        Fields to be used:
+        user.validation.end_time: date
+
+    Update GroupEvents index with change status event
+
+elif user failed validation:
+
+    Bot bans user in the group chat
+    Update GroupUsers index entity
+        Fields to be used:
+        change_historical_status: [{member: date}, {restricted: date}, {member: date}, {banned: date}]
+        current_status: banned
+
+    Update GroupUsers index entity
+        Fields to be used:
+        user.validation.end_time: date
+
+    Update GroupEvents index with change status event
+```
