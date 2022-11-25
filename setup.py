@@ -1,8 +1,8 @@
 from setuptools import setup
 
 setup(
-    name='group_eq_bot',
-    version='1.0.0',
+    name='GroupEQBot',
+    version='1.1.0',
     packages=['group_eq_bot', 'group_eq_bot.data', 'group_eq_bot.models', 'group_eq_bot.telegram_event_router', 'group_eq_bot.telegram_event_handlers',
               'group_eq_bot.storage', 'group_eq_bot.storage.users_driven_database', 'group_eq_bot.storage.events_driven_database',
               'group_eq_bot.storage.schemas', 'group_eq_bot.telegram_event_processors', 'group_eq_bot.telegram_event_processors.public',
@@ -14,7 +14,7 @@ setup(
             'main = group_eq_bot.run_bot:main',
         ]
     },
-    url='https://github.com/rebels-ai/whois_coffee_bot_internal',
+    url='https://github.com/rebels-ai/GroupEQBot',
     license='MIT',
     author='rebels.ai',
     author_email='maksim.kumundzhiev@rebels.ai',
