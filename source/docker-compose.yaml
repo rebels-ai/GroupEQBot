@@ -16,9 +16,9 @@ services:
       - server
 
   # events-storage (ElasticSearch) stands for storing under indexes TG events, TG groups and TG users
-  events-database:
+  events-storage:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
-    container_name: events-database
+    container_name: events-storage
     restart: always
     networks:
       - group-eq-bot-network
@@ -46,7 +46,7 @@ services:
       - database
 
   # events-storage-manager (Kibana) stands for UI for managing & fetching | visualising data from events-storage (ElasticSearch)
-  events-database-manager:
+  events-storage-manager:
     image: docker.elastic.co/kibana/kibana:7.4.0
     container_name: events-storage-manager
     restart: always
@@ -57,7 +57,7 @@ services:
     ports:
       - "5601:5601"
     depends_on:
-     - events-database
+     - events-storage
     profiles:
       - database
 

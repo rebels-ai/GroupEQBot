@@ -4,6 +4,10 @@ bot:
     version: 1.1.0
     token: 
     url: t.me/GroupEQBot
+  logging:
+    directory: source/group_eq_bot/utilities/internal_logger/logs
+    warning_file_name: warnings.log
+    info_file_name: info.log
   validation:
     # now we support 10 questions overall
     # this parameter is controlled in question schema (index_number)

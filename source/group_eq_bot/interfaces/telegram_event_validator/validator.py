@@ -33,9 +33,7 @@ class EventValidator:
         """ Function, which validates incoming TelegramEvent event with ExpectedExternalEvent. """
 
         try:
-            logger.info('[EventValidator] Attempting to validate TelegramEvent against ExpectedExternalEvent.')
             self.validated_external_event = ExpectedExternalEvent(**self.external_event.to_dict())
-            logger.info('[EventValidator] Successfully validated TelegramEvent against ExpectedExternalEvent.')
         except ValidationError as error:
             logger.warning('[EventValidator] Failed validating TelegramEvent against ExpectedExternalEvent.')
             raise error
