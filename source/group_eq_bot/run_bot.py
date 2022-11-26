@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from telegram import Update
 from telegram.ext import ApplicationBuilder, Application
 
-from utilities.internal_logger.logger import logger, define_info_logger, define_warning_logger
+from utilities.internal_logger.logger import logger, define_info_logger, define_warning_logger, create_logs_folder
 from utilities.configurations_constructor.constructor import Constructor
 
 
@@ -101,6 +101,7 @@ class BotBuilder:
 def main():
     """ Function, which stands for pre-validating, building and launching `group_eq_bot` application. """
 
+    create_logs_folder()
     define_info_logger()
     define_warning_logger()
 
