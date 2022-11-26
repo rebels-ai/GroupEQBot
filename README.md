@@ -34,6 +34,8 @@ or wilth multiple profiles
 e.g.: $ docker compose --profile server --profile database up --build --force-recreate
 ```
 
+events-storage: localhost:9200
+events-storage-manager: localhost:5601
 
 ## Licence
 [Rebels.AI](https://rebels.ai) has made this service available for you to incorporate into your products under the [MIT Licence](https://mit-license.org). Feel free to remix and re-share the service and documentation in your products.
