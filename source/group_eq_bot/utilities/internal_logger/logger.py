@@ -32,5 +32,3 @@ def define_info_logger() -> None:
     logger.addHandler(writer)
 
     return
-
-

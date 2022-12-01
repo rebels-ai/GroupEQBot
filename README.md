@@ -12,28 +12,6 @@ In BotFather's chat you can set other useful bot features as well:
 - With `/setdescription` command you can change bot description, which is shown when users open private chat with bot
 - `/setcommands` can be used to set bot menu in reply box for easier access to your bot commands
 
-## System Deployment
-``
-If you would like to deploy all services:
-``
-
-```bash
-$ docker-compose up --build --force-recreate
-```
-
-``
-If you would like to deploy particular profile (sevice):
-``
-
-```bash
-$ docker compose --profile {profileName} up --build --force-recreate 
-```
-```bash
-e.g.: $ docker compose --profile server up --build --force-recreate
-or wilth multiple profiles
-e.g.: $ docker compose --profile server --profile database up --build --force-recreate
-```
-
 
 ## Licence
 [Rebels.AI](https://rebels.ai) has made this service available for you to incorporate into your products under the [MIT Licence](https://mit-license.org). Feel free to remix and re-share the service and documentation in your products.
