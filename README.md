@@ -1,17 +1,23 @@
-## Bot creation
-To create a bot on Telegram, you need to contact the [BotFather](https://telegram.me/BotFather) and go through the following steps:
+## Introduction
+To make your version of `GroupEQBot`, firstly you have to create your own bot in Telegram 
+and apply changes in `source.group_eq_bot.configurations` accordingly.   
+
+## Bot Creation
+Navigate to [BotFather](https://telegram.me/BotFather) and apply following steps:
+
 1. Use command `/newbot`
-2. Create a name for your bot
-3. Create a username, which must ends with 'bot'. It would be used as a url to bot
+   - Create a name for your bot
 
-    e.g.: `t.me/name_of_your_bot`
-4. Set privacy with command `/setprivacy` to `Disable`, so bot receive all messages that people send in group chats
-5. Put bot token you received to `token` field in `configurations.yaml` (see system configurations further in README.md)
-
-In BotFather's chat you can set other useful bot features as well:
-- With `/setdescription` command you can change bot description, which is shown when users open private chat with bot
-- `/setcommands` can be used to set bot menu in reply box for easier access to your bot commands
-
+2. Create a username, which must ends with 'bot' (it would be used as `url` to bot)
+   - ``` example: "t.me/name_of_your_bot" ```
+   
+3. Use command `/setprivacy` and choose `Disable` 
+4. Use `/setdescription` command to make bot description 
+5. Use `/setcommands` command to create `2 validation commands`:
+   - `start_validation` - command which initiates validation process
+   - `cancel_validation` - command which cancels validation process 
+   
+6. Fulfill bot name, bot token, bot url in `configurations.yaml` file
 
 ## Licence
 [Rebels.AI](https://rebels.ai) has made this service available for you to incorporate into your products under the [MIT Licence](https://mit-license.org). Feel free to remix and re-share the service and documentation in your products.

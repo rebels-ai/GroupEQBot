@@ -1,3 +1,4 @@
+import os
 import logging
 from utilities.configurations_constructor.constructor import Constructor
 
@@ -6,6 +7,13 @@ logging.basicConfig(
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
+
+
+def create_logs_folder() -> None:
+    """ Method, which creates folder for storing logs, info and warning levels. """
+
+    _directory = Constructor().configurations.bot.logging.directory
+    os.makedirs(_directory, exist_ok=True)
 
 
 def define_warning_logger() -> None:
