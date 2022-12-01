@@ -17,7 +17,7 @@ Navigate to [BotFather](https://telegram.me/BotFather) and apply following steps
    - `start_validation` - command which initiates validation process
    - `cancel_validation` - command which cancels validation process 
    
-6. Fulfill bot name, bot token, bot url in `configurations.yaml` file
+6. Navigate to `source.group_eq_bot` folder and follow system invocation steps
 
 ## Licence
 [Rebels.AI](https://rebels.ai) has made this service available for you to incorporate into your products under the [MIT Licence](https://mit-license.org). Feel free to remix and re-share the service and documentation in your products.

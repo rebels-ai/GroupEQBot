@@ -1,5 +1,8 @@
 # `GroupEQBot` 
-Registered telegram bot can be found in telegram passing `@GroupEQBot` in search bar.
+
+## Prerequisites
+To utilize GroupEQBot system, firstly setup `configurations.confurations.yaml` file based on `sample.yaml`, 
+fulfilling bot `name`, `token`, `url` fields (refer to `System Configurations` clause), obtained while telegram creating bot process.  
 
 ## Technical Description
 - Mainly, `GroupEQBot` bot service stands for:
@@ -29,4 +32,11 @@ $ mv sample.yaml configuration.yaml
  - `fill` `configuration.yaml`
 ```bash
 $ nano configuration.yaml
+```
+
+## Deployment
+To deploy GroupEQBot separately of rest of the services:
+```
+$ docker build . Dockerfile
+$ docker run . Dockerfile 
 ```
