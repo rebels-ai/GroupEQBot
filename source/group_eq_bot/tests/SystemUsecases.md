@@ -1,5 +1,8 @@
-# Use cases: Bot behaviour in group (supergroup)
+# Introduction
+- @NOTE: The described use cases has to be implemented
+- At presented there are tests for `interfaces.router`, but they ahs to be revamped, due to recent changes (additions) of router  
 
+# Use cases: Bot behaviour in group (supergroup)
 ## Bot Events
 
 ### Adding Bot into Supergroup
