@@ -22,11 +22,11 @@ class QuestionsValidator:
         self.get_questions_from_configurations()
         self.validate_questions()
 
-    def get_questions_from_configurations(self):
+    def get_questions_from_configurations(self) -> None:
         """ Method, which parses list of questions, declared in configurations file. """
         self.questions = self.configurator.configurations.bot.validation.questions
 
-    def validate_questions(self):
+    def validate_questions(self) -> None:
         """ Method, which validates questions from configurations file against Question data model. """
 
         try:

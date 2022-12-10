@@ -29,33 +29,38 @@ class EventValidator:
         self.validate_external_event()
         self.generate_internal_event()
 
-    def validate_external_event(self):
+    def validate_external_event(self) -> None:
         """ Function, which validates incoming TelegramEvent event with ExpectedExternalEvent. """
+
         try:
-            logger.info('[EventValidator] Attempting to validate TelegramEvent against ExpectedExternalEvent.')
             self.validated_external_event = ExpectedExternalEvent(**self.external_event.to_dict())
-            logger.info('[EventValidator] Successfully validated TelegramEvent against ExpectedExternalEvent.')
         except ValidationError as error:
             logger.warning('[EventValidator] Failed validating TelegramEvent against ExpectedExternalEvent.')
             raise error
 
-    def generate_internal_event(self):
+    def generate_internal_event(self) -> None:
         """ Function, which generates InternalEvent, extracting some data from ExternalEvent. """
+
         logger.info('[EventValidator] Attempting to cast ExpectedExternalEvent into ExpectedInternalEvent.')
-        self.validated_internal_event = ExpectedInternalEvent(event=self.validated_external_event,
-                                                              chat_type=self.get_chat_type(),
-                                                              event_type=self.get_event_type(),
-                                                              chat_name=self.get_chat_name(),
-                                                              chat_id=self.get_chat_id(),
-                                                              user_id=self.get_user_id(),
-                                                              message_id=self.get_message_id(),
-                                                              first_name=self.get_user_first_name(),
-                                                              last_name=self.get_user_last_name(),
-                                                              username=self.get_username(),
-                                                              new_status=self.get_user_new_status(),
-                                                              old_status=self.get_user_old_status(),
-                                                              event_time=self.get_event_time(),
-                                                              message=self.get_message_text())
+        try:
+            self.validated_internal_event = ExpectedInternalEvent(event=self.validated_external_event,
+                                                                  chat_type=self.get_chat_type(),
+                                                                  event_type=self.get_event_type(),
+                                                                  chat_name=self.get_chat_name(),
+                                                                  chat_id=self.get_chat_id(),
+                                                                  user_id=self.get_user_id(),
+                                                                  message_id=self.get_message_id(),
+                                                                  first_name=self.get_user_first_name(),
+                                                                  last_name=self.get_user_last_name(),
+                                                                  username=self.get_username(),
+                                                                  new_status=self.get_user_new_status(),
+                                                                  old_status=self.get_user_old_status(),
+                                                                  event_time=self.get_event_time(),
+                                                                  message=self.get_message_text())
+        except ValidationError as error:
+            logger.warning('[EventValidator] Failed generation of ExpectedInternalEvent.')
+            raise error
+
         logger.info('[EventValidator] Successfully casted ExpectedExternalEvent into ExpectedInternalEvent.')
 
     def get_chat_type(self) -> str:

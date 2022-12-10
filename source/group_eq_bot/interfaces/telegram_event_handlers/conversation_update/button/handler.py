@@ -1,25 +1,19 @@
 from typing import Dict
 from dataclasses import dataclass, field
-from datetime import datetime
 
 from telegram import Update as TelegramEvent
 from telegram.ext import CallbackQueryHandler, ContextTypes, ConversationHandler
-from elasticsearch_dsl import Q
 
 from interfaces.models.internal_event.chat_type import ChatType
 from interfaces.models.validation.question_type import QuestionType
-from interfaces.telegram_event_handlers.conversation_update.button.helper import StartHelper
+from interfaces.telegram_event_handlers.conversation_update.button.helper import StartButtonHelper
 
 from utilities.configurations_constructor.constructor import Constructor
-from utilities.internal_logger.logger import logger
-
-from storage.schemas.group_users.schema import GroupUser
-from storage.query.query import update_query
 
 
 @dataclass
 class StartButtonBuilder:
-    """ Interface for button callback entrypoint of ConversationHandler. """
+    """ Interface for button entrypoint of ConversationHandler. """
 
     CONTEXT_DEFAULT_TYPE = ContextTypes.DEFAULT_TYPE
 
@@ -34,34 +28,28 @@ class StartButtonBuilder:
 
     async def callback_function(self, event: TelegramEvent, context: CONTEXT_DEFAULT_TYPE) -> int:
         """ Method, which will be called as a callback when button with chat_id was clicked. 
-            
+
             Note:
                 ConversationHandler supposed to be used only within private chat (bot:user)
         """
 
-        await event.callback_query.edit_message_text(text=f"Проверка началась:")  #  edit to remove buttons
+        #  Edit previous message to remove buttons
+        await event.callback_query.edit_message_text(text=self.configurator.configurations.bot.validation.validation_started_message)
 
         str_chat_id = event.callback_query.data
-        logger.info('Attempting to write BotEvent to database...')
-        StartHelper(event=event, context=context).write_event_to_database(chat_id=str_chat_id)
+
+        StartButtonHelper(event=event, context=context).write_event_to_database(chat_id=str_chat_id)
 
         if event.callback_query.message.chat.type == ChatType.private.value:
 
-            if await StartHelper(event=event, context=context).chat_owner(chat_id=str_chat_id):
-                logger.info(f'User, who talks with bot: {event.callback_query.from_user.full_name}')
+            if await StartButtonHelper(event=event, context=context).chat_owner(chat_id=str_chat_id):
 
                 await event.callback_query.message.reply_text(text=self.configurator.configurations.bot.validation.stop_validation_for_owner)
                 return ConversationHandler.END
 
-            query = Q('match', user_id=event.callback_query.from_user.id)
-            index_name = f'{GroupUser.Index.name}-group-users-{str_chat_id}'
+            StartButtonHelper(event=event, context=context).write_time_validation_started(chat_id=str_chat_id)
+            context.chat_data['chat_id'] = -int(str_chat_id)  # Save chat_id for later usage in conversation
 
-            source = "ctx._source.event.validation.start_time = params.start_time"
-            params = {"start_time": datetime.now()}
-
-            update_query(query=query, index_name=index_name, doc_type=GroupUser, source=source, params=params)
-
-            context.chat_data['chat_id'] = -int(str_chat_id)
             next_question_index = self.question.get('question_index') + 1
             question_type = self.question.get('meta').question_type
 

@@ -48,11 +48,11 @@ class QuestionsPreprocessor:
                 question_object = Reader(input_path=question.question_path).read()
                 return question_object
 
-    def sort_question(self):
+    def sort_question(self) -> None:
         """ Method, which sorts questions list[dict] by key. """
         self.processed_questions = sorted(self.processed_questions, key=lambda d: list(d.keys()))
 
-    def process(self):
+    def process(self) -> None:
         """ QuestionsPreprocessor main interface. """
 
         for question in self.questions:

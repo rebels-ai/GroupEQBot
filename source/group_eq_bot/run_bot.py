@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from telegram import Update
 from telegram.ext import ApplicationBuilder, Application
 
-from utilities.internal_logger.logger import logger
+from utilities.internal_logger.logger import logger, define_info_logger, define_warning_logger, create_logs_folder
 from utilities.configurations_constructor.constructor import Constructor
 
 
@@ -12,7 +12,9 @@ from utilities.configurations_constructor.constructor import Constructor
 class BotBuilder:
     token: Any = field(init=True)
     bot: Application = field(init=False)
-    allowed_updates: List = field(default_factory=lambda: Update.ALL_TYPES)  # mandatory to specify parameter to catch all the telegram updates
+
+    # mandatory to specify parameter to catch all the telegram updates
+    allowed_updates: List = field(default_factory=lambda: Update.ALL_TYPES)
 
     def __post_init__(self):
         self._token_is_correct_format()
@@ -45,8 +47,8 @@ class BotBuilder:
         self.bot.add_handler(BotHandler.handler)
 
     def _add_start_validation_handler(self):
-        from interfaces.telegram_event_handlers.conversation_update.commands.start_validation import StartValidation
-        self.bot.add_handler(StartValidation.handler)
+        from interfaces.telegram_event_handlers.conversation_update.commands.start_validation import StartValidationHandler
+        self.bot.add_handler(StartValidationHandler.handler)
 
     def _add_member_handler(self):
         from interfaces.telegram_event_handlers.member_update.handler import MemberHandler
@@ -98,6 +100,11 @@ class BotBuilder:
 
 def main():
     """ Function, which stands for pre-validating, building and launching `group_eq_bot` application. """
+
+    create_logs_folder()
+    define_info_logger()
+    define_warning_logger()
+
     token = Constructor().configurations.bot.general.token
     BotBuilder(token=token).launch()
 

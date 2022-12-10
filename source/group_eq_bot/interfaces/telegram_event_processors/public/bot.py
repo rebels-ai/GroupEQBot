@@ -27,7 +27,7 @@ class BotEventProcessor:
     context: ContextTypes.DEFAULT_TYPE
     configurator: Constructor = field(default_factory=lambda: Constructor())
 
-    async def process(self):
+    async def process(self) -> None:
         """ Entrypoint for the BotProcessor, which based on the bot StatusChange event, invoke appropriate logic. """
 
         logger.info('[BotEventProcessor] is called ...')
@@ -65,14 +65,13 @@ class BotEventProcessor:
 
         return
 
-    def _write_event_to_database(self):
-        """ . """
+    def _write_event_to_database(self) -> None:
+        """ Function, which generates Event document from ExpectedInternalEvent and saves it to database """
 
-        logger.info('[BotEventProcessor] attempting to write to storage ...')
+        logger.info('[BotEventProcessor] attempting to write event doc to storage ...')
 
         query = Q('match', chat_id=abs(self.internal_event.chat_id))
         document = MetadataBuilder(object=self.internal_event).build()
-
         index = document.schema._get_index()
         chat_document = find_query(query=query, index_name=document.index_name, doc_type=BotMetadata)
 
@@ -81,13 +80,12 @@ class BotEventProcessor:
         else:
             source = "ctx._source.event.bot_status = params.bot_status"
             params = {"bot_status": self.internal_event.new_status}
-
             update_query(query=query, index_name=document.index_name, doc_type=BotMetadata, source=source, params=params)
 
-    def _write_chat_name_id_mapping(self):
-        """ . """
+    def _write_chat_name_id_mapping(self) -> None:
+        """ Function, which generates chat mapping document from ExpectedInternalEvent and saves it to database """
 
-        logger.info('[BotEventProcessor] attempting to write to storage ...')
+        logger.info('[BotEventProcessor] attempting to write chat doc to storage ...')
 
         document = MappingsBuilder(object=self.internal_event).build()
         document.schema.save(index=document.index_name)

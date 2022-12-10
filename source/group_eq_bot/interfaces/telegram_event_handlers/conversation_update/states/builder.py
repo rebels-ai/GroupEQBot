@@ -1,6 +1,6 @@
 from typing import Dict, Optional
-
 from dataclasses import dataclass, field
+
 from telegram import Update as TelegramEvent
 from telegram.ext import MessageHandler, ContextTypes, filters, ConversationHandler
 
@@ -26,6 +26,8 @@ class StatesBuilder:
     configurator: Constructor = field(default_factory=lambda: Constructor())
 
     def set_question_index(self) -> int:
+        """ Method, which returns question number, needed by ConversationHandler. """
+
         if not self.final_question:
             return self.question['question_index']
         else:

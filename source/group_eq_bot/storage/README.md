@@ -130,7 +130,3 @@ The way storage connector is build is controlled from `GroupEQBot configurations
 - For local development use: "localhost" (meaning main application is running on local machine and DB in container)
 - For docker development use: "container" (meaning main application is running in container and DB in container)
 ```
-
-
-
-
