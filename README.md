@@ -1,52 +1,23 @@
-# Telegram `GroupEQBot` 
+## Introduction
+To make your version of `GroupEQBot`, firstly you have to create your own bot in Telegram 
+and apply changes in `source.group_eq_bot.configurations` accordingly.   
 
-## Motivation
-Nowadays, a buzzy request of any `telegram group` **owner/administrator** is to have a tool, which allows `detecting 
-toxic (spamming/harming) group members`, leading to way more accurate and efficient `process of moderating the groups` to enchance EQ and grow social capital of the chat groups. 
+## Bot Creation
+Navigate to [BotFather](https://telegram.me/BotFather) and apply following steps:
 
-Generally it is not only about filtering toxic people and toxic comments, it is about seeking mutual interests, and adding juce to communication, performing things like random coffe matching of persons potentially interesting for each other. Whois coffee bot is meant to encouraging people to leave their traditional circle of cummunication and learn new things.
+1. Use command `/newbot`
+   - Create a name for your bot
 
-Based on experience of [Rebels.AI](https://rebels.ai) in solving ML problems on daily bases, notably in NLP, 
-strongly believe that solve substantial chatting-related problems, making the communication
-more `ethical`, `secured`, `targeted` and in general, `wholesome` is a right thing to do.
-
-
-## Technical Description
-- Mainly, `GroupEQBot` bot service stands for:
-  - registering & validating & transforming & ingesting incoming Telegram group(S) events    
-  - `validating users`, who aiming to join [telegram group](https://www.telegram-group.com/en/blog/the-difference-between-telegram-groups-and-telegram-channels/) 
-  - `capturing and analyzing users behaviour` within [telegram group](https://www.telegram-group.com/en/blog/the-difference-between-telegram-groups-and-telegram-channels/)  
-  - `providing analytics` per [telegram group](https://www.telegram-group.com/en/blog/the-difference-between-telegram-groups-and-telegram-channels/) per user
-  - `based on employed clustering and classification` ML algorithms, detect suspicious users and contrary, unite users with common interests
-
-- Registered by `GroupEQBot` Telegram groups events are ingested in and managed with:
-  - ElasticSearch (stands for storing `events`, `users` and `groups` data)
-  - Kibana (stands for UI to manage | query | visualise `events`, `users` and `groups` data)
-
-
-
-## Example
-### User attempts to pass the validation
-
-### General system flow overview
-
-
-## System Configurations
-- There is configurations template file, containing all the system configurations:
-```
-group_eq_bot/configurations/sample.yaml
-```
-
-To set up the system before deploying, navigate to the folder and `create` and `fill` `configuration.yaml`, based on `sample.yaml`:
-
-## System Deployment
-``
-From the "source" folder, invoke:
-``
-```bash
-$ docker-compose up --build --force-recreate
-```
-
+2. Create a username, which must ends with 'bot' (it would be used as `url` to bot)
+   - ``` example: "t.me/name_of_your_bot" ```
+   
+3. Use command `/setprivacy` and choose `Disable` 
+4. Use `/setdescription` command to make bot description 
+5. Use `/setcommands` command to create `2 validation commands`:
+   - `start_validation` - command which initiates validation process
+   - `cancel_validation` - command which cancels validation process 
+   
+6. Navigate to `source.group_eq_bot` folder and follow system invocation steps
 
 ## Licence
 [Rebels.AI](https://rebels.ai) has made this service available for you to incorporate into your products under the [MIT Licence](https://mit-license.org). Feel free to remix and re-share the service and documentation in your products.
