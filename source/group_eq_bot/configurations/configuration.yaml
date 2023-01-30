@@ -1,0 +1,66 @@
+bot:
+  general:
+    name: group_eq_bot
+    version: 1.1.0
+#    token: 5923559802:AAH_hVDPmzve-TjpOyZNW3X2lqp52mgGmhY
+#    url: t.me/groupgardtest_bot
+    token: 5801832162:AAGIY7iGXrvl9_Og1pp9y_T08I6Ij9jHi_Q
+    url: https://t.me/GroupEQBot
+  logging:
+    directory: source/group_eq_bot/utilities/internal_logger/logs
+    warning_file_name: warnings.log
+    info_file_name: info.log
+  validation:
+    # now we support 10 questions overall
+    # this parameter is controlled in question schema (index_number)
+    questions:
+        [
+          {location_type: 'local', question_type: 'text', index_number: 2, question: None, question_path: '/assets/text/first_question.txt', answer: '2nd', attempts_to_fail: 2},
+          {location_type: 'local', question_type: 'text', index_number: 3, question: 'What"s your occupation ?', question_path: None, answer: '3rd', attempts_to_fail: 2},
+          {location_type: 'local', question_type: 'audio', index_number: 1, question: None, question_path: '/assets/audio/first_question.m4a', answer: '1st', attempts_to_fail: 3},
+        ]
+    welcome_message: |-
+        💃💃💃
+        К нам хочет присоединиться USERNAME
+
+        👁👄👁
+        || USERNAME, чтобы иметь полный доступ, тебе нужно пройти валидацию ||
+
+    remaining_attemps_message: |-
+            Я получил странный ответ 🗿🗿🗿 Попробуй еще раз!
+
+            Попыток осталось:
+    validation_failed_message: |-
+            Ты исчерпал все попытки 😬
+
+            🚫 Проверка провалена, доступ в группу будет закрыт 🚫
+    validation_canceled_message: " Чтобы начать сначала нажми '/start_validation' "
+    validation_passed_message: "💚 Проверка пройдена. Добро пожаловать! 💚"
+    stop_validation_for_owner: 'Ты создатель этой группы! 🤰🤰🤰 Тебя не нужно проверять'
+    bot_button_text: 'Чат со мной 🤖'
+    user_not_found: 'Я не нашел тебя в моих группах 🤨'
+    already_passed: '🌚 Ты уже прошел проверку! 🌝'
+    start_message_with_buttons: 'В каком чате ты хотел бы пройти валидацию?'
+    validation_started_message: 'Проверка началась:'
+    instruction: 'Привет! Чтобы начать проверку и получить доступ к чату нажми /start_validation.
+                  Если ты админ группы, то чтобы начать работу со мной добавь меня в свою группу и дай админские права'
+  talks:
+    faqing: 'Сейчас поищу в базе что у меня есть на этот счёт'
+    wasitusefull: 'Этот ответ помог?'
+    itwasusefull: 'Помогло'
+    itwasnotusefull: 'Не помогло'
+    callmeleathern: 'Позовите человека'
+    idontknow: 'У меня нет ответа на этот вопрос'
+
+events_database:
+  infrastructure:
+    number_of_shards: 2
+    number_of_replicas: 0
+  indices:
+    index_template: ${bot.general.name}-${bot.general.version}
+  available_hosts:
+    localhost: 127.0.0.1
+    container: host.docker.internal
+  which_host_to_use:
+#    host: ${events_database.available_hosts.container}  # is used in source.group_eq_bot.storage.events_driven_database.connectors.connector
+    host: ${events_database.available_hosts.localhost}
