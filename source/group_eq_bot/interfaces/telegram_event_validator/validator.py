@@ -89,6 +89,9 @@ class EventValidator:
         elif ChatType.private.value == chat_type:
             return ChatType.private.value
 
+        elif ChatType.group.value == chat_type:
+            return ChatType.supergroup.value
+
     def get_event_type(self) -> str:
         """ Function to get event_type from Message | Member | Bot event. """
 

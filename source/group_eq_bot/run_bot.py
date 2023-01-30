@@ -74,9 +74,18 @@ class BotBuilder:
         from interfaces.telegram_event_handlers.conversation_update.handler import ValidatorHandler
         self.bot.add_handler(ValidatorHandler)
 
+    # def _add_search_handler(self):
+    #     from interfaces.telegram_event_handlers.search.handler import SearchHandler
+    #     self.bot.add_handler(SearchHandler.handler)
+
+    def _add_faqbranch_handler(self):
+        from interfaces.telegram_event_handlers.faq_branch.handler import FaqBranchHandler
+        self.bot.add_handler(FaqBranchHandler)
+
     def __add_handlers(self):
         """ Helper method, which adds telegram_event_handlers to TelegramBot Application. """
 
+        self._add_faqbranch_handler()
         self._add_validation_handler()
         self._add_start_validation_handler()
         self._add_bot_handler()
@@ -85,6 +94,7 @@ class BotBuilder:
         self._add_text_handler()
         self._add_member_handler()
         self._add_document_handler()
+        # self._add_search_handler()
 
     def __build(self):
         """ Method, which attempts to build TelegramBot Application. """

@@ -15,5 +15,5 @@ class ChatType(Enum):
     """
 
     private = 'private'
-    # group = 'group'  #  Bot functions like restrict/ban don't work in groups
+    group = 'group'
     supergroup = 'supergroup'
