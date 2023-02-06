@@ -50,22 +50,23 @@ async def search_func(event: TelegramEvent, context: ContextTypes.DEFAULT_TYPE):
     dbase = open_database(file_name='database.txt')
     embeddings, q_list = create_embeddings(dbase)
     ex_q = find_similar_question(q_list, embeddings, question)
-    for item in dbase:
-        if item['question'] == ex_q:
-            answer_text = item['answers']
-            # question_id = 85118  #just for example
-            # question_id = item['id']
-            # print(type(question_id))
-    if len(answer_text) > 0:
-        for item in answer_text:
-            answer_message = item
-            await event.message.reply_text(text=answer_message)
-            # from_chat_id = self.internal_event.event.message.from_user.id
-            # await self.context.bot.forward_message(chat_id=self.internal_event.event.message.from_user.id, from_chat_id=from_chat_id,
-            #                                     message_id=question_id)
-    else:
-        await event.message.reply_text(text='Ничего не знаю про это')
+    answers_and_indexes = find_n_similar_questions(q_list, embeddings, question, deps=3)
+    final_answers = give_answer(dbase, answers_and_indexes)
+    print(final_answers)
+    for item in final_answers:
+        # await event.message.reply_text(text=item[0], reply_to_message_id=item[1])
+        await event.message.reply_text(text = item[0])
+    # for item in dbase:
+    #     if item['question'] == ex_q:
+    #         answer_text = item['answers']
+    #         if len(answer_text) > 0:
+    #             answer_message = 'Кажется об этом уже шла речь вот здесь ☝️'
+    #             await event.message.reply_text(text=answer_message, reply_to_message_id=item['id'])
     #
+    #         else:
+    #             await event.message.reply_text(text='Ничего не знаю про это')
+    #
+
 
     reply_keyboard = [
         [
@@ -78,7 +79,6 @@ async def search_func(event: TelegramEvent, context: ContextTypes.DEFAULT_TYPE):
     await event.message.reply_text(text="Скажи, ответ помог?", reply_markup=reply_markup)
 
     return BUTTON_PROCESSOR
-
 
 async def button_processor_yes(event: TelegramEvent, context: ContextTypes.DEFAULT_TYPE):
     query = event.callback_query
@@ -148,6 +148,39 @@ def find_similar_question(sentences, embeddings, question):
     dists = []
     ques_emb = model.encode(question)
     for sentence, embedding in zip(sentences, embeddings):
-        dists.append(distance.cosine(embedding,ques_emb))
+        dists.append(distance.cosine(embedding, ques_emb))
     ind = dists.index(min(dists))
     return sentences[ind]
+
+
+def find_n_similar_questions(sentences, embeddings, question, deps=10):
+    dists = []
+    question_embedding = model.encode(question)
+    for sentence, embedding in zip(sentences, embeddings):
+        dists.append(distance.cosine(embedding, question_embedding))
+    ans_n_index_list = []
+    i = 0
+    while i < deps:
+        ind = dists.index(min(dists))
+
+        ans_n_index_list.append([sentences[ind], ind])
+        dists.remove(min(dists))
+        i += 1
+
+    return ans_n_index_list
+
+def give_answer(database, answers_n_indexs):
+    what_to_say = []
+    for row in answers_n_indexs:
+        q = database[row[1]]['question']
+        mlink = database[row[1]]['message_url']
+        if len(database[row[1]]['answers']) > 0:
+            if 'thread_url' in database[row[1]].keys():
+                tlink = database[row[1]]['thread_url']
+                answer_message = f'Кажется вот здесь {mlink} уже шла речь о чем то похожем(весь диалог тут {tlink}): \n {q}'
+            else:
+                answer_message = f'Кажется вот здесь {mlink} уже шла речь о чем то похожем: \n {q}'
+        else:
+            answer_message = f'Кажется здесь {mlink} похожий вопрос остался без ответа: \n {q}'
+        what_to_say.append([answer_message, database[row[1]]['id']])
+    return what_to_say
