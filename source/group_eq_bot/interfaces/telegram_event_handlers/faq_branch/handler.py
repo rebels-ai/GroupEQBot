@@ -48,10 +48,12 @@ async def search_func(event: TelegramEvent, context: ContextTypes.DEFAULT_TYPE):
     logger.info('[Search] is called ...')
     # question.replace('#faq', '')
     dbase = open_database(file_name='database.txt')
-    embeddings, q_list = create_embeddings(dbase)
-    ex_q = find_similar_question(q_list, embeddings, question)
-    answers_and_indexes = find_n_similar_questions(q_list, embeddings, question, deps=3)
-    final_answers = give_answer(dbase, answers_and_indexes)
+    # embeddings, q_list = create_embeddings(dbase)
+    # ex_q = find_similar_question(q_list, embeddings, question)
+    # answers_and_indexes = find_n_similar_questions(q_list, embeddings, question, deps=3)
+    # final_answers = give_answer(dbase, answers_and_indexes)
+    answers_and_indexes = find_n_similar_questions_from_presaved_embaddings(dbase, question,  deps=3)
+    final_answers = give_n_answers(dbase, answers_and_indexes)
     print(final_answers)
     for item in final_answers:
         # await event.message.reply_text(text=item[0], reply_to_message_id=item[1])
@@ -166,7 +168,6 @@ def find_n_similar_questions(sentences, embeddings, question, deps=10):
         ans_n_index_list.append([sentences[ind], ind])
         dists.remove(min(dists))
         i += 1
-
     return ans_n_index_list
 
 def give_answer(database, answers_n_indexs):
@@ -183,4 +184,27 @@ def give_answer(database, answers_n_indexs):
         else:
             answer_message = f'Кажется здесь {mlink} похожий вопрос остался без ответа: \n {q}'
         what_to_say.append([answer_message, database[row[1]]['id']])
+    return what_to_say
+
+def find_n_similar_questions_from_presaved_embaddings(dbase, question, deps=10):
+    dists = []
+    question_embedding = model.encode(question)
+    for item in dbase:
+        dists.append(distance.cosine(item['embedding'], question_embedding))
+    ans_n_index_list = []
+    i = 0
+    while i < deps:
+        ind = dists.index(min(dists))
+        ans_n_index_list.append(ind)
+        dists.remove(min(dists))
+        i += 1
+    return ans_n_index_list
+
+def give_n_answers(database, answers_n_indexs):
+    what_to_say = []
+    for row in answers_n_indexs:
+        q = database[row]['question']
+        mlink = database[row]['message_url']
+        answer_message = f'Кажется здесь {mlink} уже шла речь об этом: \n {q}'
+        what_to_say.append([answer_message, database[row]['id']])
     return what_to_say
