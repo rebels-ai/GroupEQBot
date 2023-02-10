@@ -11,7 +11,7 @@ COPY ./requirements.txt requirements.txt
 
 RUN --mount=type=cache,target=/root/.cache \
 ( pip install --upgrade pip \
-  && pip install --upgrade -r requirements.txt
+  && pip install --upgrade -r requirements.txt \
 )
 
 CMD ["python", "./run_bot.py"]
