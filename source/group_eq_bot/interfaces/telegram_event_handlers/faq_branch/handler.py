@@ -129,6 +129,7 @@ FaqBranchHandler = ConversationHandler(entry_points=[MessageHandler(filters=filt
                                           CallbackQueryHandler(callback=button_processor_no, pattern="^"+str('No')+"$")],
                                   },
                                   fallbacks=[CommandHandler('cancel', cancel)],
+                                    conversation_timeout=30,
                                   )
 
 def open_database(file_name):
