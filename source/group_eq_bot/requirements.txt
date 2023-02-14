@@ -5,3 +5,4 @@ omegaconf~=2.2.3
 elasticsearch-dsl>=7.0.0,<8.0.0
 shortuuid==1.0.10
 sentence_transformers
+telegram
