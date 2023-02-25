@@ -2,10 +2,9 @@ bot:
   general:
     name: group_eq_bot
     version: 1.1.0
-#    token: 5923559802:AAH_hVDPmzve-TjpOyZNW3X2lqp52mgGmhY
-#    url: t.me/groupgardtest_bot
-    token: 5801832162:AAGIY7iGXrvl9_Og1pp9y_T08I6Ij9jHi_Q
-    url: https://t.me/GroupEQBot
+
+    token: TELEGRAM_BOT_TOKEN
+    url: TELEGRAM_BOT_URL
   logging:
     directory: source/group_eq_bot/utilities/internal_logger/logs
     warning_file_name: warnings.log
